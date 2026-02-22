@@ -23,27 +23,25 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             touch-action: none; /* Чтобы палец не скроллил страницу при движении */
         }
+        /* Стиль для панели ввода, чтобы она была более прозрачной */
+        .input-panel { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden">
 
     <div id="canvas-container"></div>
 
-    <!-- ВХОД -->
     <div id="auth-screen" class="glass-ui z-40 p-8 rounded-[2.5rem] w-full max-w-sm text-center space-y-6 mx-4">
         <h2 class="text-2xl font-black text-emerald-400 italic">GALAXY 4.0</h2>
         <input type="password" id="room-pass" placeholder="ПАРОЛЬ" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white text-center font-bold focus:border-emerald-500 outline-none">
         <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-black text-lg active:scale-95 transition-all">ВОЙТИ</button>
     </div>
 
-    <!-- ИНТЕРФЕЙС -->
     <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden">
         
-        <!-- ГЛАВНОЕ ВИДЕО (НА ВЕСЬ ЭКРАН) -->
         <div id="video-zone" class="absolute inset-0 bg-black flex items-center justify-center">
             <video id="remote-v" class="w-full h-full" autoplay playsinline></video>
             
-            <!-- МАЛЕНЬКОЕ ВИДЕО (ПЛАВАЮЩЕЕ) -->
             <video id="local-v" class="top-4 right-4 transform scale-x-[-1]" autoplay playsinline muted></video>
 
             <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-emerald-500 space-y-2">
@@ -52,13 +50,11 @@
             </div>
         </div>
 
-        <!-- НИЖНЯЯ ПАНЕЛЬ (КОМПАКТНАЯ) -->
-        <footer class="absolute bottom-0 left-0 w-full glass-ui p-4 rounded-t-[2rem] space-y-3">
+        <footer class="absolute bottom-0 left-0 w-full p-4 space-y-3 z-30">
             
-            <!-- Сообщения (теперь компактные поверх видео) -->
-            <div id="msgs" class="max-h-24 overflow-y-auto no-scrollbar space-y-1 mb-2"></div>
+            <div id="msgs" class="max-h-36 overflow-y-auto no-scrollbar space-y-1 mb-2 px-2"></div>
 
-            <div id="setup-controls" class="flex flex-col gap-2">
+            <div id="setup-controls" class="flex flex-col gap-2 glass-ui p-3 rounded-2xl">
                 <div class="flex justify-between items-center px-1">
                     <span class="text-[8px] text-gray-400 uppercase font-bold">Твой ID: <span id="display-id" class="text-emerald-400 ml-1">----</span></span>
                     <button onclick="location.reload()" class="text-[8px] text-red-400 font-bold uppercase">Сброс</button>
@@ -69,10 +65,10 @@
                 </div>
             </div>
 
-            <div id="chat-controls" class="flex gap-2 hidden">
-                <button id="call-btn" class="bg-emerald-500/20 p-3 rounded-xl text-emerald-400">🎥</button>
-                <input type="text" id="msg-in" placeholder="Сигнал..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm">
-                <button id="send-btn" class="bg-indigo-600 px-4 rounded-xl font-bold">🚀</button>
+            <div id="chat-controls" class="flex gap-2 hidden input-panel p-3 rounded-2xl transition-all duration-300">
+                <button id="call-btn" class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400">🎥</button>
+                <input type="text" id="msg-in" placeholder="Сигнал..." class="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-sm outline-none focus:border-emerald-500/50">
+                <button id="send-btn" class="bg-indigo-600/80 px-4 rounded-xl font-bold">🚀</button>
             </div>
         </footer>
     </main>
@@ -146,13 +142,23 @@
             peer.on('connection', c => { conn = c; bindEvents(); });
             peer.on('call', async call => {
                 if(confirm('ПРИНЯТЬ ВЫЗОВ?')) {
-                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    localV.srcObject = localStream;
-                    call.answer(localStream);
-                    call.on('stream', s => {
-                        document.getElementById('remote-v').srcObject = s;
-                        document.getElementById('video-wait').style.display = 'none';
-                    });
+                    try {
+                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        localV.srcObject = localStream;
+                        call.answer(localStream);
+                        call.on('stream', s => {
+                            document.getElementById('remote-v').srcObject = s;
+                            document.getElementById('video-wait').style.display = 'none';
+                        });
+                        call.on('close', () => { // Обработка завершения звонка
+                             document.getElementById('remote-v').srcObject = null;
+                             document.getElementById('video-wait').style.display = 'flex';
+                             addMsg('СИГНАЛ ПОТЕРЯН', true);
+                        });
+                    } catch (e) {
+                        alert("Ошибка доступа к камере/микрофону");
+                        console.error(e);
+                    }
                 }
             });
         }
@@ -171,6 +177,7 @@
                 document.getElementById('chat-controls').classList.remove('hidden');
             });
             conn.on('data', d => addMsg(d, false));
+            conn.on('close', () => addMsg('СВЯЗЬ ПРЕРВАНА', true)); // Обработка разрыва соединения
         }
 
         function addMsg(text, isSys) {
@@ -182,7 +189,8 @@
                 const isMine = text.startsWith('me:');
                 const clean = isMine ? text.replace('me:', '') : text;
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/80' : 'bg-white/10'} px-3 py-1 rounded-xl text-xs max-w-[80%] backdrop-blur-sm">${clean}</div>`;
+                // Сделал фон сообщений более прозрачным (bg-emerald-600/40 и bg-white/5)
+                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/40' : 'bg-white/5'} px-3 py-1 rounded-xl text-xs max-w-[80%] backdrop-blur-sm">${clean}</div>`;
             }
             const msgs = document.getElementById('msgs');
             msgs.appendChild(d);
@@ -208,9 +216,26 @@
                     document.getElementById('remote-v').srcObject = s;
                     document.getElementById('video-wait').style.display = 'none';
                 });
-            } catch(e) { alert("Ошибка камеры!"); }
+                call.on('close', () => { // Обработка завершения звонка
+                     document.getElementById('remote-v').srcObject = null;
+                     document.getElementById('video-wait').style.display = 'flex';
+                     addMsg('СИГНАЛ ПОТЕРЯН', true);
+                });
+            } catch(e) { 
+                alert("Ошибка камеры!"); 
+                console.error(e);
+            }
         };
+
+        // Фикс для клавиатуры: поднимаем панель при фокусе
+        const msgIn = document.getElementById('msg-in');
+        const chatControls = document.getElementById('chat-controls');
+        msgIn.addEventListener('focus', () => {
+            chatControls.classList.add('mb-8'); 
+        });
+        msgIn.addEventListener('blur', () => {
+            chatControls.classList.remove('mb-8');
+        });
     </script>
 </body>
 </html>
-
