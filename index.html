@@ -3,74 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy Chat 3.3 | Stable</title>
+    <title>Galaxy Chat 3.4 | Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
-        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-        .active-ring { animation: pulse-green 2s infinite; }
+        video { background-color: #000; border-radius: 12px; }
     </style>
 </head>
 <body class="h-screen w-screen flex items-center justify-center p-2">
 
     <div id="canvas-container"></div>
 
-    <!-- ЭКРАН ВХОДА -->
     <div id="auth-screen" class="glass z-20 p-8 rounded-3xl w-full max-w-sm text-center space-y-6 shadow-2xl">
-        <h2 class="text-2xl font-bold text-emerald-400 uppercase tracking-widest">Вход в сектор</h2>
-        <input type="password" id="room-pass" placeholder="Секретное слово..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-center">
-        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-xl font-bold hover:bg-emerald-500 transition shadow-lg">ЗАПУСТИТЬ СИСТЕМУ</button>
+        <h2 class="text-2xl font-bold text-emerald-400 uppercase tracking-widest">Сектор Связи</h2>
+        <input type="password" id="room-pass" placeholder="Пароль комнаты..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-center font-bold">
+        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-xl font-bold hover:bg-emerald-500 transition shadow-lg">ВОЙТИ В ЭФИР</button>
     </div>
 
-    <!-- ГЛАВНЫЙ ИНТЕРФЕЙС -->
     <main id="chat-ui" class="glass w-full max-w-md h-[100dvh] sm:h-[85vh] sm:rounded-3xl flex flex-col relative z-10 overflow-hidden hidden">
         <header class="p-4 border-b border-white/10 bg-black/40 flex justify-between items-center">
             <div>
-                <h1 class="font-bold text-emerald-400 text-xs">GALAXY 3.3</h1>
-                <div id="status" class="text-[9px] text-yellow-400 uppercase font-bold">Подключение...</div>
+                <h1 class="font-bold text-emerald-400 text-[10px] uppercase">Galaxy Chat 3.4</h1>
+                <div id="status" class="text-[8px] text-yellow-400 uppercase font-bold tracking-widest">Запуск...</div>
             </div>
-            <button onclick="location.reload()" class="text-gray-400 hover:text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            </button>
+            <button onclick="location.reload()" class="text-gray-400 hover:text-white p-1">🔄</button>
         </header>
 
-        <!-- Видео -->
-        <div id="video-zone" class="relative w-full aspect-video bg-black/90 hidden border-b border-white/10">
+        <div id="video-zone" class="relative w-full aspect-video bg-black hidden border-b border-emerald-500/20">
             <video id="remote-v" class="w-full h-full object-cover" autoplay playsinline></video>
-            <video id="local-v" class="absolute bottom-2 right-2 w-28 rounded-lg border-2 border-emerald-500 object-cover shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
+            <video id="local-v" class="absolute bottom-2 right-2 w-28 rounded-lg border border-emerald-500 object-cover shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
         </div>
 
-        <!-- Чат -->
         <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
-            <div id="my-code-display" class="bg-white/5 border border-white/10 p-3 rounded-xl text-center mb-4">
-                <p class="text-[10px] text-gray-400 uppercase">Твой ID (сообщи напарнику):</p>
-                <p id="display-id" class="text-xl font-mono font-bold text-emerald-400 tracking-widest">---</p>
+            <div id="id-card" class="bg-black/40 border border-white/5 p-4 rounded-2xl text-center mb-4">
+                <p class="text-[8px] text-gray-500 uppercase tracking-widest mb-1">Твой позывной:</p>
+                <p id="display-id" class="text-2xl font-mono font-bold text-emerald-400 tracking-[0.3em]">----</p>
             </div>
         </div>
 
-        <!-- Кнопки -->
-        <form id="msg-form" class="p-3 bg-black/40 border-t border-white/10 flex flex-col gap-2">
-            <div id="connection-controls" class="flex gap-2 mb-1">
-                <input type="text" id="target-id" placeholder="ID напарника..." class="flex-1 bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none">
-                <button type="button" id="connect-btn" class="bg-emerald-600 px-4 py-2 rounded-xl text-xs font-bold">СВЯЗЬ</button>
+        <form id="msg-form" class="p-3 bg-black/60 border-t border-white/10 flex flex-col gap-2">
+            <div id="setup-controls" class="flex gap-2">
+                <input type="text" id="target-id" placeholder="ID НАПАРНИКА..." class="flex-1 bg-black/50 border border-white/5 rounded-xl px-4 py-2 text-xs text-white outline-none focus:border-emerald-500 uppercase">
+                <button type="button" id="connect-btn" class="bg-emerald-600 px-6 py-2 rounded-xl text-xs font-bold">СВЯЗЬ</button>
             </div>
-            <div class="flex gap-2">
-                <button type="button" id="call-btn" class="bg-white/5 p-2 rounded-xl text-emerald-400 border border-white/10 hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                </button>
-                <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-white outline-none disabled:opacity-50" disabled>
-                <button type="submit" id="send-btn" class="bg-indigo-600 p-2 px-4 rounded-xl text-white disabled:opacity-50" disabled>🚀</button>
+            <div id="chat-controls" class="flex gap-2 hidden">
+                <button type="button" id="call-btn" class="bg-emerald-500/20 p-2 rounded-xl text-emerald-400 border border-emerald-500/30">🎥</button>
+                <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 bg-black/50 border border-white/5 rounded-xl px-4 py-2 text-sm text-white outline-none">
+                <button type="submit" class="bg-indigo-600 p-2 px-5 rounded-xl text-white font-bold">🚀</button>
             </div>
         </form>
     </main>
 
     <script>
-        // --- КОСМОС (THREE.JS) ---
+        // --- ГРАФИКА (ЗВЕЗДЫ) ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
@@ -81,56 +71,50 @@
         const pos = new Float32Array(50000 * 3);
         for(let i=0; i<150000; i++) pos[i] = (Math.random() - 0.5) * 20;
         geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        const stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.02, color: 0x10b981, transparent: true, opacity: 0.5 }));
+        const stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.015, color: 0x10b981, transparent: true, opacity: 0.5 }));
         scene.add(stars);
-        function animate() { stars.rotation.y += 0.0005; renderer.render(scene, camera); requestAnimationFrame(animate); }
+        function animate() { stars.rotation.y += 0.0003; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        // --- ЛОГИКА СВЯЗИ ---
+        // --- ЛОГИКА P2P ---
         let peer = null; let conn = null; let localStream = null; let roomPass = "";
 
         document.getElementById('auth-btn').onclick = () => {
-            roomPass = document.getElementById('room-pass').value.trim();
+            roomPass = document.getElementById('room-pass').value.trim().toLowerCase();
             if(!roomPass) return;
-            startPeer();
+            initPeer();
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('chat-ui').classList.remove('hidden');
         };
 
-        function startPeer() {
-            // Создаем ID: Пароль + Рандом (4 знака)
-            const myShortId = Math.random().toString(36).substring(2, 6).toUpperCase();
-            peer = new Peer(roomPass + '-' + myShortId.toLowerCase(), {
-                debug: 2,
+        function initPeer() {
+            const shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
+            peer = new Peer(roomPass + '-' + shortId.toLowerCase(), {
                 config: {'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }]}
             });
 
             peer.on('open', (id) => {
-                document.getElementById('display-id').textContent = myShortId;
+                document.getElementById('display-id').textContent = shortId;
                 document.getElementById('status').textContent = 'В ЭФИРЕ';
-                document.getElementById('status').className = 'text-[9px] text-emerald-400 font-bold';
-            });
-
-            peer.on('error', (err) => {
-                console.error(err);
-                document.getElementById('status').textContent = 'ОШИБКА СЕТИ';
-                if(err.type === 'peer-unavailable') alert('Напарник не найден. Проверь его ID!');
+                document.getElementById('status').className = 'text-[8px] text-emerald-400 font-bold';
             });
 
             peer.on('connection', (c) => {
                 conn = c;
-                initConnection();
+                bindEvents();
             });
 
             peer.on('call', async (call) => {
-                if(confirm('Входящий видеозвонок!')) {
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('local-v').srcObject = localStream;
-                        document.getElementById('video-zone').classList.remove('hidden');
-                        call.answer(localStream);
-                        call.on('stream', s => document.getElementById('remote-v').srcObject = s);
-                    } catch(e) { alert("Ошибка камеры!"); }
+                if(confirm('ВХОДЯЩИЙ ВЫЗОВ!')) {
+                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('local-v').srcObject = localStream;
+                    document.getElementById('video-zone').classList.remove('hidden');
+                    call.answer(localStream);
+                    call.on('stream', s => {
+                        const rv = document.getElementById('remote-v');
+                        rv.srcObject = s;
+                        rv.play(); // СИЛОВОЙ ПИНОК ДЛЯ ВИДЕО
+                    });
                 }
             });
         }
@@ -139,32 +123,27 @@
             const tid = document.getElementById('target-id').value.trim().toLowerCase();
             if(!tid) return;
             conn = peer.connect(roomPass + '-' + tid);
-            initConnection();
+            bindEvents();
         };
 
-        function initConnection() {
+        function bindEvents() {
             conn.on('open', () => {
-                addMessage('Связь установлена!', false, true);
-                document.getElementById('msg-in').disabled = false;
-                document.getElementById('send-btn').disabled = false;
-                document.getElementById('call-btn').classList.remove('hidden');
-                document.getElementById('connection-controls').classList.add('hidden');
+                addMsg('СВЯЗЬ УСТАНОВЛЕНА', false, true);
+                document.getElementById('setup-controls').classList.add('hidden');
+                document.getElementById('chat-controls').classList.remove('hidden');
+                document.getElementById('id-card').classList.add('hidden');
             });
-            conn.on('data', d => addMessage(d, false));
-            conn.on('close', () => {
-                addMessage('Связь потеряна.', false, true);
-                location.reload();
-            });
+            conn.on('data', d => addMsg(d, false));
         }
 
-        function addMessage(text, isMine, isSys=false) {
+        function addMsg(text, mine, sys=false) {
             const d = document.createElement('div');
-            if(isSys) {
-                d.className = 'text-center text-[10px] text-emerald-400 uppercase font-bold my-2';
-                d.textContent = text;
+            if(sys) {
+                d.className = 'text-center text-[9px] text-emerald-400 font-bold uppercase my-2';
+                d.textContent = `--- ${text} ---`;
             } else {
-                d.className = `flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600' : 'bg-white/10 border border-white/10'} px-4 py-2 rounded-2xl text-sm max-w-[85%]">${text}</div>`;
+                d.className = `flex ${mine ? 'justify-end' : 'justify-start'} mb-2`;
+                d.innerHTML = `<div class="${mine ? 'bg-emerald-600' : 'bg-white/10 border border-white/10'} px-4 py-2 rounded-2xl text-sm max-w-[85%]">${text}</div>`;
             }
             const msgs = document.getElementById('msgs');
             msgs.appendChild(d);
@@ -176,7 +155,7 @@
             const val = document.getElementById('msg-in').value.trim();
             if(val && conn && conn.open) {
                 conn.send(val);
-                addMessage(val, true);
+                addMsg(val, true);
                 document.getElementById('msg-in').value = '';
             }
         };
@@ -187,10 +166,13 @@
                 document.getElementById('local-v').srcObject = localStream;
                 document.getElementById('video-zone').classList.remove('hidden');
                 const call = peer.call(conn.peer, localStream);
-                call.on('stream', s => document.getElementById('remote-v').srcObject = s);
-            } catch(e) { alert("Нет доступа к камере!"); }
+                call.on('stream', s => {
+                    const rv = document.getElementById('remote-v');
+                    rv.srcObject = s;
+                    rv.play(); // СИЛОВОЙ ПИНОК
+                });
+            } catch(e) { alert("Камера недоступна!"); }
         };
     </script>
 </body>
 </html>
-
