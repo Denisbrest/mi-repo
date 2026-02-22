@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy Chat 3.5 | Pro Edition</title>
+    <title>Galaxy Chat 3.6 | Global Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: system-ui, -apple-system, sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        video { background: #000; object-fit: cover; width: 100%; height: 100%; border-radius: 12px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        .anim-pulse { animation: pulse 1.5s infinite; }
+        video { background-color: #000; border-radius: 20px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.2); }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        .scanning::after { content: ""; position: absolute; left: 0; width: 100%; height: 2px; background: #10b981; box-shadow: 0 0 15px #10b981; animation: scan 2s linear infinite; }
     </style>
 </head>
 <body class="h-[100dvh] w-screen flex items-center justify-center p-2">
@@ -23,98 +22,75 @@
     <div id="canvas-container"></div>
 
     <!-- ЭКРАН ВХОДА -->
-    <div id="auth-screen" class="glass z-20 p-8 rounded-[2rem] w-full max-w-sm text-center space-y-6 shadow-2xl border border-emerald-500/30">
-        <div class="text-6xl mb-2">🚀</div>
-        <h2 class="text-2xl font-black text-emerald-400 uppercase tracking-[0.2em]">Galaxy Pro</h2>
-        <input type="password" id="room-pass" placeholder="Пароль комнаты..." class="w-full bg-black/50 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-center font-bold placeholder-gray-600">
-        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] active:scale-95 text-lg">ВЫЙТИ В ЭФИР</button>
+    <div id="auth-screen" class="glass z-20 p-8 rounded-[2.5rem] w-full max-w-sm text-center space-y-6 shadow-2xl">
+        <div class="text-6xl">🌍</div>
+        <h2 class="text-2xl font-black text-emerald-400 uppercase tracking-widest">Global Link</h2>
+        <p class="text-[10px] text-gray-500 uppercase tracking-tighter font-bold">Децентрализованная связь без границ</p>
+        <input type="password" id="room-pass" placeholder="Секретное слово..." class="w-full bg-black/50 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-center font-bold">
+        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition shadow-lg active:scale-95">УСТАНОВИТЬ КАНАЛ</button>
     </div>
 
-    <!-- ГЛАВНЫЙ ИНТЕРФЕЙС -->
+    <!-- ИНТЕРФЕЙС -->
     <main id="chat-ui" class="glass w-full max-w-md h-full sm:h-[85vh] sm:rounded-[2.5rem] flex flex-col relative z-10 overflow-hidden hidden shadow-2xl">
-        
-        <!-- Шапка -->
         <header class="p-4 border-b border-white/10 bg-black/40 flex justify-between items-center">
-            <div>
-                <h1 class="font-black text-emerald-400 text-xs tracking-widest uppercase">Система 3.5</h1>
-                <div id="status-container" class="flex items-center">
-                    <span id="status-dot" class="status-dot bg-yellow-500 anim-pulse"></span>
-                    <span id="status-text" class="text-[9px] text-gray-400 uppercase font-bold">Запуск...</span>
+            <div class="flex items-center gap-3">
+                <div id="signal-indicator" class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                <div>
+                    <h1 class="font-black text-emerald-400 text-[10px] uppercase">Galaxy Global 3.6</h1>
+                    <div id="status" class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">Инициализация...</div>
                 </div>
             </div>
-            <button onclick="location.reload()" class="bg-white/5 p-2 rounded-full text-gray-400 hover:text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <button onclick="location.reload()" class="p-2 text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
         </header>
 
-        <!-- ВИДЕО-ОТСЕК -->
-        <div id="video-zone" class="relative w-full aspect-video bg-black hidden border-b border-emerald-500/20 group">
-            <video id="remote-v" autoplay playsinline></video>
-            <div id="video-placeholder" class="absolute inset-0 flex items-center justify-center text-xs text-gray-600 uppercase tracking-widest bg-black">Ожидание потока...</div>
-            <video id="local-v" class="absolute bottom-2 right-2 w-28 rounded-xl border-2 border-emerald-500 shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
-            
-            <!-- Кнопка форсирования звука -->
-            <button id="unmute-btn" class="absolute inset-0 w-full h-full bg-black/60 flex flex-col items-center justify-center gap-2 z-30 hidden">
-                <div class="p-4 bg-emerald-600 rounded-full shadow-lg">🔊</div>
-                <span class="text-xs font-bold uppercase tracking-widest">Включить звук и видео</span>
-            </button>
+        <div id="video-zone" class="relative w-full aspect-video bg-black hidden border-b border-emerald-500/20 overflow-hidden">
+            <div class="absolute inset-0 scanning z-10 opacity-20 pointer-events-none"></div>
+            <video id="remote-v" class="w-full h-full object-cover" autoplay playsinline></video>
+            <video id="local-v" class="absolute bottom-2 right-2 w-28 rounded-xl border border-emerald-500 shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
         </div>
 
-        <!-- ЧАТ И ID -->
-        <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col bg-black/10">
-            <div id="my-id-box" class="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-3xl text-center mb-4 backdrop-blur-md">
-                <p class="text-[8px] text-gray-500 uppercase tracking-[0.3em] mb-1 font-bold">Твой космический код:</p>
-                <p id="display-id" class="text-3xl font-mono font-black text-emerald-400 tracking-[0.2em] uppercase select-all">----</p>
-                <p class="text-[7px] text-gray-600 mt-2 uppercase font-bold">Напарник должен ввести его внизу</p>
+        <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
+            <div id="id-info" class="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-3xl text-center mb-4">
+                <p class="text-[8px] text-gray-500 uppercase tracking-widest mb-1">Твой глобальный позывной:</p>
+                <p id="display-id" class="text-3xl font-mono font-black text-emerald-400 tracking-widest uppercase">----</p>
             </div>
         </div>
 
-        <!-- УПРАВЛЕНИЕ -->
-        <footer class="p-4 bg-black/60 border-t border-white/10 space-y-3">
-            <div id="conn-form" class="flex gap-2">
-                <input type="text" id="target-id" placeholder="КОД НАПАРНИКА..." class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-emerald-500 transition-all uppercase font-mono tracking-widest">
-                <button id="connect-btn" class="bg-emerald-600 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95">СВЯЗЬ</button>
+        <form id="msg-form" class="p-4 bg-black/60 border-t border-white/10 space-y-3">
+            <div id="setup-box" class="flex gap-2">
+                <input type="text" id="target-id" placeholder="ID НАПАРНИКА..." class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white outline-none focus:border-emerald-500 uppercase font-mono">
+                <button type="button" id="connect-btn" class="bg-emerald-600 px-6 py-3 rounded-2xl text-xs font-black uppercase shadow-lg active:scale-95">СВЯЗЬ</button>
             </div>
             
-            <div id="chat-controls" class="flex gap-2 hidden">
-                <button id="call-btn" class="bg-emerald-500/20 p-3 rounded-2xl text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/40 transition active:scale-90">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                </button>
+            <div id="chat-box" class="flex gap-2 hidden">
+                <button type="button" id="call-btn" class="bg-emerald-500/10 p-3 rounded-2xl text-emerald-400 border border-emerald-500/20 active:scale-90">🎥</button>
                 <input type="text" id="msg-in" placeholder="Введите сообщение..." class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none">
-                <button id="send-btn" class="bg-indigo-600 p-3 px-6 rounded-2xl text-white font-bold transition-all active:scale-95">🚀</button>
+                <button type="submit" class="bg-indigo-600 p-3 px-6 rounded-2xl text-white font-bold">🚀</button>
             </div>
-        </footer>
+        </form>
     </main>
 
     <script>
-        // --- ГРАФИКА: 100 000 ЗВЕЗД ---
+        // --- ГРАФИКА: 100k STARS ---
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        const starGeo = new THREE.BufferGeometry();
-        const starPos = new Float32Array(80000 * 3);
-        for(let i=0; i<240000; i++) starPos[i] = (Math.random() - 0.5) * 20;
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.015, color: 0x10b981, transparent: true, opacity: 0.4 }));
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(60000 * 3);
+        for(let i=0; i<180000; i++) pos[i] = (Math.random() - 0.5) * 20;
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.015, color: 0x10b981, transparent: true, opacity: 0.4 }));
         scene.add(stars);
-
-        function animate() {
-            stars.rotation.y += 0.0003;
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
+        function animate() { stars.rotation.y += 0.0003; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        // --- ЛОГИКА P2P СВЯЗИ ---
-        let peer = null, conn = null, localStream = null, currentCall = null;
-        let roomPass = "";
-
-        const statusText = document.getElementById('status-text');
-        const statusDot = document.getElementById('status-dot');
+        // --- ГЛОБАЛЬНАЯ СВЯЗЬ (PEERJS + STUN) ---
+        let peer = null; let conn = null; let localStream = null; let roomPass = "";
 
         document.getElementById('auth-btn').onclick = () => {
             roomPass = document.getElementById('room-pass').value.trim().toLowerCase();
@@ -124,21 +100,26 @@
             document.getElementById('chat-ui').classList.remove('hidden');
         };
 
-        function setStatus(text, colorClass) {
-            statusText.textContent = text;
-            statusDot.className = `status-dot ${colorClass} ${colorClass === 'bg-emerald-500' ? '' : 'anim-pulse'}`;
-        }
-
         function initPeer() {
             const shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
+            
+            // Расширенный список STUN серверов для международных звонков
             peer = new Peer(roomPass + '-' + shortId.toLowerCase(), {
-                debug: 1,
-                config: {'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }, { 'urls': 'stun:stun1.l.google.com:19302' }]}
+                config: {
+                    'iceServers': [
+                        { 'urls': 'stun:stun.l.google.com:19302' },
+                        { 'urls': 'stun:stun1.l.google.com:19302' },
+                        { 'urls': 'stun:stun2.l.google.com:19302' },
+                        { 'urls': 'stun:stun3.l.google.com:19302' },
+                        { 'urls': 'stun:stun.services.mozilla.com' }
+                    ]
+                }
             });
 
             peer.on('open', (id) => {
                 document.getElementById('display-id').textContent = shortId;
-                setStatus('В ЭФИРЕ', 'bg-emerald-500');
+                document.getElementById('status').textContent = 'Глобальный узел активен';
+                document.getElementById('signal-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]';
             });
 
             peer.on('connection', (c) => {
@@ -147,47 +128,18 @@
             });
 
             peer.on('call', async (call) => {
-                currentCall = call;
-                if(confirm('ВХОДЯЩИЙ ВИДЕОЗВОНОК!')) {
+                if(confirm('Входящий видеосигнал! Принять?')) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         document.getElementById('local-v').srcObject = localStream;
                         document.getElementById('video-zone').classList.remove('hidden');
                         call.answer(localStream);
-                        handleStream(call);
-                    } catch(e) { 
-                        alert("Камера недоступна! Возможно, её юзает другое окно."); 
-                        console.error(e);
-                    }
-                }
-            });
-
-            peer.on('error', (err) => {
-                console.error('PeerJS Error:', err);
-                if(err.type === 'peer-unavailable') setStatus('ОШИБКА: ID НЕ НАЙДЕН', 'bg-red-500');
-                else setStatus('ОШИБКА СЕТИ', 'bg-red-500');
-            });
-        }
-
-        function handleStream(call) {
-            const rv = document.getElementById('remote-v');
-            const unmuteBtn = document.getElementById('unmute-btn');
-            
-            call.on('stream', (stream) => {
-                rv.srcObject = stream;
-                document.getElementById('video-placeholder').classList.add('hidden');
-                
-                // Проверка на автоплей
-                const playPromise = rv.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        // Браузер заблокировал звук. Показываем кнопку.
-                        unmuteBtn.classList.remove('hidden');
-                        unmuteBtn.onclick = () => {
+                        call.on('stream', s => {
+                            const rv = document.getElementById('remote-v');
+                            rv.srcObject = s;
                             rv.play();
-                            unmuteBtn.classList.add('hidden');
-                        };
-                    });
+                        });
+                    } catch(e) { alert("Ошибка камеры!"); }
                 }
             });
         }
@@ -201,33 +153,29 @@
 
         function bindEvents() {
             conn.on('open', () => {
-                addMsg('КАНАЛ СВЯЗИ УСТАНОВЛЕН', false, true);
-                document.getElementById('conn-form').classList.add('hidden');
-                document.getElementById('chat-controls').classList.remove('hidden');
-                document.getElementById('my-id-box').classList.add('hidden');
+                addMsg('ПРЯМОЙ КАНАЛ ПРОБИТ', false, true);
+                document.getElementById('setup-box').classList.add('hidden');
+                document.getElementById('chat-box').classList.remove('hidden');
+                document.getElementById('id-info').classList.add('hidden');
             });
             conn.on('data', d => addMsg(d, false));
-            conn.on('close', () => {
-                addMsg('СВЯЗЬ ПОТЕРЯНА', false, true);
-                setTimeout(() => location.reload(), 2000);
-            });
         }
 
         function addMsg(text, isMine, isSys=false) {
             const d = document.createElement('div');
             if(isSys) {
-                d.className = 'text-center text-[10px] text-emerald-400 font-black uppercase my-4 tracking-[0.3em] opacity-80';
+                d.className = 'text-center text-[9px] text-emerald-400 font-black uppercase my-4 tracking-[0.4em]';
                 d.textContent = `--- ${text} ---`;
             } else {
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'} mb-3`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600 shadow-xl' : 'bg-white/10 border border-white/10 text-gray-200'} px-5 py-3 rounded-[1.5rem] text-sm max-w-[85%] backdrop-blur-md">${text}</div>`;
+                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600 shadow-xl' : 'bg-white/10 border border-white/10 text-gray-100'} px-5 py-2.5 rounded-[1.3rem] text-sm max-w-[85%] backdrop-blur-md">${text}</div>`;
             }
             const msgs = document.getElementById('msgs');
             msgs.appendChild(d);
             msgs.scrollTop = msgs.scrollHeight;
         }
 
-        document.getElementById('send-btn').onclick = (e) => {
+        document.getElementById('msg-form').onsubmit = (e) => {
             e.preventDefault();
             const val = document.getElementById('msg-in').value.trim();
             if(val && conn && conn.open) {
@@ -242,14 +190,13 @@
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 document.getElementById('local-v').srcObject = localStream;
                 document.getElementById('video-zone').classList.remove('hidden');
-                
-                const tid = conn.peer;
-                const call = peer.call(tid, localStream);
-                currentCall = call;
-                handleStream(call);
-            } catch(e) { 
-                alert("Ошибка камеры! Проверьте разрешения в браузере."); 
-            }
+                const call = peer.call(conn.peer, localStream);
+                call.on('stream', s => {
+                    const rv = document.getElementById('remote-v');
+                    rv.srcObject = s;
+                    rv.play();
+                });
+            } catch(e) { alert("Камера недоступна!"); }
         };
     </script>
 </body>
