@@ -3,77 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy Chat 3.6 | Global Edition</title>
+    <title>Galaxy Chat 3.7 | Clean Air</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #050505; color: white; font-family: sans-serif; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-panel { background: rgba(10, 10, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        video { background-color: #000; border-radius: 20px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.2); }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-        .scanning::after { content: ""; position: absolute; left: 0; width: 100%; height: 2px; background: #10b981; box-shadow: 0 0 15px #10b981; animation: scan 2s linear infinite; }
+        video { background-color: #000; border-radius: 16px; object-fit: cover; }
+        .status-pulse { width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 10px #10b981; }
     </style>
 </head>
 <body class="h-[100dvh] w-screen flex items-center justify-center p-2">
 
+    <!-- ФОН: ЗВЕЗДЫ -->
     <div id="canvas-container"></div>
 
-    <!-- ЭКРАН ВХОДА -->
-    <div id="auth-screen" class="glass z-20 p-8 rounded-[2.5rem] w-full max-w-sm text-center space-y-6 shadow-2xl">
-        <div class="text-6xl">🌍</div>
-        <h2 class="text-2xl font-black text-emerald-400 uppercase tracking-widest">Global Link</h2>
-        <p class="text-[10px] text-gray-500 uppercase tracking-tighter font-bold">Децентрализованная связь без границ</p>
-        <input type="password" id="room-pass" placeholder="Секретное слово..." class="w-full bg-black/50 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none text-center font-bold">
-        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition shadow-lg active:scale-95">УСТАНОВИТЬ КАНАЛ</button>
+    <!-- ВХОД -->
+    <div id="auth-screen" class="glass-panel z-20 p-8 rounded-[2rem] w-full max-w-sm text-center space-y-6 shadow-2xl">
+        <h2 class="text-2xl font-bold text-emerald-400 uppercase tracking-widest">Вход в сектор</h2>
+        <input type="password" id="room-pass" placeholder="Пароль..." class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:border-emerald-500 outline-none text-center font-bold">
+        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition active:scale-95">ВОЙТИ</button>
     </div>
 
     <!-- ИНТЕРФЕЙС -->
-    <main id="chat-ui" class="glass w-full max-w-md h-full sm:h-[85vh] sm:rounded-[2.5rem] flex flex-col relative z-10 overflow-hidden hidden shadow-2xl">
-        <header class="p-4 border-b border-white/10 bg-black/40 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div id="signal-indicator" class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                <div>
-                    <h1 class="font-black text-emerald-400 text-[10px] uppercase">Galaxy Global 3.6</h1>
-                    <div id="status" class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">Инициализация...</div>
-                </div>
+    <main id="chat-ui" class="glass-panel w-full max-w-md h-full sm:h-[90vh] sm:rounded-[2.5rem] flex flex-col relative z-10 overflow-hidden hidden shadow-2xl">
+        
+        <header class="p-4 border-b border-white/5 flex justify-between items-center bg-black/20">
+            <div class="flex items-center gap-2">
+                <div class="status-pulse"></div>
+                <h1 class="font-bold text-emerald-400 text-xs uppercase tracking-tighter">Galaxy 3.7 | Clean</h1>
             </div>
-            <button onclick="location.reload()" class="p-2 text-gray-400 hover:text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            </button>
+            <button onclick="location.reload()" class="text-gray-500 hover:text-white p-2 text-xs uppercase font-bold">Сброс</button>
         </header>
 
-        <div id="video-zone" class="relative w-full aspect-video bg-black hidden border-b border-emerald-500/20 overflow-hidden">
-            <div class="absolute inset-0 scanning z-10 opacity-20 pointer-events-none"></div>
-            <video id="remote-v" class="w-full h-full object-cover" autoplay playsinline></video>
-            <video id="local-v" class="absolute bottom-2 right-2 w-28 rounded-xl border border-emerald-500 shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
+        <!-- ВИДЕО -->
+        <div id="video-zone" class="relative w-full aspect-video bg-black hidden border-b border-white/5">
+            <video id="remote-v" class="w-full h-full" autoplay playsinline></video>
+            <video id="local-v" class="absolute bottom-2 right-2 w-28 h-36 rounded-xl border border-emerald-500/50 shadow-2xl transform scale-x-[-1]" autoplay playsinline muted></video>
         </div>
 
-        <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
-            <div id="id-info" class="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-3xl text-center mb-4">
-                <p class="text-[8px] text-gray-500 uppercase tracking-widest mb-1">Твой глобальный позывной:</p>
-                <p id="display-id" class="text-3xl font-mono font-black text-emerald-400 tracking-widest uppercase">----</p>
+        <!-- КОНТЕНТ -->
+        <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar flex flex-col">
+            <div id="id-card" class="bg-white/5 border border-white/10 p-4 rounded-2xl text-center">
+                <p class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Ваш ID для напарника:</p>
+                <p id="display-id" class="text-2xl font-mono font-bold text-emerald-400">----</p>
             </div>
         </div>
 
-        <form id="msg-form" class="p-4 bg-black/60 border-t border-white/10 space-y-3">
-            <div id="setup-box" class="flex gap-2">
-                <input type="text" id="target-id" placeholder="ID НАПАРНИКА..." class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white outline-none focus:border-emerald-500 uppercase font-mono">
-                <button type="button" id="connect-btn" class="bg-emerald-600 px-6 py-3 rounded-2xl text-xs font-black uppercase shadow-lg active:scale-95">СВЯЗЬ</button>
+        <!-- УПРАВЛЕНИЕ -->
+        <footer class="p-3 bg-black/40 border-t border-white/5 flex flex-col gap-3">
+            <div id="setup-controls" class="flex gap-2">
+                <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-emerald-500 uppercase font-mono">
+                <button type="button" id="connect-btn" class="bg-emerald-600 px-6 rounded-xl text-xs font-bold uppercase shadow-lg">СВЯЗЬ</button>
             </div>
             
-            <div id="chat-box" class="flex gap-2 hidden">
-                <button type="button" id="call-btn" class="bg-emerald-500/10 p-3 rounded-2xl text-emerald-400 border border-emerald-500/20 active:scale-90">🎥</button>
-                <input type="text" id="msg-in" placeholder="Введите сообщение..." class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none">
-                <button type="submit" class="bg-indigo-600 p-3 px-6 rounded-2xl text-white font-bold">🚀</button>
+            <div id="chat-controls" class="flex gap-2 hidden">
+                <button type="button" id="call-btn" class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 border border-emerald-500/20 active:scale-90 transition">🎥</button>
+                <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white outline-none">
+                <button type="submit" id="send-btn" class="bg-indigo-600 p-2 px-6 rounded-xl text-white font-bold">🚀</button>
             </div>
-        </form>
+        </footer>
     </main>
 
     <script>
-        // --- ГРАФИКА: 100k STARS ---
+        // ЗВЕЗДЫ
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
@@ -81,15 +77,15 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
         const geo = new THREE.BufferGeometry();
-        const pos = new Float32Array(60000 * 3);
-        for(let i=0; i<180000; i++) pos[i] = (Math.random() - 0.5) * 20;
+        const pos = new Float32Array(50000 * 3);
+        for(let i=0; i<150000; i++) pos[i] = (Math.random() - 0.5) * 20;
         geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        const stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.015, color: 0x10b981, transparent: true, opacity: 0.4 }));
+        const stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.02, color: 0x10b981, transparent: true, opacity: 0.3 }));
         scene.add(stars);
         function animate() { stars.rotation.y += 0.0003; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        // --- ГЛОБАЛЬНАЯ СВЯЗЬ (PEERJS + STUN) ---
+        // СВЯЗЬ
         let peer = null; let conn = null; let localStream = null; let roomPass = "";
 
         document.getElementById('auth-btn').onclick = () => {
@@ -102,44 +98,19 @@
 
         function initPeer() {
             const shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
-            
-            // Расширенный список STUN серверов для международных звонков
             peer = new Peer(roomPass + '-' + shortId.toLowerCase(), {
-                config: {
-                    'iceServers': [
-                        { 'urls': 'stun:stun.l.google.com:19302' },
-                        { 'urls': 'stun:stun1.l.google.com:19302' },
-                        { 'urls': 'stun:stun2.l.google.com:19302' },
-                        { 'urls': 'stun:stun3.l.google.com:19302' },
-                        { 'urls': 'stun:stun.services.mozilla.com' }
-                    ]
-                }
+                config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }, { 'urls': 'stun:stun1.l.google.com:19302' }] }
             });
 
-            peer.on('open', (id) => {
-                document.getElementById('display-id').textContent = shortId;
-                document.getElementById('status').textContent = 'Глобальный узел активен';
-                document.getElementById('signal-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]';
-            });
-
-            peer.on('connection', (c) => {
-                conn = c;
-                bindEvents();
-            });
-
-            peer.on('call', async (call) => {
-                if(confirm('Входящий видеосигнал! Принять?')) {
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('local-v').srcObject = localStream;
-                        document.getElementById('video-zone').classList.remove('hidden');
-                        call.answer(localStream);
-                        call.on('stream', s => {
-                            const rv = document.getElementById('remote-v');
-                            rv.srcObject = s;
-                            rv.play();
-                        });
-                    } catch(e) { alert("Ошибка камеры!"); }
+            peer.on('open', id => document.getElementById('display-id').textContent = shortId);
+            peer.on('connection', c => { conn = c; bindEvents(); });
+            peer.on('call', async call => {
+                if(confirm('ВХОДЯЩИЙ ЗВОНОК!')) {
+                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('local-v').srcObject = localStream;
+                    document.getElementById('video-zone').classList.remove('hidden');
+                    call.answer(localStream);
+                    call.on('stream', s => document.getElementById('remote-v').srcObject = s);
                 }
             });
         }
@@ -153,34 +124,34 @@
 
         function bindEvents() {
             conn.on('open', () => {
-                addMsg('ПРЯМОЙ КАНАЛ ПРОБИТ', false, true);
-                document.getElementById('setup-box').classList.add('hidden');
-                document.getElementById('chat-box').classList.remove('hidden');
-                document.getElementById('id-info').classList.add('hidden');
+                addMsg('КАНАЛ ОТКРЫТ', true);
+                document.getElementById('setup-controls').classList.add('hidden');
+                document.getElementById('chat-controls').classList.remove('hidden');
+                document.getElementById('id-card').classList.add('hidden');
             });
             conn.on('data', d => addMsg(d, false));
         }
 
-        function addMsg(text, isMine, isSys=false) {
+        function addMsg(text, isSys) {
             const d = document.createElement('div');
             if(isSys) {
-                d.className = 'text-center text-[9px] text-emerald-400 font-black uppercase my-4 tracking-[0.4em]';
-                d.textContent = `--- ${text} ---`;
+                d.className = 'text-center text-[10px] text-emerald-500/50 uppercase font-bold my-2';
+                d.textContent = text;
             } else {
-                d.className = `flex ${isMine ? 'justify-end' : 'justify-start'} mb-3`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600 shadow-xl' : 'bg-white/10 border border-white/10 text-gray-100'} px-5 py-2.5 rounded-[1.3rem] text-sm max-w-[85%] backdrop-blur-md">${text}</div>`;
+                d.className = `flex ${typeof text === 'string' && text.startsWith('mine:') ? 'justify-end' : 'justify-start'} mb-2`;
+                const cleanText = typeof text === 'string' && text.startsWith('mine:') ? text.replace('mine:', '') : text;
+                d.innerHTML = `<div class="${typeof text === 'string' && text.startsWith('mine:') ? 'bg-emerald-600' : 'bg-white/10'} px-4 py-2 rounded-2xl text-sm max-w-[85%]">${cleanText}</div>`;
             }
-            const msgs = document.getElementById('msgs');
-            msgs.appendChild(d);
-            msgs.scrollTop = msgs.scrollHeight;
+            document.getElementById('msgs').appendChild(d);
+            document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
         }
 
-        document.getElementById('msg-form').onsubmit = (e) => {
+        document.getElementById('send-btn').onclick = (e) => {
             e.preventDefault();
-            const val = document.getElementById('msg-in').value.trim();
-            if(val && conn && conn.open) {
-                conn.send(val);
-                addMsg(val, true);
+            const v = document.getElementById('msg-in').value.trim();
+            if(v && conn && conn.open) {
+                conn.send(v);
+                addMsg('mine:' + v, false);
                 document.getElementById('msg-in').value = '';
             }
         };
@@ -191,12 +162,8 @@
                 document.getElementById('local-v').srcObject = localStream;
                 document.getElementById('video-zone').classList.remove('hidden');
                 const call = peer.call(conn.peer, localStream);
-                call.on('stream', s => {
-                    const rv = document.getElementById('remote-v');
-                    rv.srcObject = s;
-                    rv.play();
-                });
-            } catch(e) { alert("Камера недоступна!"); }
+                call.on('stream', s => document.getElementById('remote-v').srcObject = s);
+            } catch(e) { alert("Камера занята!"); }
         };
     </script>
 </body>
