@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Омега 1 | STEALTH Edition</title>
+  <title>Омега 2.0 | CARDIOGRAM</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,33 +164,32 @@
       padding: 14px 14px 22px;
       z-index:30;
     }
-    #msgs{
-      max-height: 160px;
-      overflow:auto;
-      padding: 6px 4px;
-      display:flex; flex-direction:column; gap:8px;
+
+    /* Стили для панели кардиограммы */
+    #signal-panel{
+      display:none;
+      margin-bottom: 10px;
+      background: rgba(15, 23, 42, 0.85); /* Темный фон под радар */
+      border:1px solid rgba(255,255,255,.2);
+      border-radius: 20px;
+      box-shadow: 0 18px 55px -30px rgba(0,0,0,.5);
+      backdrop-filter: blur(18px);
+      padding: 12px;
+      text-align:center;
     }
-    #msgs::-webkit-scrollbar{ display:none; }
-    .sys{ text-align:center; font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:rgba(100,116,139,.75); padding:8px 0; }
-    .row{ display:flex; }
-    .mine{ justify-content:flex-end; }
-    .their{ justify-content:flex-start; }
-    .bubble{
-      max-width: 85%;
-      padding: 12px 14px;
-      border-radius: 18px;
-      font-size: 14px;
-      font-weight: 600;
-      box-shadow: 0 10px 25px -20px rgba(0,0,0,.28);
-      line-height: 1.15;
-      word-wrap: break-word;
-      white-space: pre-wrap;
+    .radar-title{
+      font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; 
+      color: #38bdf8; margin-bottom: 8px;
     }
-    .bMine{ background: linear-gradient(135deg, var(--p), var(--p2)); color:white; }
-    .bTheir{ background: rgba(255,255,255,.92); border:1px solid rgba(226,232,240,.9); color:var(--t); }
+    #radar-canvas{
+      width: 100%;
+      height: 60px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.4);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
 
     .panel{
-      margin-top: 10px;
       background: rgba(255,255,255,.78);
       border:1px solid rgba(255,255,255,.88);
       border-radius: 26px;
@@ -198,7 +197,7 @@
       backdrop-filter: blur(18px);
       padding: 14px;
     }
-    .row2{ display:flex; gap:10px; align-items:center; }
+    .row2{ display:flex; gap:8px; align-items:center; }
     .in{
       flex:1;
       height:48px;
@@ -226,15 +225,19 @@
     }
     .cta:active{ transform: scale(.98); }
 
-    #chatControls{ display:none; gap:10px; align-items:center; }
-    .smallBtn{
-      width:48px; height:48px; border-radius:18px;
+    #callControls{ display:none; gap:10px; align-items:center; justify-content:center; }
+    .bigBtn{
+      flex: 1;
+      height:56px; border-radius:18px;
       border:1px solid rgba(226,232,240,.9);
       background: rgba(255,255,255,.92);
-      font-size:20px;
+      font-size:24px; font-weight: 800; color: var(--m);
+      display:flex; align-items:center; justify-content:center; gap: 8px;
+      box-shadow: 0 10px 20px -10px rgba(0,0,0,.15);
     }
-    .msgIn{ flex:1; text-align:left; font-weight:700; letter-spacing: normal; text-transform:none; padding:0 14px; }
-    .send{ width:64px; }
+    .bigBtn:active{ background:var(--p); color:white; border-color:var(--p); }
+    .btn-red{ color: #ef4444; }
+    .btn-red:active{ background: #ef4444; color: white; border-color: #ef4444; }
   </style>
 </head>
 
@@ -247,8 +250,8 @@
 
   <div class="wrap" id="authWrap">
     <div class="card" id="auth-screen">
-      <div class="logoWrap"><div class="logo">Ω1</div></div>
-      <div class="cap">ОМЕГА 1 | СВЯЗЬ</div>
+      <div class="logoWrap"><div class="logo">Ω2</div></div>
+      <div class="cap">ОМЕГА 2.0 | CARDIOGRAM</div>
       <div class="sub">Выберите ключ доступа</div>
       <div class="pad" id="symbol-pad"></div>
       <div class="idRow">
@@ -271,24 +274,27 @@
       </div>
     </div>
     <div id="footer">
-      <div id="msgs"></div>
+      
+      <div id="signal-panel">
+        <div class="radar-title">PING: <span id="ping-val" style="color:#fff;">--</span> MS</div>
+        <canvas id="radar-canvas" width="400" height="80"></canvas>
+      </div>
 
       <div class="panel" id="setup-controls">
         <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
           <div class="stxt" style="letter-spacing:.22em;">ВАШ ID: <b style="color:var(--p)" id="display-id">----</b></div>
-          <button class="smallBtn" onclick="location.reload()" title="Сброс">↻</button>
+          <button class="smallBtn" onclick="location.reload()" title="Сброс" style="width:48px; height:48px; border-radius:14px; border:1px solid #e2e8f0; background:#fff; font-size:18px;">↻</button>
         </div>
         <div class="row2">
           <input class="in" id="target-id" placeholder="ID НАПАРНИКА" />
           <button class="cta" id="connect-btn">СВЯЗЬ</button>
         </div>
-        <div class="hint" style="margin-top:10px;">Оба должны выбрать <b>одинаковый</b> ключ</div>
       </div>
 
-      <div class="panel row2" id="chatControls">
-        <button class="smallBtn" id="call-btn" title="Видео">📹</button>
-        <input class="in msgIn" id="msg-in" placeholder="Сообщение…" />
-        <button class="cta send" id="send-btn">➤</button>
+      <div class="panel row2" id="callControls">
+        <button class="bigBtn" id="audio-btn">📞 Аудио</button>
+        <button class="bigBtn" id="call-btn">📹 Видео</button>
+        <button class="bigBtn btn-red" id="drop-btn" style="display:none; flex:0.4;">✖</button>
       </div>
     </div>
   </div>
@@ -319,49 +325,67 @@
   let peer = null;
   let conn = null;
   let localStream = null;
+  let pingInterval = null;
 
-  function addSys(text){
-    const d = document.createElement("div"); d.className = "sys"; d.textContent = text;
-    $("msgs").appendChild(d); $("msgs").scrollTop = $("msgs").scrollHeight;
+  // --- Логика Кардиограммы (Радара) ---
+  const cvs = $('radar-canvas');
+  const ctx = cvs.getContext('2d');
+  const pings = new Array(40).fill(0); // Храним последние 40 замеров
+
+  function drawRadar() {
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    
+    // Рисуем сетку
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, cvs.height/2); ctx.lineTo(cvs.width, cvs.height/2);
+    ctx.stroke();
+
+    // Рисуем линию пинга
+    ctx.beginPath();
+    ctx.strokeStyle = '#22c55e'; // Неоново-зеленый
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    
+    const step = cvs.width / (pings.length - 1);
+    
+    for(let i=0; i<pings.length; i++) {
+      // Максимальный пинг на графике 1000мс. Всё что выше - упирается в потолок
+      let val = Math.min(pings[i], 1000); 
+      // Чем больше пинг, тем выше линия на графике (как кардиограмма)
+      let h = (val / 1000) * cvs.height; 
+      let y = cvs.height - h - 5; // -5 чтоб не упиралось в самый низ
+      if(y > cvs.height) y = cvs.height;
+      if(y < 5) y = 5;
+
+      if(i===0) ctx.moveTo(i*step, y);
+      else ctx.lineTo(i*step, y);
+    }
+    ctx.stroke();
+    
+    // Меняем цвет ответа в зависимости от качества
+    const lastPing = pings[pings.length-1];
+    if (lastPing === 0) $('ping-val').style.color = "#fff";
+    else if (lastPing < 150) $('ping-val').style.color = "#22c55e"; // Зеленый (Отлично)
+    else if (lastPing < 400) $('ping-val').style.color = "#facc15"; // Желтый (Норм, VPN тупит)
+    else $('ping-val').style.color = "#ef4444"; // Красный (Лаги)
   }
-  function addChat(text, mine){
-    const row = document.createElement("div"); row.className = "row " + (mine ? "mine" : "their");
-    const b = document.createElement("div"); b.className = "bubble " + (mine ? "bMine" : "bTheir"); b.textContent = text;
-    row.appendChild(b); $("msgs").appendChild(row); $("msgs").scrollTop = $("msgs").scrollHeight;
-  }
+  drawRadar(); // Отрисовка пустого при старте
 
   function enterApp(){
     $("authWrap").style.display = "none";
     $("app").style.display = "block";
   }
 
-  // Вот они, твои новые хардкодные сервера от Metered
   async function getIceServers(){
     $("sec-hint").textContent = "TURN: активен (Metered Global Cloud).";
     return [
-      {
-        urls: "stun:stun.relay.metered.ca:80",
-      },
-      {
-        urls: "turn:standard.relay.metered.ca:80",
-        username: "0d0bf8d106dd90657dca0a1d",
-        credential: "2D4ts2w87TtkX1xU",
-      },
-      {
-        urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-        username: "0d0bf8d106dd90657dca0a1d",
-        credential: "2D4ts2w87TtkX1xU",
-      },
-      {
-        urls: "turn:standard.relay.metered.ca:443",
-        username: "0d0bf8d106dd90657dca0a1d",
-        credential: "2D4ts2w87TtkX1xU",
-      },
-      {
-        urls: "turns:standard.relay.metered.ca:443?transport=tcp",
-        username: "0d0bf8d106dd90657dca0a1d",
-        credential: "2D4ts2w87TtkX1xU",
-      }
+      { urls: "stun:stun.relay.metered.ca:80" },
+      { urls: "turn:standard.relay.metered.ca:80", username: "0d0bf8d106dd90657dca0a1d", credential: "2D4ts2w87TtkX1xU" },
+      { urls: "turn:standard.relay.metered.ca:80?transport=tcp", username: "0d0bf8d106dd90657dca0a1d", credential: "2D4ts2w87TtkX1xU" },
+      { urls: "turn:standard.relay.metered.ca:443", username: "0d0bf8d106dd90657dca0a1d", credential: "2D4ts2w87TtkX1xU" },
+      { urls: "turns:standard.relay.metered.ca:443?transport=tcp", username: "0d0bf8d106dd90657dca0a1d", credential: "2D4ts2w87TtkX1xU" }
     ];
   }
 
@@ -371,45 +395,79 @@
 
     const myIceServers = await getIceServers();
 
-    peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
-      config: { iceServers: myIceServers }
-    });
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), { config: { iceServers: myIceServers } });
 
-    peer.on("open", () => { setStatus("ГОТОВО", "#22c55e"); addSys("Сеть активна"); });
-    peer.on("error", (e) => { setStatus("ОШИБКА", "#ef4444"); addSys("Peer error: " + (e?.type || "unknown")); });
+    peer.on("open", () => { setStatus("ГОТОВО", "#22c55e"); });
+    peer.on("error", (e) => { setStatus("ОШИБКА", "#ef4444"); });
 
     peer.on("connection", (c) => { conn = c; bindConn(); });
 
     peer.on("call", async (call) => {
-      if (!confirm("Входящий видеозвонок. Принять?")) return;
+      const isVideo = confirm("Входящий вызов! Включить камеру для ответа?\n(ОК = Видео, Отмена = Только голос)");
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-        $("local-v").srcObject = localStream; $("local-v").style.display = "block";
+        localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+        if (isVideo) { $("local-v").srcObject = localStream; $("local-v").style.display = "block"; } 
+        else { $("local-v").style.display = "none"; }
+        
         call.answer(localStream);
+        
         call.on("stream", (s) => {
           $("remote-v").srcObject = s; $("remote-v").style.display = "block";
-          $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
+          $("wait").style.display = "none"; setStatus(isVideo ? "ВИДЕО" : "АУДИО", "#22c55e");
         });
-        call.on("close", () => {
-          $("remote-v").srcObject = null; $("remote-v").style.display = "none";
-          $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
-        });
-      } catch {
-        setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
-      }
+        call.on("close", closeCallUI);
+      } catch { setStatus("ОШИБКА", "#f59e0b"); }
     });
   }
 
   function bindConn(){
     if (!conn) return;
     conn.on("open", () => {
-      addSys("Соединение установлено");
       $("setup-controls").style.display = "none";
-      $("chatControls").style.display = "flex";
-      setStatus("НА СВЯЗИ", "#22c55e");
+      $("callControls").style.display = "flex";
+      $("signal-panel").style.display = "block"; // Показываем радар!
+      setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
+
+      // Запускаем пульс кардиограммы (Ping)
+      pingInterval = setInterval(() => {
+        if(conn && conn.open) {
+          conn.send(JSON.stringify({ type: 'ping', ts: Date.now() }));
+        }
+      }, 1000);
     });
-    conn.on("data", (d) => addChat(String(d), false));
-    conn.on("close", () => { addSys("Соединение разорвано"); setStatus("РАЗРЫВ", "#f59e0b"); });
+
+    conn.on("data", (d) => {
+      try {
+        const data = JSON.parse(d);
+        if (data.type === 'ping') {
+          // Напарник прислал пинг, отбиваем понг обратно
+          conn.send(JSON.stringify({ type: 'pong', ts: data.ts }));
+        } else if (data.type === 'pong') {
+          // Вернулся наш понг, считаем задержку
+          const rtt = Date.now() - data.ts;
+          $('ping-val').textContent = rtt;
+          pings.push(rtt);
+          pings.shift(); // удаляем старое
+          drawRadar();
+        }
+      } catch (e) { console.log("Ignore non-json"); }
+    });
+
+    conn.on("close", () => { 
+      clearInterval(pingInterval); 
+      setStatus("РАЗРЫВ", "#f59e0b"); 
+      $("signal-panel").style.display = "none";
+    });
+  }
+
+  function closeCallUI() {
+    $("remote-v").srcObject = null; $("remote-v").style.display = "none";
+    $("local-v").style.display = "none";
+    $("wait").style.display = "flex"; 
+    setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
+    $("audio-btn").style.display = "flex";
+    $("call-btn").style.display = "flex";
+    $("drop-btn").style.display = "none";
   }
 
   sysCode.forEach(s => {
@@ -426,50 +484,51 @@
     const tid = ($("target-id").value || "").trim().toUpperCase();
     if (!tid) return;
     localStorage.setItem("lastTarget", tid);
-    if (!peer) { addSys("Сеть не готова"); setStatus("СЕТЬ?", "#f59e0b"); return; }
+    if (!peer) { setStatus("СЕТЬ?", "#f59e0b"); return; }
     setStatus("КОННЕКТ…", "#0ea5e9");
     conn = peer.connect(roomPass + "-" + tid.toLowerCase());
     bindConn();
   };
 
-  function send(){
-    const v = ($("msg-in").value || "").trim();
-    if (!v) return;
-    if (!conn || !conn.open) { addSys("Нет соединения"); setStatus("НЕТ СВЯЗИ", "#f59e0b"); return; }
-    conn.send(v); addChat(v, true); $("msg-in").value = "";
-  }
-  $("send-btn").onclick = (e) => { e.preventDefault(); send(); };
-  $("msg-in").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); send(); } });
+  $("audio-btn").onclick = async () => {
+    if (!conn || !conn.open) return;
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video:false, audio:true });
+      $("local-v").style.display = "none";
+      const call = peer.call(conn.peer, localStream);
+      setupCallEvents(call, "АУДИО");
+    } catch { setStatus("МИКРОФОН?", "#f59e0b"); }
+  };
 
   $("call-btn").onclick = async () => {
-    if (!conn || !conn.open) { addSys("Сначала подключись"); return; }
+    if (!conn || !conn.open) return;
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
       $("local-v").srcObject = localStream; $("local-v").style.display = "block";
       const call = peer.call(conn.peer, localStream);
-      call.on("stream", (s) => {
-        $("remote-v").srcObject = s; $("remote-v").style.display = "block";
-        $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
-      });
-      call.on("close", () => {
-        $("remote-v").srcObject = null; $("remote-v").style.display = "none";
-        $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
-      });
-    } catch {
-      setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
-    }
+      setupCallEvents(call, "ВИДЕО");
+    } catch { setStatus("КАМЕРА?", "#f59e0b"); }
   };
+
+  $("drop-btn").onclick = () => {
+    // В PeerJS чтобы сбросить звонок, нужно пересоздать соединение (или перезагрузить)
+    // Самый надежный способ - просто перезагрузить страницу
+    location.reload(); 
+  };
+
+  function setupCallEvents(call, modeText) {
+    $("audio-btn").style.display = "none";
+    $("call-btn").style.display = "none";
+    $("drop-btn").style.display = "flex";
+
+    call.on("stream", (s) => {
+      $("remote-v").srcObject = s; $("remote-v").style.display = "block";
+      $("wait").style.display = "none"; setStatus(modeText, "#22c55e");
+    });
+    call.on("close", closeCallUI);
+  }
 
   const localV = $("local-v");
   let drag=false, sx=0, sy=0;
   localV.addEventListener("touchstart", (e)=>{ drag=true; sx = e.touches[0].clientX - localV.offsetLeft; sy = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#38bdf8"; }, {passive:true});
-  document.addEventListener("touchmove", (e)=>{ if(!drag) return; const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth)); const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight)); localV.style.left = x + "px"; localV.style.top = y + "px"; localV.style.right = "auto"; }, {passive:true});
-  document.addEventListener("touchend", ()=>{ drag=false; localV.style.borderColor = "rgba(255,255,255,.95)"; });
-
-  // Сразу показываем, что пытаемся инициализировать
-  $("sec-hint").textContent = "TURN: Подготовка...";
-  setStatus("ОЖИДАНИЕ", "#94a3b8");
-})();
-</script>
-</body>
-</html>
+  document.addEventListener("touchmove", (e)=>{ if(!drag) return; const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth)); const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight)); localV.style.left = x +
