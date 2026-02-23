@@ -1,117 +1,527 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galaxy Secure</title>
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<style>
-body { font-family: Arial; text-align:center; margin-top:40px; }
-button { padding:10px 20px; font-size:16px; }
-video { width:45%; margin:5px; background:#000; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Galaxy 4.2 | STEALTH Edition</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+  <style>
+    :root{
+      --p:#0ea5e9; --p2:#38bdf8;
+      --bg1:#f0f9ff; --bg2:#e0f2fe;
+      --t:#0f172a; --m:#64748b;
+      --g: rgba(255,255,255,.72);
+      --st: rgba(226,232,240,.95);
+      --sh: rgba(2,132,199,.20);
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0; overflow:hidden; touch-action:none;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--t);
+    }
+    .bg-dots{
+      position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.55;
+      background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mask-image: radial-gradient(circle at 30% 20%, black 0%, black 40%, transparent 75%);
+    }
+    .status{
+      position:absolute; top:14px; left:14px; z-index:50;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:16px;
+      background: rgba(255,255,255,.72);
+      border:1px solid var(--st);
+      box-shadow: 0 10px 28px -20px rgba(0,0,0,.28);
+      backdrop-filter: blur(14px);
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; }
+    .stxt{ font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:var(--m); }
+
+    .wrap{
+      position:relative; z-index:10;
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      padding:16px;
+    }
+    .card{
+      width:min(380px, 92vw);
+      border-radius: 34px;
+      background: var(--g);
+      border:1px solid var(--st);
+      box-shadow: 0 18px 60px -26px var(--sh);
+      backdrop-filter: blur(18px) saturate(180%);
+      padding: 28px;
+      text-align:center;
+    }
+    .logoWrap{
+      width:112px; height:112px; margin:0 auto 10px;
+      border-radius: 30px;
+      padding:6px;
+      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(56,189,248,.22));
+      border:1px solid rgba(255,255,255,.75);
+      box-shadow: 0 18px 55px -28px rgba(14,165,233,.45);
+    }
+    .logo{
+      width:100%; height:100%;
+      border-radius: 24px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,.88);
+      border:1px solid rgba(56,189,248,.25);
+      font-weight:900; font-size:52px;
+      background: linear-gradient(135deg, var(--p), var(--p2));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:800; color:var(--m); }
+    .sub{ margin-top:8px; font-size:12px; font-weight:700; color:rgba(100,116,139,.85); text-transform:uppercase; letter-spacing:.2em; }
+
+    .pad{
+      display:grid; grid-template-columns: repeat(5, 1fr);
+      gap:12px; margin-top:18px;
+    }
+    .btn{
+      height:56px;
+      border-radius:18px;
+      font-size:24px;
+      background: rgba(255,255,255,.88);
+      border:1px solid rgba(226,232,240,.95);
+      color:#64748b;
+      box-shadow: 0 10px 25px -20px rgba(0,0,0,.25);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn:active{
+      transform: scale(.96);
+      background: var(--p);
+      border-color: var(--p);
+      box-shadow: 0 0 0 4px rgba(14,165,233,.18), 0 18px 40px -18px rgba(14,165,233,.65);
+      color:white;
+    }
+
+    .idRow{
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid rgba(226,232,240,.65);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-size:11px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:var(--m);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:14px;
+      background: rgba(14,165,233,.10);
+      border:1px solid rgba(14,165,233,.22);
+      color: var(--p);
+      font-weight:900;
+      letter-spacing:.18em;
+    }
+    .copy{
+      width:44px; height:38px;
+      border-radius:14px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(226,232,240,.95);
+      font-weight:900;
+    }
+    .hint{ margin-top:8px; font-size:11px; color:rgba(100,116,139,.75); }
+
+    #app{ display:none; position:absolute; inset:0; z-index:20; background: rgba(248,250,252,.65); }
+    #video-zone{ position:absolute; inset:0; overflow:hidden; border-bottom-left-radius:34px; border-bottom-right-radius:34px; }
+    #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
+    #local-v{
+      position:absolute; top:14px; right:14px;
+      width:104px; height:146px; border-radius:18px;
+      border:2px solid rgba(255,255,255,.95);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+      transform: scaleX(-1);
+      display:none; touch-action:none;
+    }
+    #wait{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+      gap:12px;
+      background: rgba(241,245,249,.80);
+      backdrop-filter: blur(14px);
+      color: var(--p);
+    }
+    .spin{
+      width:46px; height:46px; border-radius:999px;
+      border:4px solid rgba(148,163,184,.22);
+      border-top-color: var(--p);
+      animation: rot 1s linear infinite;
+    }
+    @keyframes rot{ to{ transform: rotate(360deg); } }
+
+    #footer{
+      position:absolute; left:0; right:0; bottom:0;
+      padding: 14px 14px 22px;
+      z-index:30;
+    }
+    #msgs{
+      max-height: 160px;
+      overflow:auto;
+      padding: 6px 4px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    #msgs::-webkit-scrollbar{ display:none; }
+    .sys{ text-align:center; font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:rgba(100,116,139,.75); padding:8px 0; }
+    .row{ display:flex; }
+    .mine{ justify-content:flex-end; }
+    .their{ justify-content:flex-start; }
+    .bubble{
+      max-width: 85%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px -20px rgba(0,0,0,.28);
+      line-height: 1.15;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .bMine{ background: linear-gradient(135deg, var(--p), var(--p2)); color:white; }
+    .bTheir{ background: rgba(255,255,255,.92); border:1px solid rgba(226,232,240,.9); color:var(--t); }
+
+    .panel{
+      margin-top: 10px;
+      background: rgba(255,255,255,.78);
+      border:1px solid rgba(255,255,255,.88);
+      border-radius: 26px;
+      box-shadow: 0 18px 55px -30px rgba(0,0,0,.25);
+      backdrop-filter: blur(18px);
+      padding: 14px;
+    }
+    .row2{ display:flex; gap:10px; align-items:center; }
+    .in{
+      flex:1;
+      height:48px;
+      border-radius: 18px;
+      border:1px solid rgba(203,213,225,.85);
+      background: rgba(241,245,249,.85);
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      outline:none;
+    }
+    .in:focus{ background:white; border-color:var(--p); box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
+    .cta{
+      height:48px;
+      padding: 0 18px;
+      border-radius: 18px;
+      border:none;
+      color:white;
+      font-weight:900;
+      letter-spacing:.22em;
+      background: linear-gradient(90deg, var(--p), var(--p2));
+      box-shadow: 0 18px 45px -30px rgba(14,165,233,.85);
+      transform: translateZ(0);
+    }
+    .cta:active{ transform: scale(.98); }
+
+    #chatControls{ display:none; gap:10px; align-items:center; }
+    .smallBtn{
+      width:48px; height:48px; border-radius:18px;
+      border:1px solid rgba(226,232,240,.9);
+      background: rgba(255,255,255,.92);
+      font-size:20px;
+    }
+    .msgIn{ flex:1; text-align:left; font-weight:700; letter-spacing: normal; text-transform:none; padding:0 14px; }
+    .send{ width:64px; }
+  </style>
 </head>
+
 <body>
+  <div class="bg-dots"></div>
+  <div class="status">
+    <div id="dot" class="dot"></div>
+    <div id="status" class="stxt">ОЖИДАНИЕ</div>
+  </div>
 
-<h2>Galaxy Secure</h2>
-<div>Your ID: <b id="myid">...</b></div>
-<br>
-<input id="target" placeholder="Peer ID">
-<button onclick="connect()">Connect</button>
-<button onclick="callPeer()">Call</button>
+  <div class="wrap" id="authWrap">
+    <div class="card" id="auth-screen">
+      <div class="logoWrap"><div class="logo">DK</div></div>
+      <div class="cap">Premium Connection</div>
+      <div class="sub">Выберите ключ доступа</div>
+      <div class="pad" id="symbol-pad"></div>
+      <div class="idRow">
+        ВАШ ID:
+        <span class="chip"><span id="front-id">----</span></span>
+        <button class="copy" id="copy-id">⧉</button>
+      </div>
+      <div class="hint" id="sec-hint">TURN: авто (безопасный режим).</div>
+      <div class="hint" id="diag" style="display:none; color:#ef4444; font-weight:800; letter-spacing:.08em; margin-top:10px;"></div>
+    </div>
+  </div>
 
-<br><br>
-<video id="local" autoplay muted playsinline></video>
-<video id="remote" autoplay playsinline></video>
+  <div id="app">
+    <div id="video-zone">
+      <video id="remote-v" autoplay playsinline></video>
+      <video id="local-v" autoplay playsinline muted></video>
+      <div id="wait">
+        <div class="spin"></div>
+        <div class="stxt" style="letter-spacing:.34em;">ПОИСК СИГНАЛА…</div>
+      </div>
+    </div>
+    <div id="footer">
+      <div id="msgs"></div>
+
+      <div class="panel" id="setup-controls">
+        <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
+          <div class="stxt" style="letter-spacing:.22em;">ВАШ ID: <b style="color:var(--p)" id="display-id">----</b></div>
+          <button class="smallBtn" onclick="location.reload()" title="Сброс">↻</button>
+        </div>
+        <div class="row2">
+          <input class="in" id="target-id" placeholder="ID НАПАРНИКА" />
+          <button class="cta" id="connect-btn">СВЯЗЬ</button>
+        </div>
+        <div class="hint" style="margin-top:10px;">Оба должны выбрать <b>одинаковый</b> ключ</div>
+      </div>
+
+      <div class="panel row2" id="chatControls">
+        <button class="smallBtn" id="call-btn" title="Видео">📹</button>
+        <input class="in msgIn" id="msg-in" placeholder="Сообщение…" />
+        <button class="cta send" id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const TURN_API = params.get("turn"); // передаётся только если нужно
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
+  const diag = (t) => { $("diag").style.display = "block"; $("diag").textContent = t; setStatus("ОШИБКА", "#ef4444"); };
 
-let peer;
-let conn;
-let localStream;
+  // === НАСТРОЙКА BACKEND URL ДЛЯ TURN ===
+  // ВАРИАНТ 1 (рекомендую): backend на твоём домене с https:
+  //   const TURN_API = "https://your-domain.com/turn";
+  // ВАРИАНТ 2 (тест): напрямую по IP и порту где Node.js:
+  const TURN_API = "http://89.124.78.246:8080/turn"; // <- поменяй на свой URL
 
-async function getIceServers(){
-  const servers = [{ urls:"stun:stun.l.google.com:19302" }];
+  let myId = localStorage.getItem("myGalaxyId");
+  if (!myId) { myId = Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
+  $("front-id").textContent = myId;
+  $("display-id").textContent = myId;
 
-  if (TURN_API) {
-    try {
-      const r = await fetch(TURN_API, { cache:"no-store" });
-      const data = await r.json();
-      if (data.username && data.credential && data.urls) {
-        servers.push({
-          urls: data.urls,
-          username: data.username,
-          credential: data.credential
-        });
-      }
-    } catch(e) {
-      console.log("TURN недоступен");
-    }
+  $("copy-id").onclick = async () => {
+    try { await navigator.clipboard.writeText(myId); setStatus("СКОПИРОВАНО", "#22c55e"); setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"),900); }
+    catch { setStatus("КОПИРАЙ РУКАМИ", "#f59e0b"); }
+  };
+
+  const sysCode = [
+    { i:'👽', v:'alien' }, { i:'🚀', v:'rocket' }, { i:'🛰️', v:'sat' }, { i:'🛸', v:'ufo' }, { i:'🌍', v:'earth' },
+    { i:'🌙', v:'moon' }, { i:'🪐', v:'planet' }, { i:'☄️', v:'comet' }, { i:'🤖', v:'bot' }, { i:'☢️', v:'nuke' }
+  ];
+
+  const pad = $("symbol-pad");
+  let roomPass = "";
+  let peer = null;
+  let conn = null;
+  let localStream = null;
+
+  function addSys(text){
+    const d = document.createElement("div"); d.className = "sys"; d.textContent = text;
+    $("msgs").appendChild(d); $("msgs").scrollTop = $("msgs").scrollHeight;
+  }
+  function addChat(text, mine){
+    const row = document.createElement("div"); row.className = "row " + (mine ? "mine" : "their");
+    const b = document.createElement("div"); b.className = "bubble " + (mine ? "bMine" : "bTheir"); b.textContent = text;
+    row.appendChild(b); $("msgs").appendChild(row); $("msgs").scrollTop = $("msgs").scrollHeight;
   }
 
-  return servers;
-}
+  function enterApp(){
+    $("authWrap").style.display = "none";
+    $("app").style.display = "block";
+  }
 
-async function init(){
-  const iceServers = await getIceServers();
+  async function getIceServers(){
+    // STUN всегда есть
+    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
 
-  peer = new Peer(undefined, {
-    config:{ iceServers }
-  });
+    // Пытаемся взять TURN с бэкенда (безопасно)
+    try {
+      const r = await fetch(TURN_API, { cache: "no-store" });
+      if (!r.ok) throw new Error("TURN API HTTP " + r.status);
+      const data = await r.json();
+      // ожидаем: { username, credential, ttl, urls: ["turn:IP:3478?transport=udp", "turn:IP:3478?transport=tcp"] }
+      if (data && data.username && data.credential && Array.isArray(data.urls)) {
+        iceServers.push({ urls: data.urls, username: data.username, credential: data.credential });
+        $("sec-hint").textContent = "TURN: активен (временные ключи).";
+      } else {
+        $("sec-hint").textContent = "TURN: формат ответа кривой. Работаю только на STUN.";
+      }
+    } catch (e) {
+      $("sec-hint").textContent = "TURN: недоступен. Работаю только на STUN.";
+    }
+    return iceServers;
+  }
 
-  peer.on("open", id=>{
-    document.getElementById("myid").textContent=id;
-  });
+  async function initPeer(){
+    if (!window.Peer) { diag("PeerJS не загрузился."); return; }
+    setStatus("СЕТЬ…", "#0ea5e9");
 
-  peer.on("connection", c=>{
-    conn=c;
-  });
+    const myIceServers = await getIceServers();
 
-  peer.on("call", async call=>{
-    localStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-    document.getElementById("local").srcObject=localStream;
-    call.answer(localStream);
-    call.on("stream", s=>{
-      document.getElementById("remote").srcObject=s;
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
+      config: { iceServers: myIceServers }
     });
+
+    peer.on("open", () => { setStatus("ГОТОВО", "#22c55e"); addSys("Сеть активна"); });
+    peer.on("error", (e) => { setStatus("ОШИБКА", "#ef4444"); addSys("Peer error: " + (e?.type || "unknown")); });
+
+    peer.on("connection", (c) => { conn = c; bindConn(); });
+
+    peer.on("call", async (call) => {
+      if (!confirm("Входящий видеозвонок. Принять?")) return;
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+        $("local-v").srcObject = localStream; $("local-v").style.display = "block";
+        call.answer(localStream);
+        call.on("stream", (s) => {
+          $("remote-v").srcObject = s; $("remote-v").style.display = "block";
+          $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
+        });
+        call.on("close", () => {
+          $("remote-v").srcObject = null; $("remote-v").style.display = "none";
+          $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
+        });
+      } catch {
+        setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
+      }
+    });
+  }
+
+  function bindConn(){
+    if (!conn) return;
+    conn.on("open", () => {
+      addSys("Соединение установлено");
+      $("setup-controls").style.display = "none";
+      $("chatControls").style.display = "flex";
+      setStatus("НА СВЯЗИ", "#22c55e");
+    });
+    conn.on("data", (d) => addChat(String(d), false));
+    conn.on("close", () => { addSys("Соединение разорвано"); setStatus("РАЗРЫВ", "#f59e0b"); });
+  }
+
+  sysCode.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "btn"; b.textContent = s.i;
+    b.onclick = async () => { roomPass = s.v; enterApp(); await initPeer(); };
+    pad.appendChild(b);
   });
-}
 
-function connect(){
-  const id=document.getElementById("target").value;
-  conn=peer.connect(id);
-}
+  const last = localStorage.getItem("lastTarget");
+  if (last) $("target-id").value = last;
 
-async function callPeer(){
-  const id=document.getElementById("target").value;
-  localStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-  document.getElementById("local").srcObject=localStream;
-  const call=peer.call(id,localStream);
-  call.on("stream", s=>{
-    document.getElementById("remote").srcObject=s;
-  });
-}
+  $("connect-btn").onclick = () => {
+    const tid = ($("target-id").value || "").trim().toUpperCase();
+    if (!tid) return;
+    localStorage.setItem("lastTarget", tid);
+    if (!peer) { addSys("Сеть не готова"); setStatus("СЕТЬ?", "#f59e0b"); return; }
+    setStatus("КОННЕКТ…", "#0ea5e9");
+    conn = peer.connect(roomPass + "-" + tid.toLowerCase());
+    bindConn();
+  };
 
-init();
+  function send(){
+    const v = ($("msg-in").value || "").trim();
+    if (!v) return;
+    if (!conn || !conn.open) { addSys("Нет соединения"); setStatus("НЕТ СВЯЗИ", "#f59e0b"); return; }
+    conn.send(v); addChat(v, true); $("msg-in").value = "";
+  }
+  $("send-btn").onclick = (e) => { e.preventDefault(); send(); };
+  $("msg-in").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); send(); } });
+
+  $("call-btn").onclick = async () => {
+    if (!conn || !conn.open) { addSys("Сначала подключись"); return; }
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+      $("local-v").srcObject = localStream; $("local-v").style.display = "block";
+      const call = peer.call(conn.peer, localStream);
+      call.on("stream", (s) => {
+        $("remote-v").srcObject = s; $("remote-v").style.display = "block";
+        $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
+      });
+      call.on("close", () => {
+        $("remote-v").srcObject = null; $("remote-v").style.display = "none";
+        $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
+      });
+    } catch {
+      setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
+    }
+  };
+
+  const localV = $("local-v");
+  let drag=false, sx=0, sy=0;
+  localV.addEventListener("touchstart", (e)=>{ drag=true; sx = e.touches[0].clientX - localV.offsetLeft; sy = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#38bdf8"; }, {passive:true});
+  document.addEventListener("touchmove", (e)=>{ if(!drag) return; const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth)); const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight)); localV.style.left = x + "px"; localV.style.top = y + "px"; localV.style.right = "auto"; }, {passive:true});
+  document.addEventListener("touchend", ()=>{ drag=false; localV.style.borderColor = "rgba(255,255,255,.95)"; });
+
+  setStatus("ОЖИДАНИЕ", "#94a3b8");
+})();
 </script>
-
 </body>
 </html>
-🚀 Как использовать
-Без VPN
-Открываешь просто:
+2) BACKEND: turn-auth.js (на VDS)
+Это то, что нельзя класть на публичный GitHub с секретом.
+Секрет хранится в переменной окружения TURN_SECRET.
+JavaScript
 Копировать код
+const http = require("http");
+const crypto = require("crypto");
 
-https://denisbrest.github.io/mi-repo/
-С VPN (через TURN)
-Открываешь:
+const SECRET = process.env.TURN_SECRET;        // тот же что static-auth-secret в coturn
+const TURN_IP = process.env.TURN_IP;           // IP или домен сервера
+const TTL = 300;                               // 5 минут
+const PORT = process.env.PORT || 8080;
+
+if (!SECRET || !TURN_IP) {
+  console.error("Need TURN_SECRET and TURN_IP env vars");
+  process.exit(1);
+}
+
+function makeCreds() {
+  const username = String(Math.floor(Date.now() / 1000) + TTL);
+  const credential = crypto.createHmac("sha1", SECRET).update(username).digest("base64");
+  return {
+    username,
+    credential,
+    ttl: TTL,
+    urls: [
+      `turn:${TURN_IP}:3478?transport=udp`,
+      `turn:${TURN_IP}:3478?transport=tcp`
+    ]
+  };
+}
+
+http.createServer((req, res) => {
+  if (req.url !== "/turn") { res.writeHead(404); return res.end("not found"); }
+
+  // CORS чтобы фронт с GitHub Pages мог забрать JSON
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "no-store");
+  res.writeHead(200, { "Content-Type": "application/json" });
+
+  res.end(JSON.stringify(makeCreds()));
+}).listen(PORT, "0.0.0.0", () => {
+  console.log(`TURN auth on :${PORT}/turn`);
+});
+3) coturn: что должно быть в /etc/turnserver.conf
+Оставь TURN как TURN. Не мешай туда Node.js код.
+Минимально так (пример):
+Conf
 Копировать код
+listening-port=3478
+tls-listening-port=5349
 
-https://denisbrest.github.io/mi-repo/?turn=https://ТВОЙ_ДОМЕН/turn
-⚠ В коде нигде нет твоего сервера.
-Теперь скажи:
-Хочешь подключить это к твоему turn-auth.js?
-Или сначала проверим, что через STUN всё работает?
+fingerprint
+lt-cred-mech
+
+listening-ip
