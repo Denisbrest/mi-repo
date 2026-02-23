@@ -3,80 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy 4.0 | Free View</title>
+    <title>Galaxy 4.0 | Cyber Key</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; touch-action: none; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
-        .glass-ui { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         video { background-color: #050505; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        #local-v { 
-            position: absolute; 
-            width: 100px; 
-            height: 140px; 
-            z-index: 50; 
-            border-radius: 1rem; 
-            border: 2px solid #10b981; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            touch-action: none; 
-        }
-        .input-panel { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        /* Красивое свечение для нажатых кнопок пароля */
-        .sym-btn:active { background: rgba(16, 185, 129, 0.4); border-color: #10b981; transform: scale(0.95); }
+        .glass-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .sym-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.2s ease-in-out; }
+        .sym-btn:active { background: rgba(16, 185, 129, 0.2); border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); transform: scale(0.92); }
+        #local-v { position: absolute; width: 100px; height: 140px; z-index: 50; border-radius: 1rem; border: 2px solid #10b981; box-shadow: 0 10px 30px rgba(0,0,0,0.8); touch-action: none; }
+        .input-panel { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
 <body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden">
 
     <div id="canvas-container"></div>
 
-    <div id="auth-screen" class="glass-ui z-40 p-8 rounded-[2.5rem] w-full max-w-sm text-center space-y-6 mx-4">
-        <h2 class="text-2xl font-black text-emerald-400 italic">GALAXY 4.0</h2>
-        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">КЛЮЧ ЧАСТОТЫ</p>
+    <div id="auth-screen" class="glass-panel z-40 p-6 rounded-[2rem] w-full max-w-xs text-center space-y-5 mx-4 border-emerald-500/20 border-2">
+        <h2 class="text-xl font-black text-emerald-400 italic tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.4)]">GALAXY 4.0</h2>
         
-        <div id="symbol-pad" class="grid grid-cols-5 gap-3"></div>
+        <div id="symbol-pad" class="grid grid-cols-5 gap-2"></div>
         
-        <p class="text-[9px] text-gray-500 uppercase mt-2">Выбери с напарником один знак</p>
+        <p class="text-[8px] text-gray-400/80 uppercase mt-2 tracking-wider">Синхронизация частоты</p>
+        
+        <div class="mt-4 pt-4 border-t border-white/10">
+            <p class="text-[10px] text-emerald-500/80 uppercase tracking-widest font-bold">Твой позывной: <span id="front-id" class="text-white text-xs ml-1 tracking-normal">----</span></p>
+        </div>
     </div>
 
     <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden">
-        
         <div id="video-zone" class="absolute inset-0 bg-black flex items-center justify-center">
             <video id="remote-v" class="w-full h-full" autoplay playsinline></video>
             <video id="local-v" class="top-4 right-4 transform scale-x-[-1]" autoplay playsinline muted></video>
-
-            <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-emerald-500 space-y-2">
-                <div class="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-[8px] font-bold uppercase tracking-[0.5em]">Эфир пуст...</p>
+            <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-emerald-500 space-y-2 backdrop-blur-sm">
+                <div class="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
+                <p class="text-[8px] font-bold uppercase tracking-[0.5em] animate-pulse">Поиск частоты...</p>
             </div>
         </div>
 
         <footer class="absolute bottom-0 left-0 w-full p-4 space-y-3 z-30">
             <div id="msgs" class="max-h-36 overflow-y-auto no-scrollbar space-y-1 mb-2 px-2"></div>
-
-            <div id="setup-controls" class="flex flex-col gap-2 glass-ui p-3 rounded-2xl">
+            <div id="setup-controls" class="flex flex-col gap-2 glass-panel p-3 rounded-2xl">
                 <div class="flex justify-between items-center px-1">
-                    <span class="text-[8px] text-gray-400 uppercase font-bold">Твой ID: <span id="display-id" class="text-emerald-400 ml-1 text-xs">----</span></span>
-                    <button onclick="location.reload()" class="text-[8px] text-red-400 font-bold uppercase">Сброс</button>
+                    <span class="text-[8px] text-gray-400 uppercase font-bold">ID: <span id="display-id" class="text-emerald-400 ml-1 text-[10px]">----</span></span>
+                    <button onclick="location.reload()" class="text-[8px] text-red-400/80 font-bold uppercase hover:text-red-400">Сброс</button>
                 </div>
                 <div class="flex gap-2">
-                    <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none uppercase font-mono font-bold tracking-widest">
-                    <button id="connect-btn" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/30">СВЯЗЬ</button>
+                    <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-sm text-emerald-300 outline-none uppercase font-mono font-bold tracking-widest focus:border-emerald-500/50 transition-all">
+                    <button id="connect-btn" class="bg-emerald-600/90 px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">СВЯЗЬ</button>
                 </div>
             </div>
-
             <div id="chat-controls" class="flex gap-2 hidden input-panel p-3 rounded-2xl transition-all duration-300">
-                <button id="call-btn" class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400">🎥</button>
-                <input type="text" id="msg-in" placeholder="Сигнал..." class="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-sm outline-none focus:border-emerald-500/50">
-                <button id="send-btn" class="bg-indigo-600/80 px-4 rounded-xl font-bold">🚀</button>
+                <button id="call-btn" class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 active:bg-emerald-500/20 transition-all">🎥</button>
+                <input type="text" id="msg-in" placeholder="Сигнал..." class="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-emerald-500/50 transition-all">
+                <button id="send-btn" class="bg-indigo-600/80 px-4 rounded-xl font-bold active:scale-95 transition-all shadow-lg shadow-indigo-500/20">🚀</button>
             </div>
         </footer>
     </main>
 
     <script>
-        // --- ЗВЕЗДЫ ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
@@ -92,85 +81,58 @@
         function animate() { stars.rotation.y += 0.0002; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        // --- ЛОГИКА ПЕРЕТАСКИВАНИЯ ---
         const localV = document.getElementById('local-v');
         let isDragging = false; let startX, startY;
-        localV.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].clientX - localV.offsetLeft;
-            startY = e.touches[0].clientY - localV.offsetTop;
-            localV.style.borderColor = "#60a5fa";
-        });
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            let x = Math.max(0, Math.min(e.touches[0].clientX - startX, window.innerWidth - localV.offsetWidth));
-            let y = Math.max(0, Math.min(e.touches[0].clientY - startY, window.innerHeight - localV.offsetHeight));
-            localV.style.left = x + 'px'; localV.style.top = y + 'px';
-            localV.style.right = 'auto'; localV.style.bottom = 'auto';
-        });
+        localV.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX - localV.offsetLeft; startY = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#60a5fa"; });
+        document.addEventListener('touchmove', (e) => { if (!isDragging) return; let x = Math.max(0, Math.min(e.touches[0].clientX - startX, window.innerWidth - localV.offsetWidth)); let y = Math.max(0, Math.min(e.touches[0].clientY - startY, window.innerHeight - localV.offsetHeight)); localV.style.left = x + 'px'; localV.style.top = y + 'px'; localV.style.right = 'auto'; localV.style.bottom = 'auto'; });
         document.addEventListener('touchend', () => { isDragging = false; localV.style.borderColor = "#10b981"; });
 
-        // --- ЛОГИКА СВЯЗИ И ПАМЯТЬ ---
-        let peer = null; let conn = null; let localStream = null; let roomPass = "";
+        // --- ЖЕЛЕЗОБЕТОННАЯ ПАМЯТЬ ---
+        let roomPass = ""; let peer = null; let conn = null; let localStream = null;
+        
+        // Добываем или создаем ID СРАЗУ при запуске скрипта
+        let myStaticId = localStorage.getItem('myGalaxyId');
+        if(!myStaticId) {
+            myStaticId = Math.random().toString(36).substring(2, 6).toUpperCase();
+            localStorage.setItem('myGalaxyId', myStaticId);
+        }
 
-        // Восстановление ID напарника из памяти
         window.onload = () => {
+            // Сразу пишем ID на главный экран и в панель чата
+            document.getElementById('front-id').textContent = myStaticId;
+            document.getElementById('display-id').textContent = myStaticId;
+
+            // Вспоминаем ID напарника
             if(localStorage.getItem('lastTarget')) {
                 document.getElementById('target-id').value = localStorage.getItem('lastTarget');
             }
         };
 
-        // 10 Космических символов (наш новый визуальный пароль)
-        const sysCode = [
-            { i: '👽', v: 'alien' }, { i: '🚀', v: 'rocket' }, { i: '🛰️', v: 'sat' }, 
-            { i: '🛸', v: 'ufo' }, { i: '🌍', v: 'earth' }, { i: '🌙', v: 'moon' }, 
-            { i: '🪐', v: 'planet' }, { i: '☄️', v: 'comet' }, { i: '🤖', v: 'bot' }, { i: '☢️', v: 'nuke' }
-        ];
-
-        // Рисуем кнопки-символы
+        const sysCode = [ { i: '👽', v: 'alien' }, { i: '🚀', v: 'rocket' }, { i: '🛰️', v: 'sat' }, { i: '🛸', v: 'ufo' }, { i: '🌍', v: 'earth' }, { i: '🌙', v: 'moon' }, { i: '🪐', v: 'planet' }, { i: '☄️', v: 'comet' }, { i: '🤖', v: 'bot' }, { i: '☢️', v: 'nuke' } ];
         const pad = document.getElementById('symbol-pad');
         sysCode.forEach(s => {
             const btn = document.createElement('button');
-            btn.className = 'sym-btn bg-white/5 border border-white/10 rounded-2xl text-2xl py-4 flex justify-center items-center transition-all';
+            btn.className = 'sym-btn rounded-xl text-2xl py-3 flex justify-center items-center'; 
             btn.textContent = s.i;
             btn.onclick = () => {
-                roomPass = s.v; // Код символа становится паролем
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('chat-ui').style.display = 'flex';
-                initPeer(); // Сразу запускаем подключение (экономим 1 клик)
+                roomPass = s.v;
+                const authScreen = document.getElementById('auth-screen');
+                authScreen.style.opacity = '0'; authScreen.style.transform = 'scale(0.9)';
+                setTimeout(() => { authScreen.style.display = 'none'; document.getElementById('chat-ui').style.display = 'flex'; initPeer(); }, 300);
             };
             pad.appendChild(btn);
         });
 
         function initPeer() {
-            // Ищем СВОЙ постоянный ID или создаем его навсегда
-            let shortId = localStorage.getItem('myGalaxyId');
-            if(!shortId) {
-                shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
-                localStorage.setItem('myGalaxyId', shortId);
-            }
-
-            peer = new Peer(roomPass + '-' + shortId.toLowerCase(), {
-                config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
-            });
-            
-            peer.on('open', () => document.getElementById('display-id').textContent = shortId);
+            peer = new Peer(roomPass + '-' + myStaticId.toLowerCase(), { config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] } });
             peer.on('connection', c => { conn = c; bindEvents(); });
             peer.on('call', async call => {
                 if(confirm('ПРИНЯТЬ СИГНАЛ?')) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        localV.srcObject = localStream;
-                        call.answer(localStream);
-                        call.on('stream', s => {
-                            document.getElementById('remote-v').srcObject = s;
-                            document.getElementById('video-wait').style.display = 'none';
-                        });
-                        call.on('close', () => { 
-                             document.getElementById('remote-v').srcObject = null;
-                             document.getElementById('video-wait').style.display = 'flex';
-                             addMsg('ЭФИР ЗАКРЫТ', true);
-                        });
+                        localV.srcObject = localStream; call.answer(localStream);
+                        call.on('stream', s => { document.getElementById('remote-v').srcObject = s; document.getElementById('video-wait').style.display = 'none'; });
+                        call.on('close', () => { document.getElementById('remote-v').srcObject = null; document.getElementById('video-wait').style.display = 'flex'; addMsg('ЭФИР ЗАКРЫТ', true); });
                     } catch (e) { alert("Ошибка камеры!"); }
                 }
             });
@@ -179,68 +141,40 @@
         document.getElementById('connect-btn').onclick = () => {
             const tid = document.getElementById('target-id').value.trim().toUpperCase();
             if(!tid) return;
-            localStorage.setItem('lastTarget', tid); // Запоминаем ID напарника
-            conn = peer.connect(roomPass + '-' + tid.toLowerCase());
-            bindEvents();
+            localStorage.setItem('lastTarget', tid);
+            conn = peer.connect(roomPass + '-' + tid.toLowerCase()); bindEvents();
         };
 
         function bindEvents() {
-            conn.on('open', () => {
-                addMsg('КАНАЛ ЗАЩИЩЕН', true);
-                document.getElementById('setup-controls').style.display = 'none';
-                document.getElementById('chat-controls').classList.remove('hidden');
-            });
+            conn.on('open', () => { addMsg('КАНАЛ ЗАЩИЩЕН', true); document.getElementById('setup-controls').style.display = 'none'; document.getElementById('chat-controls').classList.remove('hidden'); });
             conn.on('data', d => addMsg(d, false));
             conn.on('close', () => addMsg('СВЯЗЬ ПРЕРВАНА', true));
         }
 
         function addMsg(text, isSys) {
             const d = document.createElement('div');
-            if(isSys) {
-                d.className = 'text-center text-[8px] text-emerald-400 font-bold uppercase opacity-60';
-                d.textContent = text;
-            } else {
-                const isMine = text.startsWith('me:');
-                const clean = isMine ? text.replace('me:', '') : text;
+            if(isSys) { d.className = 'text-center text-[8px] text-emerald-400 font-bold uppercase opacity-60 tracking-wider'; d.textContent = text; } 
+            else {
+                const isMine = text.startsWith('me:'); const clean = isMine ? text.replace('me:', '') : text;
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/40' : 'bg-white/5'} px-3 py-1 rounded-xl text-xs max-w-[80%] backdrop-blur-sm">${clean}</div>`;
+                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/30 border-emerald-500/20' : 'bg-white/5 border-white/10'} border px-3 py-2 rounded-xl text-xs max-w-[85%] backdrop-blur-md shadow-sm">${clean}</div>`;
             }
-            const msgs = document.getElementById('msgs');
-            msgs.appendChild(d);
-            msgs.scrollTop = msgs.scrollHeight;
+            const msgs = document.getElementById('msgs'); msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
         }
 
-        document.getElementById('send-btn').onclick = (e) => {
-            e.preventDefault();
-            const v = document.getElementById('msg-in').value.trim();
-            if(v && conn && conn.open) {
-                conn.send(v);
-                addMsg('me:' + v, false);
-                document.getElementById('msg-in').value = '';
-            }
-        };
-
+        document.getElementById('send-btn').onclick = (e) => { e.preventDefault(); const v = document.getElementById('msg-in').value.trim(); if(v && conn && conn.open) { conn.send(v); addMsg('me:' + v, false); document.getElementById('msg-in').value = ''; } };
         document.getElementById('call-btn').onclick = async () => {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localV.srcObject = localStream;
-                const call = peer.call(conn.peer, localStream);
-                call.on('stream', s => {
-                    document.getElementById('remote-v').srcObject = s;
-                    document.getElementById('video-wait').style.display = 'none';
-                });
-                call.on('close', () => { 
-                     document.getElementById('remote-v').srcObject = null;
-                     document.getElementById('video-wait').style.display = 'flex';
-                     addMsg('ЭФИР ЗАКРЫТ', true);
-                });
+                localV.srcObject = localStream; const call = peer.call(conn.peer, localStream);
+                call.on('stream', s => { document.getElementById('remote-v').srcObject = s; document.getElementById('video-wait').style.display = 'none'; });
+                call.on('close', () => { document.getElementById('remote-v').srcObject = null; document.getElementById('video-wait').style.display = 'flex'; addMsg('ЭФИР ЗАКРЫТ', true); });
             } catch(e) { alert("Ошибка камеры!"); }
         };
 
-        const msgIn = document.getElementById('msg-in');
-        const chatControls = document.getElementById('chat-controls');
-        msgIn.addEventListener('focus', () => chatControls.classList.add('mb-8'));
-        msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-8'));
+        const msgIn = document.getElementById('msg-in'); const chatControls = document.getElementById('chat-controls');
+        msgIn.addEventListener('focus', () => chatControls.classList.add('mb-8')); msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-8'));
+        document.getElementById('auth-screen').style.transition = 'all 0.3s ease-in-out';
     </script>
 </body>
 </html>
