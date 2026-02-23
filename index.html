@@ -15,11 +15,8 @@
                 fontFamily: { sans: ['Inter', 'sans-serif'] },
                 extend: {
                     colors: {
-                        // Наш новый акцентный цвет - благородный морской синий
                         primary: { DEFAULT: '#0ea5e9', light: '#38bdf8', dark: '#0284c7' },
-                        // Цвет фона - сложный светло-серый, как дорогая штукатурка
                         surface: '#f8fafc',
-                        // Цвет текста - не черный, а дорогой графит
                         darktext: '#1e293b',
                     }
                 }
@@ -42,37 +39,37 @@
         video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
         video { background-color: transparent; object-fit: cover; outline: none; border: none; }
 
-        /* НОВОЕ СВЕТЛОЕ СТЕКЛО (Frosted Glass Light) */
+        /* НОВОЕ СВЕТЛОЕ СТЕКЛО */
         .glass-panel { 
-            background: rgba(255, 255, 255, 0.65); /* Светлый полупрозрачный */
-            backdrop-filter: blur(20px) saturate(180%); /* Сильное размытие и насыщенность */
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(20px) saturate(180%); 
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.8); /* Белая каемка */
-            box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.15); /* Мягкая цветная тень */
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.15); 
         }
 
-        /* КНОПКИ-СИМВОЛЫ - КАК ДОРОГАЯ КЕРАМИКА */
+        /* КНОПКИ-СИМВОЛЫ */
         .sym-btn { 
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(230, 240, 255, 0.8);
-            color: #64748b; /* Спокойный серый цвет иконок */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Легкая тень */
+            color: #64748b; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .sym-btn:active { 
-            background: #0ea5e9; /* При нажатии - сочный синий */
+            background: #0ea5e9; 
             color: white;
             border-color: #0ea5e9;
             transform: scale(0.95); 
             box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
         }
         
-        /* СВОЕ ВИДЕО - АККУРАТНАЯ РАМКА */
+        /* СВОЕ ВИДЕО */
         #local-v { 
             position: absolute; width: 100px; height: 140px; z-index: 50; 
             border-radius: 1rem; 
-            border: 3px solid white; /* Белая рамка */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Мягкая тень */
+            border: 3px solid white; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
             touch-action: none; 
         }
         
@@ -150,7 +147,6 @@
             
             <div id="chat-controls" class="flex gap-3 hidden input-panel p-4 rounded-[2rem] transition-all duration-300 items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                 <button id="call-btn" class="bg-white text-primary p-3 rounded-2xl text-xl shadow-md border border-blue-100 active:scale-95 transition-all active:bg-blue-50">📹</button>
-                
                 <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 modern-input rounded-2xl px-5 py-3 text-sm outline-none h-full font-medium">
                 <button id="send-btn" class="bg-gradient-to-tr from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold active:scale-95 transition-all shadow-lg shadow-indigo-500/25 h-full text-lg">➤</button>
             </div>
@@ -158,24 +154,24 @@
     </main>
 
     <script>
-        // ЗВЕЗДЫ ТЕПЕРЬ СВЕТЛЫЕ И ЕЛЕ ЗАМЕТНЫЕ (ПЫЛЬ В ЛУЧАХ СВЕТА)
+        // Анимация фона (светлые частицы)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000, 0); // Прозрачный фон
+        renderer.setClearColor(0x000000, 0); 
         document.getElementById('canvas-container').appendChild(renderer.domElement);
         const starGeo = new THREE.BufferGeometry();
         const starPos = new Float32Array(20000 * 3);
         for(let i=0; i<60000; i++) starPos[i] = (Math.random() - 0.5) * 15;
         starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        // Цвет звезд изменен на светло-голубой серый, прозрачность уменьшена
         const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.02, color: 0x94a3b8, transparent: true, opacity: 0.2 }));
         scene.add(stars);
         function animate() { stars.rotation.y += 0.0001; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
+        // Перетаскивание видео
         const localV = document.getElementById('local-v'); const remoteV = document.getElementById('remote-v');
         let isDragging = false; let startX, startY;
         localV.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX - localV.offsetLeft; startY = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#38bdf8"; });
@@ -183,6 +179,8 @@
         document.addEventListener('touchend', () => { isDragging = false; localV.style.borderColor = "white"; });
 
         let roomPass = ""; let peer = null; let conn = null; let localStream = null;
+        
+        // Генерация и память ID
         let myStaticId = localStorage.getItem('myGalaxyId');
         if(!myStaticId) { myStaticId = Math.random().toString(36).substring(2, 6).toUpperCase(); localStorage.setItem('myGalaxyId', myStaticId); }
 
@@ -206,9 +204,21 @@
             pad.appendChild(btn);
         });
 
+        // ИНИЦИАЛИЗАЦИЯ СЕТИ (С УСИЛЕННЫМИ TURN-СЕРВЕРАМИ ДЛЯ ОБХОДА VPN)
         function initPeer() {
-            peer = new Peer(roomPass + '-' + myStaticId.toLowerCase(), { config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] } });
+            peer = new Peer(roomPass + '-' + myStaticId.toLowerCase(), { 
+                config: { 
+                    'iceServers': [
+                        { 'urls': 'stun:stun.l.google.com:19302' },
+                        { 'urls': 'turn:openrelay.metered.ca:80', 'username': 'openrelayproject', 'credential': 'openrelayproject' },
+                        { 'urls': 'turn:openrelay.metered.ca:443', 'username': 'openrelayproject', 'credential': 'openrelayproject' },
+                        { 'urls': 'turn:openrelay.metered.ca:443?transport=tcp', 'username': 'openrelayproject', 'credential': 'openrelayproject' }
+                    ] 
+                } 
+            });
+            
             peer.on('connection', c => { conn = c; bindEvents(); });
+            
             peer.on('call', async call => {
                 if(confirm('Входящий видеозвонок. Принять?')) {
                     try {
@@ -241,13 +251,13 @@
             else {
                 const isMine = text.startsWith('me:'); const clean = isMine ? text.replace('me:', '') : text;
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
-                // Светлые пузыри сообщений
                 d.innerHTML = `<div class="${isMine ? 'bg-gradient-to-br from-primary to-primary-light text-white shadow-blue-500/20' : 'bg-white text-darktext border border-slate-100 shadow-slate-200/50'} px-4 py-3 rounded-2xl text-sm max-w-[85%] shadow-md font-medium leading-tight">${clean}</div>`;
             }
             const msgs = document.getElementById('msgs'); msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
         }
 
         document.getElementById('send-btn').onclick = (e) => { e.preventDefault(); const v = document.getElementById('msg-in').value.trim(); if(v && conn && conn.open) { conn.send(v); addMsg('me:' + v, false); document.getElementById('msg-in').value = ''; } };
+        
         document.getElementById('call-btn').onclick = async () => {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -257,6 +267,7 @@
                 call.on('close', () => { remoteV.srcObject = null; remoteV.classList.add('hidden'); document.getElementById('video-wait').style.display = 'flex'; addMsg('Звонок завершен', true); });
             } catch(e) { alert("Ошибка доступа к камере!"); }
         };
+        
         const msgIn = document.getElementById('msg-in'); const chatControls = document.getElementById('chat-controls');
         msgIn.addEventListener('focus', () => chatControls.classList.add('mb-4')); msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-4'));
     </script>
