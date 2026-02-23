@@ -4,13 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Galaxy 5.0 | Premium Link</title>
+  <title>Galaxy 4.1 | Premium Link</title>
 
-  <meta name="theme-color" content="#0ea5e9" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -22,7 +18,8 @@
         extend: {
           colors: {
             primary: { DEFAULT: '#0ea5e9', light: '#38bdf8', dark: '#0284c7' },
-            ink: '#0f172a'
+            surface: '#f8fafc',
+            darktext: '#1e293b',
           }
         }
       }
@@ -30,503 +27,457 @@
   </script>
 
   <style>
-    :root {
-      --bg1:#f0f9ff; --bg2:#e0f2fe;
-      --glass: rgba(255,255,255,.68);
-      --glass2: rgba(255,255,255,.82);
-      --stroke: rgba(255,255,255,.75);
-      --shadow: rgba(2,132,199,.14);
-      --text: #0f172a;
-      --muted:#64748b;
-    }
-    [data-theme="dark"]{
-      --bg1:#0b1220; --bg2:#0a1b2f;
-      --glass: rgba(15,23,42,.55);
-      --glass2: rgba(15,23,42,.72);
-      --stroke: rgba(148,163,184,.18);
-      --shadow: rgba(0,0,0,.30);
-      --text: #e2e8f0;
-      --muted:#94a3b8;
-    }
-
-    html, body { height: 100%; }
     body {
-      margin: 0;
-      overflow: hidden;
-      touch-action: none;
-      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
-      color: var(--text);
+      margin: 0; overflow: hidden;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      color: #1e293b;
       font-family: 'Inter', sans-serif;
+      touch-action: none;
     }
-
-    #canvas-container {
-      position: absolute; inset: 0; z-index: 0;
-      opacity: .55;
-      mix-blend-mode: multiply;
-      pointer-events: none;
-    }
-    [data-theme="dark"] #canvas-container { opacity: .35; mix-blend-mode: screen; }
-
+    #canvas-container { position: absolute; inset: 0; z-index: 0; opacity: 0.5; mix-blend-mode: multiply; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
 
     video::-webkit-media-controls { display: none !important; }
     video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
-    video { background: transparent; object-fit: cover; outline: none; border: none; }
+    video { background-color: transparent; object-fit: cover; outline: none; border: none; }
 
-    .glass {
-      background: var(--glass);
-      backdrop-filter: blur(18px) saturate(170%);
-      -webkit-backdrop-filter: blur(18px) saturate(170%);
-      border: 1px solid var(--stroke);
-      box-shadow: 0 18px 60px -18px var(--shadow);
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.70);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 12px 45px -18px rgba(2,132,199,0.25);
     }
-    .glass-strong { background: var(--glass2); }
 
     .sym-btn {
-      background: rgba(255,255,255,.78);
-      border: 1px solid rgba(226,232,240,.9);
-      box-shadow: 0 10px 25px -18px rgba(0,0,0,.25);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      color: #64748b;
+      box-shadow: 0 8px 22px -18px rgba(0,0,0,.25);
       transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
-      user-select: none;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-    [data-theme="dark"] .sym-btn{
-      background: rgba(15,23,42,.55);
-      border-color: rgba(148,163,184,.18);
-      box-shadow: 0 12px 30px -18px rgba(0,0,0,.6);
-    }
-    .sym-btn:active{
-      transform: scale(.96);
-      box-shadow: 0 0 0 4px rgba(14,165,233,.18), 0 20px 45px -20px rgba(14,165,233,.45);
-      border-color: rgba(14,165,233,.8);
-    }
-
-    .modern-input {
-      background: rgba(241,245,249,.72);
-      border: 1px solid rgba(203,213,225,.78);
-      color: var(--text);
-      transition: box-shadow .18s ease, border-color .18s ease, background .18s ease;
-    }
-    [data-theme="dark"] .modern-input{
-      background: rgba(15,23,42,.55);
-      border-color: rgba(148,163,184,.18);
-      color: var(--text);
-    }
-    .modern-input:focus{
-      background: rgba(255,255,255,.95);
+    .sym-btn:active {
+      background: #0ea5e9;
+      color: white;
       border-color: #0ea5e9;
-      box-shadow: 0 0 0 4px rgba(14,165,233,.15);
-      outline: none;
-    }
-    [data-theme="dark"] .modern-input:focus{
-      background: rgba(2,6,23,.55);
+      transform: scale(0.96);
+      box-shadow: 0 0 0 4px rgba(14,165,233,0.18), 0 18px 40px -18px rgba(14,165,233,.65);
     }
 
     #local-v {
       position: absolute;
       width: 104px; height: 146px;
-      border-radius: 18px;
-      border: 2px solid rgba(255,255,255,.9);
-      box-shadow: 0 14px 32px rgba(0,0,0,.16);
       z-index: 50;
+      border-radius: 1rem;
+      border: 2px solid rgba(255,255,255,0.95);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.12);
       touch-action: none;
       overflow: hidden;
     }
-    [data-theme="dark"] #local-v { border-color: rgba(148,163,184,.22); }
 
-    .pill {
-      border: 1px solid rgba(148,163,184,.20);
-      background: rgba(255,255,255,.65);
+    .input-panel {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
     }
-    [data-theme="dark"] .pill{
-      background: rgba(15,23,42,.55);
-      border-color: rgba(148,163,184,.18);
+
+    .modern-input {
+      background: rgba(241, 245, 249, 0.85);
+      border: 1px solid rgba(203, 213, 225, 0.85);
+      color: #334155;
+      transition: all 0.2s;
     }
+    .modern-input:focus {
+      background: white;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+      outline: none;
+    }
+
+    /* маленький статус сверху */
+    .status-pill{
+      position: absolute;
+      top: 14px; left: 14px;
+      z-index: 60;
+      padding: 10px 12px;
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(226,232,240,0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px -22px rgba(0,0,0,0.22);
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; }
+    .status-text{ font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:#64748b; }
   </style>
 </head>
 
-<body class="w-screen h-[100dvh] flex items-center justify-center overflow-hidden" data-theme="light">
+<body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden bg-surface">
 
   <div id="canvas-container"></div>
 
-  <!-- TOP BAR (theme + status) -->
-  <div class="absolute top-4 left-4 right-4 z-50 flex items-center justify-between pointer-events-none">
-    <div class="pointer-events-auto flex items-center gap-2 glass pill rounded-2xl px-3 py-2">
-      <div class="w-2.5 h-2.5 rounded-full" id="dot" style="background:#94a3b8;"></div>
-      <div class="text-[10px] font-extrabold uppercase tracking-[0.28em]" id="status" style="color:var(--muted);">Ожидание</div>
-    </div>
-
-    <button id="theme-btn" class="pointer-events-auto glass pill rounded-2xl px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.28em] active:scale-95 transition"
-      style="color:var(--muted);">
-      Тема
-    </button>
+  <div class="status-pill">
+    <div id="dot" class="dot"></div>
+    <div id="status" class="status-text">ОЖИДАНИЕ</div>
   </div>
 
   <!-- AUTH -->
-  <section id="auth-screen" class="glass z-40 p-7 rounded-[2.25rem] w-full max-w-xs text-center space-y-5 mx-4 transition-all duration-300">
-    <div class="w-28 h-28 mx-auto rounded-3xl p-1"
-      style="background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(56,189,248,.22)); border:1px solid rgba(255,255,255,.75); box-shadow: 0 18px 55px -28px rgba(14,165,233,.45);">
-      <div class="w-full h-full rounded-2xl flex items-center justify-center"
-        style="background: rgba(255,255,255,.85); border:1px solid rgba(56,189,248,.25);">
-        <span class="text-5xl font-black tracking-tighter"
+  <div id="auth-screen" class="glass-panel z-40 p-8 rounded-[2.5rem] w-full max-w-xs text-center space-y-6 mx-4 transition-all duration-300">
+    <div class="w-28 h-28 mx-auto bg-gradient-to-tr from-white to-blue-50 border border-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/10 p-1">
+      <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center border border-blue-100">
+        <span class="text-5xl font-black text-primary tracking-tighter"
           style="background: linear-gradient(135deg, #0ea5e9, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DK</span>
       </div>
     </div>
 
-    <div class="space-y-1">
-      <p class="text-[10px] uppercase font-extrabold tracking-[0.42em]" style="color:var(--muted);">Premium Connection</p>
-      <p class="text-[11px] font-semibold" style="color:var(--muted); opacity:.85;">Выберите ключ доступа</p>
+    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.4em] -mt-3">Premium Connection</p>
+
+    <div id="symbol-pad" class="grid grid-cols-5 gap-3 mt-6"></div>
+
+    <p class="text-[9px] text-slate-500/70 uppercase mt-3 font-medium tracking-widest">Выберите ключ доступа</p>
+
+    <div class="mt-6 pt-5 border-t border-slate-200/50">
+      <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold flex justify-center items-center">
+        Ваш ID:
+        <span id="front-id" class="text-primary font-black text-sm ml-2 bg-blue-50 px-3 py-1 rounded-lg shadow-sm">----</span>
+        <button id="copy-id" class="ml-2 bg-white border border-slate-200 px-2 py-1 rounded-lg text-xs font-black active:scale-95">⧉</button>
+      </p>
     </div>
 
-    <div id="symbol-pad" class="grid grid-cols-5 gap-3 mt-4"></div>
+    <!-- диагностика (если что-то не грузится) -->
+    <p id="diag" class="text-[10px] text-rose-400 font-bold hidden"></p>
+  </div>
 
-    <div class="mt-4 pt-4 border-t" style="border-color: rgba(148,163,184,.20);">
-      <div class="flex items-center justify-center gap-2">
-        <span class="text-[10px] uppercase tracking-[0.28em] font-extrabold" style="color:var(--muted);">Ваш ID</span>
-        <button id="copy-id-front" class="text-[10px] font-black px-3 py-1 rounded-xl active:scale-95 transition"
-          style="background: rgba(14,165,233,.12); color:#0ea5e9; border:1px solid rgba(14,165,233,.25);">
-          <span id="front-id">----</span> ⧉
-        </button>
-      </div>
-      <p class="text-[10px] mt-2" style="color:var(--muted); opacity:.75;">ID сохраняется в устройстве</p>
-    </div>
-  </section>
+  <!-- CHAT UI -->
+  <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden bg-slate-50">
+    <div id="video-zone" class="absolute inset-0 flex items-center justify-center overflow-hidden rounded-b-[2.5rem]">
+      <video id="remote-v" class="w-full h-full hidden object-cover" autoplay playsinline></video>
+      <video id="local-v" class="top-4 right-4 transform scale-x-[-1] hidden" autoplay playsinline muted></video>
 
-  <!-- APP -->
-  <main id="app" class="absolute inset-0 z-20 hidden">
-    <div class="absolute inset-0 flex items-center justify-center overflow-hidden rounded-b-[2.5rem]">
-      <video id="remote-v" class="w-full h-full hidden" autoplay playsinline></video>
-      <video id="local-v" class="top-4 right-4 hidden transform scale-x-[-1]" autoplay playsinline muted></video>
-
-      <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center glass-strong glass text-primary space-y-4">
+      <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100/80 text-primary space-y-4 backdrop-blur-md">
         <div class="relative">
-          <div class="w-12 h-12 border-4 rounded-full" style="border-color: rgba(148,163,184,.22);"></div>
+          <div class="w-12 h-12 border-4 border-blue-100 rounded-full"></div>
           <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
         </div>
-        <p class="text-[10px] font-extrabold uppercase tracking-[0.34em]" style="color:var(--muted);">Поиск сигнала...</p>
+        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 animate-pulse">Поиск сигнала...</p>
       </div>
     </div>
 
-    <footer class="absolute bottom-0 left-0 w-full z-30 pb-6 pt-4 px-4 space-y-3">
-      <div id="msgs" class="max-h-44 overflow-y-auto no-scrollbar space-y-2 mb-3 px-1"></div>
+    <footer class="absolute bottom-0 left-0 w-full space-y-3 z-30 pb-6 pt-4 px-4">
+      <div id="msgs" class="max-h-40 overflow-y-auto no-scrollbar space-y-2 mb-4 px-2"></div>
 
-      <!-- SETUP -->
-      <div id="setup" class="glass p-4 rounded-3xl space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div class="text-[10px] uppercase tracking-[0.28em] font-extrabold" style="color:var(--muted);">
-            Ваш ID: <span id="display-id" class="font-black" style="color:#0ea5e9;">----</span>
-            <button id="copy-id" class="ml-2 px-2 py-1 rounded-xl active:scale-95 transition"
-              style="background: rgba(14,165,233,.12); color:#0ea5e9; border:1px solid rgba(14,165,233,.25);">⧉</button>
-          </div>
-
-          <button id="reset-btn" class="text-[10px] font-extrabold uppercase tracking-[0.28em] px-2 py-1 rounded-xl active:scale-95 transition"
-            style="background: rgba(244,63,94,.10); color:#fb7185; border:1px solid rgba(244,63,94,.22);">
-            Сброс
-          </button>
+      <div id="setup-controls" class="flex flex-col gap-3 glass-panel p-4 rounded-3xl shadow-sm">
+        <div class="flex justify-between items-center px-2">
+          <span class="text-[9px] text-slate-400 uppercase font-bold">
+            Ваш ID: <span id="display-id" class="text-primary font-black text-xs ml-1">----</span>
+          </span>
+          <button onclick="location.reload()" class="text-[9px] text-rose-400 font-bold uppercase hover:text-rose-600 transition py-1 px-2 bg-rose-50 rounded-lg">Сброс</button>
         </div>
-
         <div class="flex gap-3">
-          <input id="target-id" type="text" inputmode="latin" autocomplete="off" spellcheck="false"
-            placeholder="ID напарника"
-            class="flex-1 modern-input rounded-2xl px-4 py-3 text-sm font-black uppercase tracking-widest text-center" />
+          <input type="text" id="target-id" placeholder="ID напарника"
+            class="flex-1 modern-input rounded-2xl px-4 py-3 text-sm font-bold outline-none uppercase tracking-widest text-center">
           <button id="connect-btn"
-            class="px-6 py-3 rounded-2xl text-xs font-black uppercase active:scale-95 transition-all"
-            style="background: linear-gradient(90deg, #0ea5e9, #38bdf8); color:white; box-shadow: 0 18px 45px -28px rgba(14,165,233,.75);">
+            class="bg-gradient-to-r from-primary to-primary-light text-white px-6 py-3 rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-500/25 active:scale-95 transition-all">
             СВЯЗЬ
           </button>
         </div>
-
-        <div class="text-[10px] px-1" style="color:var(--muted); opacity:.8;">
-          Подсказка: оба пользователя выбирают <b>одинаковый</b> ключ (👽/🚀/…).
-        </div>
+        <p class="text-[10px] text-slate-500 px-2">
+          Важно: оба должны выбрать <b>одинаковый</b> ключ (👽/🚀/…)
+        </p>
       </div>
 
-      <!-- CHAT -->
-      <div id="chat" class="hidden glass-strong glass p-4 rounded-[2rem] items-center gap-3">
-        <button id="call-btn" class="p-3 rounded-2xl text-xl active:scale-95 transition"
-          style="background: rgba(14,165,233,.10); border:1px solid rgba(14,165,233,.22);">📹</button>
-
-        <button id="hang-btn" class="p-3 rounded-2xl text-xl active:scale-95 transition"
-          style="background: rgba(244,63,94,.10); border:1px solid rgba(244,63,94,.22);">⛔</button>
-
-        <input id="msg-in" type="text" placeholder="Сообщение…" autocomplete="off"
-          class="flex-1 modern-input rounded-2xl px-5 py-3 text-sm font-semibold" />
-
-        <button id="send-btn"
-          class="px-6 py-3 rounded-2xl font-black text-lg active:scale-95 transition-all"
-          style="background: linear-gradient(135deg, #6366f1, #a855f7); color:white; box-shadow: 0 18px 45px -28px rgba(99,102,241,.75);">
-          ➤
-        </button>
+      <div id="chat-controls" class="flex gap-3 hidden input-panel p-4 rounded-[2rem] transition-all duration-300 items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <button id="call-btn" class="bg-white text-primary p-3 rounded-2xl text-xl shadow-md border border-blue-100 active:scale-95 transition-all active:bg-blue-50">📹</button>
+        <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 modern-input rounded-2xl px-5 py-3 text-sm outline-none h-full font-medium">
+        <button id="send-btn" class="bg-gradient-to-tr from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold active:scale-95 transition-all shadow-lg shadow-indigo-500/25 h-full text-lg">➤</button>
       </div>
     </footer>
   </main>
 
-<script>
-(() => {
-  /* ------------------ tiny helpers ------------------ */
-  const $ = (id) => document.getElementById(id);
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const safeUpper = (s) => (s || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toUpperCase();
-
-  function setStatus(text, kind = "idle") {
-    const dot = $("dot");
-    const st = $("status");
-    st.textContent = text;
-    const map = {
-      idle: "#94a3b8",
-      ok: "#22c55e",
-      warn: "#f59e0b",
-      err: "#ef4444",
-      link: "#0ea5e9"
-    };
-    dot.style.background = map[kind] || map.idle;
-  }
-
-  async function copyText(t) {
-    try {
-      await navigator.clipboard.writeText(t);
-      addSys("Скопировано: " + t);
-    } catch {
-      // fallback
-      const ta = document.createElement("textarea");
-      ta.value = t;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-      addSys("Скопировано: " + t);
+  <script>
+    /* ---------- статус ---------- */
+    function setStatus(text, color) {
+      document.getElementById('status').textContent = text;
+      document.getElementById('dot').style.background = color || '#94a3b8';
     }
-  }
 
-  /* ------------------ theme ------------------ */
-  const themeKey = "galaxyTheme";
-  const themeBtn = $("theme-btn");
-  function applyTheme(t) {
-    document.body.dataset.theme = t;
-    localStorage.setItem(themeKey, t);
-  }
-  applyTheme(localStorage.getItem(themeKey) || "light");
-  themeBtn.addEventListener("click", () => {
-    applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
-  });
-
-  /* ------------------ THREE background (lighter) ------------------ */
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 120);
-  camera.position.z = 6;
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x000000, 0);
-  $("canvas-container").appendChild(renderer.domElement);
-
-  const starGeo = new THREE.BufferGeometry();
-  const COUNT = 9000; // меньше = быстрее на мобиле
-  const starPos = new Float32Array(COUNT * 3);
-  for (let i = 0; i < COUNT * 3; i++) starPos[i] = (Math.random() - 0.5) * 18;
-  starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
-
-  const stars = new THREE.Points(
-    starGeo,
-    new THREE.PointsMaterial({ size: 0.02, color: 0x94a3b8, transparent: true, opacity: 0.22 })
-  );
-  scene.add(stars);
-
-  let raf = 0;
-  function animate() {
-    stars.rotation.y += 0.00012;
-    stars.rotation.x += 0.00004;
-    renderer.render(scene, camera);
-    raf = requestAnimationFrame(animate);
-  }
-  animate();
-
-  function onResize() {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-  }
-  window.addEventListener("resize", onResize, { passive: true });
-
-  /* ------------------ ID + auth ------------------ */
-  const idKey = "myGalaxyId";
-  let myId = localStorage.getItem(idKey);
-  if (!myId) {
-    myId = Math.random().toString(36).substring(2, 6).toUpperCase();
-    localStorage.setItem(idKey, myId);
-  }
-
-  $("front-id").textContent = myId;
-  $("display-id").textContent = myId;
-
-  $("copy-id-front").addEventListener("click", () => copyText(myId));
-  $("copy-id").addEventListener("click", () => copyText(myId));
-
-  const lastTargetKey = "lastTarget";
-  const lastTarget = localStorage.getItem(lastTargetKey);
-  if (lastTarget) $("target-id").value = lastTarget;
-
-  /* ------------------ UI messages ------------------ */
-  const msgs = $("msgs");
-  function addSys(text) {
-    const d = document.createElement("div");
-    d.className = "text-center text-[10px] font-extrabold uppercase tracking-[0.28em] py-2";
-    d.style.color = "var(--muted)";
-    d.textContent = text;
-    msgs.appendChild(d);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  function addChat(text, mine) {
-    const row = document.createElement("div");
-    row.className = "flex " + (mine ? "justify-end" : "justify-start");
-
-    const bubble = document.createElement("div");
-    bubble.className = "px-4 py-3 rounded-2xl text-sm max-w-[85%] shadow-md font-semibold leading-tight";
-    bubble.style.border = mine ? "none" : "1px solid rgba(148,163,184,.18)";
-    bubble.style.background = mine
-      ? "linear-gradient(135deg, #0ea5e9, #38bdf8)"
-      : (document.body.dataset.theme === "dark" ? "rgba(15,23,42,.55)" : "rgba(255,255,255,.85)");
-    bubble.style.color = mine ? "white" : "var(--text)";
-
-    // Безопасно: только текст, без HTML
-    bubble.textContent = text;
-
-    row.appendChild(bubble);
-    msgs.appendChild(row);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  /* ------------------ peer/video state ------------------ */
-  const localV = $("local-v");
-  const remoteV = $("remote-v");
-  const videoWait = $("video-wait");
-
-  let roomPass = "";
-  let peer = null;
-  let conn = null;
-  let localStream = null;
-  let activeCall = null;
-
-  function stopStream(s) {
-    if (!s) return;
-    s.getTracks().forEach(t => { try { t.stop(); } catch {} });
-  }
-
-  function resetVideoUI() {
-    remoteV.srcObject = null;
-    localV.srcObject = null;
-    remoteV.classList.add("hidden");
-    localV.classList.add("hidden");
-    videoWait.style.display = "flex";
-  }
-
-  async function getMedia() {
-    try {
-      return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    } catch (e) {
-      addSys("Нет доступа к камере/микрофону");
-      setStatus("Камера недоступна", "err");
-      throw e;
+    /* ---------- проверка библиотек (чтобы сразу видеть, что не грузится) ---------- */
+    function diagFail(msg) {
+      const d = document.getElementById('diag');
+      d.textContent = msg;
+      d.classList.remove('hidden');
+      setStatus('ОШИБКА', '#ef4444');
     }
-  }
 
-  function showApp() {
-    $("auth-screen").style.opacity = "0";
-    $("auth-screen").style.transform = "scale(.97) translateY(16px)";
-    setTimeout(() => {
-      $("auth-screen").style.display = "none";
-      $("app").classList.remove("hidden");
-    }, 260);
-  }
+    if (!window.THREE) diagFail('THREE.js не загрузился (проверь доступ к cdnjs).');
+    if (!window.Peer) diagFail('PeerJS не загрузился (проверь доступ к unpkg).');
 
-  /* ------------------ symbol pad ------------------ */
-  const sysCode = [
-    { i: "👽", v: "alien" },
-    { i: "🚀", v: "rocket" },
-    { i: "🛰️", v: "sat" },
-    { i: "🛸", v: "ufo" },
-    { i: "🌍", v: "earth" },
-    { i: "🌙", v: "moon" },
-    { i: "🪐", v: "planet" },
-    { i: "☄️", v: "comet" },
-    { i: "🤖", v: "bot" },
-    { i: "☢️", v: "nuke" }
-  ];
+    /* ---------- фон ---------- */
+    try {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 5;
 
-  const pad = $("symbol-pad");
-  sysCode.forEach(s => {
-    const btn = document.createElement("button");
-    btn.className = "sym-btn rounded-2xl text-2xl py-4 flex justify-center items-center";
-    btn.textContent = s.i;
-    btn.addEventListener("click", async () => {
-      roomPass = s.v;
-      showApp();
-      await sleep(260);
-      initPeer();
-    });
-    pad.appendChild(btn);
-  });
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x000000, 0);
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-  /* ------------------ PeerJS init ------------------ */
-  function initPeer() {
-    // аккуратно закрываем если уже было
-    try { if (peer) peer.destroy(); } catch {}
-    peer = null;
+      const starGeo = new THREE.BufferGeometry();
+      const starPos = new Float32Array(9000 * 3);
+      for (let i = 0; i < starPos.length; i++) starPos[i] = (Math.random() - 0.5) * 15;
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      const stars = new THREE.Points(
+        starGeo,
+        new THREE.PointsMaterial({ size: 0.02, color: 0x94a3b8, transparent: true, opacity: 0.22 })
+      );
+      scene.add(stars);
 
-    const peerId = `${roomPass}-${myId.toLowerCase()}`;
-
-    setStatus("Подключение…", "link");
-
-    peer = new Peer(peerId, {
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
-          { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
-          { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
-        ]
+      function animate() {
+        stars.rotation.y += 0.00012;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
       }
+      animate();
+
+      window.addEventListener('resize', () => {
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
+    } catch (e) {
+      // если three упал — просто молча, но статус покажем
+      setStatus('ФОН OFF', '#f59e0b');
+    }
+
+    /* ---------- drag local video ---------- */
+    const localV = document.getElementById('local-v');
+    let isDragging = false, startX = 0, startY = 0;
+
+    localV.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startX = e.touches[0].clientX - localV.offsetLeft;
+      startY = e.touches[0].clientY - localV.offsetTop;
+      localV.style.borderColor = "#38bdf8";
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const x = Math.max(0, Math.min(e.touches[0].clientX - startX, window.innerWidth - localV.offsetWidth));
+      const y = Math.max(0, Math.min(e.touches[0].clientY - startY, window.innerHeight - localV.offsetHeight));
+      localV.style.left = x + 'px';
+      localV.style.top = y + 'px';
+      localV.style.right = 'auto';
+      localV.style.bottom = 'auto';
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      isDragging = false;
+      localV.style.borderColor = "white";
     });
 
-    peer.on("open", () => {
-      setStatus("Готово", "ok");
-      addSys("Сеть активна");
+    /* ---------- твоё ядро сети (почти без изменений) ---------- */
+    let roomPass = "";
+    let peer = null;
+    let conn = null;
+    let localStream = null;
+
+    // Генерация и память ID
+    let myStaticId = localStorage.getItem('myGalaxyId');
+    if (!myStaticId) {
+      myStaticId = Math.random().toString(36).substring(2, 6).toUpperCase();
+      localStorage.setItem('myGalaxyId', myStaticId);
+    }
+
+    function copyId() {
+      const txt = myStaticId;
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(txt);
+      setStatus('СКОПИРОВАНО', '#22c55e');
+      setTimeout(() => setStatus('ОЖИДАНИЕ', '#94a3b8'), 900);
+    }
+
+    document.getElementById('copy-id').onclick = copyId;
+
+    window.addEventListener('load', () => {
+      document.getElementById('front-id').textContent = myStaticId;
+      document.getElementById('display-id').textContent = myStaticId;
+      if (localStorage.getItem('lastTarget')) {
+        document.getElementById('target-id').value = localStorage.getItem('lastTarget');
+      }
+      setStatus('ОЖИДАНИЕ', '#94a3b8');
     });
 
-    peer.on("error", (e) => {
-      console.error(e);
-      setStatus("Ошибка сети", "err");
-      addSys("Ошибка PeerJS: " + (e?.type || "unknown"));
+    const sysCode = [
+      { i: '👽', v: 'alien' }, { i: '🚀', v: 'rocket' }, { i: '🛰️', v: 'sat' }, { i: '🛸', v: 'ufo' }, { i: '🌍', v: 'earth' },
+      { i: '🌙', v: 'moon' }, { i: '🪐', v: 'planet' }, { i: '☄️', v: 'comet' }, { i: '🤖', v: 'bot' }, { i: '☢️', v: 'nuke' }
+    ];
+
+    const pad = document.getElementById('symbol-pad');
+    sysCode.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'sym-btn rounded-2xl text-2xl py-4 flex justify-center items-center';
+      btn.textContent = s.i;
+      btn.onclick = () => {
+        roomPass = s.v;
+
+        const authScreen = document.getElementById('auth-screen');
+        authScreen.style.opacity = '0';
+        authScreen.style.transform = 'scale(0.95) translateY(20px)';
+
+        setStatus('ЗАПУСК...', '#0ea5e9');
+
+        setTimeout(() => {
+          authScreen.style.display = 'none';
+          document.getElementById('chat-ui').style.display = 'flex';
+          initPeer();
+        }, 300);
+      };
+      pad.appendChild(btn);
     });
 
-    peer.on("connection", (c) => {
-      conn = c;
-      bindConn();
-    });
+    function initPeer() {
+      if (!window.Peer) { diagFail('PeerJS не доступен.'); return; }
 
-    peer.on("call", async (call) => {
-      // Простой confirm — ок, но без “залипания”
-      const ok = confirm("Входящий видеозвонок. Принять?");
-      if (!ok) { try { call.close(); } catch {} ; return; }
+      setStatus('СЕТЬ...', '#0ea5e9');
+
+      peer = new Peer(roomPass + '-' + myStaticId.toLowerCase(), {
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+
+            // твои TURN
+            { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+            { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+            { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+
+            // добавка для VPN (TLS)
+            { urls: 'turns:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+          ]
+        }
+      });
+
+      peer.on('open', () => {
+        setStatus('ГОТОВО', '#22c55e');
+        addMsg('Сеть активна', true);
+      });
+
+      peer.on('error', (e) => {
+        setStatus('ОШИБКА', '#ef4444');
+        addMsg('Peer error: ' + (e?.type || 'unknown'), true);
+      });
+
+      peer.on('connection', c => { conn = c; bindEvents(); });
+
+      peer.on('call', async call => {
+        if (confirm('Входящий видеозвонок. Принять?')) {
+          try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localV.srcObject = localStream;
+            localV.classList.remove('hidden');
+
+            call.answer(localStream);
+            call.on('stream', s => {
+              const remoteV = document.getElementById('remote-v');
+              remoteV.srcObject = s;
+              remoteV.classList.remove('hidden');
+              document.getElementById('video-wait').style.display = 'none';
+              setStatus('ВИДЕО', '#22c55e');
+            });
+
+            call.on('close', () => {
+              document.getElementById('remote-v').srcObject = null;
+              document.getElementById('remote-v').classList.add('hidden');
+              document.getElementById('video-wait').style.display = 'flex';
+              addMsg('Звонок завершен', true);
+              setStatus('НА СВЯЗИ', '#22c55e');
+            });
+          } catch (e) {
+            alert("Ошибка доступа к камере!");
+            setStatus('КАМЕРА?', '#f59e0b');
+          }
+        }
+      });
+    }
+
+    document.getElementById('connect-btn').onclick = () => {
+      const tid = document.getElementById('target-id').value.trim().toUpperCase();
+      if (!tid) return;
+
+      localStorage.setItem('lastTarget', tid);
+
+      if (!peer) { addMsg('Сеть не готова', true); setStatus('СЕТЬ?', '#f59e0b'); return; }
+
+      setStatus('КОННЕКТ...', '#0ea5e9');
+      conn = peer.connect(roomPass + '-' + tid.toLowerCase());
+      bindEvents();
+    };
+
+    function bindEvents() {
+      if (!conn) return;
+
+      conn.on('open', () => {
+        addMsg('Соединение установлено', true);
+        document.getElementById('setup-controls').style.display = 'none';
+        document.getElementById('chat-controls').classList.remove('hidden');
+        setStatus('НА СВЯЗИ', '#22c55e');
+      });
+
+      conn.on('data', d => addMsg(d, false));
+
+      conn.on('close', () => {
+        addMsg('Соединение разорвано', true);
+        setStatus('РАЗРЫВ', '#f59e0b');
+      });
+    }
+
+    function addMsg(text, isSys) {
+      const msgs = document.getElementById('msgs');
+      const d = document.createElement('div');
+
+      if (isSys) {
+        d.className = 'text-center text-[9px] text-slate-400 font-bold uppercase tracking-wider py-2';
+        d.textContent = text;
+      } else {
+        // безопасно: без innerHTML для текста
+        const isMine = String(text).startsWith('me:');
+        const clean = isMine ? String(text).replace('me:', '') : String(text);
+
+        d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = `${isMine ? 'bg-gradient-to-br from-primary to-primary-light text-white shadow-blue-500/20'
+          : 'bg-white text-darktext border border-slate-100 shadow-slate-200/50'} px-4 py-3 rounded-2xl text-sm max-w-[85%] shadow-md font-medium leading-tight`;
+        bubble.textContent = clean;
+
+        d.appendChild(bubble);
+      }
+
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    document.getElementById('send-btn').onclick = (e) => {
+      e.preventDefault();
+      const v = document.getElementById('msg-in').value.trim();
+      if (v && conn && conn.open) {
+        conn.send(v);
+        addMsg('me:' + v, false);
+        document.getElementById('msg-in').value = '';
+      } else {
+        addMsg('Нет соединения', true);
+        setStatus('НЕТ СВЯЗИ', '#f59e0b');
+      }
+    };
+
+    document.getElementById('call-btn').onclick = async () => {
+      if (!conn || !conn.open) { addMsg('Сначала подключись', true); setStatus('НЕТ СВЯЗИ', '#f59e0b'); return; }
 
       try {
-        localStream = await getMedia();
-        localV.srcObject = localStream;
-        localV.classList.remove("hidden");
-
-        activeCall = call;
-        call.answer(localStream);
-
-        call.on("stream", (s) => {
-          remoteV.srcObject = s;
-          remoteV.classList.remove("hidden");
-          videoWait.style.display = "none";
-          setStatus("Видео активно", "ok");
-          addSys("Видеосвязь установлена");
-        });
-
-        call.on("close", ()
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
