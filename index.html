@@ -3,221 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX LINK v1.0</title>
+    <title>MATRIX COMM v2.0</title>
     <style>
-        /* Базовые настройки страницы */
+        /* --- ТЕМА МАТРИЦА (СТРОГАЯ) --- */
+        :root {
+            --matrix-green: #00ff41; /* Тот самый зеленый цвет */
+            --matrix-dark: #000000;  /* Глухой черный */
+            --matrix-glow: 0 0 10px rgba(0, 255, 65, 0.7); /* Эффект свечения */
+        }
+
         body {
+            background-color: var(--matrix-dark);
+            color: var(--matrix-green);
+            font-family: 'Courier New', Courier, monospace; /* Шрифт терминала */
             margin: 0;
             padding: 20px;
-            background-color: #000; /* Черный фон */
-            color: #0F0; /* Ярко-зеленый текст */
-            font-family: 'Courier New', Courier, monospace; /* Шрифт как в терминале */
-            overflow: hidden; /* Чтобы не было полос прокрутки */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
-        /* Холст для эффекта Матрицы */
-        #matrix {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1; /* Убираем на задний план */
-        }
-
         /* Заголовок */
         h1 {
-            text-shadow: 0 0 10px #0F0; /* Зеленое свечение */
+            text-transform: uppercase;
+            letter-spacing: 3px;
             margin-bottom: 30px;
-            background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон, чтобы текст читался */
-            padding: 10px 20px;
-            border: 1px solid #0F0;
+            text-shadow: var(--matrix-glow); /* Свечение текста */
+            border-bottom: 2px solid var(--matrix-green);
+            padding-bottom: 10px;
         }
 
-        /* Контейнеры для видео */
-        .video-container {
+        /* Контейнер для видео-блоков */
+        .main-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
             justify-content: center;
+            gap: 30px;
             width: 100%;
-            max-width: 900px;
-            z-index: 10; /* Интерфейс поверх матрицы */
+            max-width: 1000px;
+            margin-bottom: 40px;
         }
 
+        /* Отдельный видео-бокс */
         .video-box {
-            flex: 1 1 300px;
-            background: rgba(0, 20, 0, 0.8); /* Темно-зеленый полупрозрачный фон */
-            border: 2px solid #0F0;
-            box-shadow: 0 0 15px #0F0; /* Свечение границ */
+            flex: 1 1 350px; /* Адаптивный размер */
+            border: 3px solid var(--matrix-green);
+            background-color: #001100; /* Очень темный зеленый фон внутри */
+            box-shadow: var(--matrix-glow); /* Свечение границ */
             padding: 5px;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Сами видео-элементы */
         video {
             width: 100%;
             height: auto;
-            background: #000;
-            display: block;
-        }
-
-        /* Подписи к видео */
-        .label {
-            text-align: center;
-            margin-top: 5px;
-            font-weight: bold;
-            color: #0F0;
-        }
-
-        /* Кнопка связи */
-        button {
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            color: #000;
-            background-color: #0F0; /* Зеленая кнопка */
-            border: 2px solid #0F0;
-            cursor: pointer;
-            box-shadow: 0 0 20px #0F0; /* Сильное свечение */
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        button:hover {
             background-color: #000;
-            color: #0F0;
-            box-shadow: 0 0 40px #0F0; /* При наведении светится еще сильнее */
+            border-bottom: 1px solid var(--matrix-green);
+            flex-grow: 1; /* Чтобы занимало всё место */
+            min-height: 250px; /* Минимальная высота на телефоне */
+        }
+
+        /* Подписи под видео */
+        .label {
+            margin-top: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* Зона управления внизу */
+        .controls-area {
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            border: 2px dashed var(--matrix-green); /* Пунктирная рамка */
+            text-align: center;
+        }
+
+        /* Поля ввода */
+        input {
+            background-color: var(--matrix-dark);
+            border: 2px solid var(--matrix-green);
+            color: var(--matrix-green);
+            padding: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            margin: 10px 5px;
+            outline: none;
+            text-align: center;
+            width: calc(50% - 20px); /* Два поля в ряд */
+            box-shadow: inset 0 0 5px var(--matrix-green);
         }
         
-        /* Статус подключения */
-        #status {
-            margin-top: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 5px 15px;
-            border: 1px solid #0F0;
-            z-index: 10;
+        /* На маленьких экранах поля друг под другом */
+        @media (max-width: 500px) {
+            input { width: 90%; }
         }
+
+        /* Главная кнопка */
+        button {
+            display: block;
+            width: 80%;
+            margin: 25px auto 0;
+            background-color: var(--matrix-dark);
+            color: var(--matrix-green);
+            border: 3px solid var(--matrix-green);
+            padding: 15px 30px;
+            font-size: 20px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: var(--matrix-glow);
+        }
+
+        /* Эффект при наведении на кнопку */
+        button:hover {
+            background-color: var(--matrix-green);
+            color: var(--matrix-dark);
+            box-shadow: 0 0 25px var(--matrix-green); /* Сильное свечение */
+        }
+
     </style>
 </head>
 <body>
 
-    <canvas id="matrix"></canvas>
+    <h1>> ТЕРМИНАЛ СВЯЗИ <</h1>
 
-    <h1>> СИСТЕМА СВЯЗИ "АМСТЕРДАМ" <</h1>
-
-    <div class="video-container">
+    <div class="main-container">
         <div class="video-box">
             <video id="localVideo" autoplay muted playsinline></video>
-            <div class="label">ОПЕРАТОР 1 (ТЫ)</div>
+            <div class="label">[ ОПЕРАТОР: ТЫ ]</div>
         </div>
+        
         <div class="video-box">
             <video id="remoteVideo" autoplay playsinline></video>
-            <div class="label">ОПЕРАТОР 2 (БРАТ)</div>
+            <div class="label">[ ЦЕЛЬ: БРАТ ]</div>
         </div>
     </div>
 
-    <div id="status">СТАТУС: ОЖИДАНИЕ ПОДКЛЮЧЕНИЯ...</div>
-
-    <button id="startButton">ВЗЛОМАТЬ СЕТЬ</button>
+    <div class="controls-area">
+        <div style="margin-bottom: 15px;">СТАТУС СИСТЕМЫ: ОЖИДАНИЕ КОМАНДЫ</div>
+        
+        <button id="startButton">УСТАНОВИТЬ СОЕДИНЕНИЕ</button>
+    </div>
 
     <script>
-        // Находим холст
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-
-        // Растягиваем холст на весь экран
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // Набор символов: катакана, цифры и латиница для аутентичности
-        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモロゴゾドボポヴッン';
-        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const nums = '0123456789';
-        const alphabet = katakana + latin + nums;
-
-        const fontSize = 16; // Размер шрифта падающих букв
-        // Вычисляем количество колонок
-        const columns = canvas.width / fontSize; 
-
-        // Массив для отслеживания позиции каждой капли (изначально все вверху)
-        const rainDrops = [];
-        for (let x = 0; x < columns; x++) {
-            rainDrops[x] = 1;
-        }
-
-        // Главная функция рисования
-        const draw = () => {
-            // Самый главный трюк: мы не стираем экран полностью, 
-            // а рисуем полупрозрачный черный прямоугольник поверх.
-            // Это создает эффект затухающего шлейфа.
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Настройки текста
-            ctx.fillStyle = '#0F0'; // Ярко-зеленый цвет
-            ctx.font = fontSize + 'px monospace';
-
-            // Проходимся по каждой колонке и рисуем символ
-            for (let i = 0; i < rainDrops.length; i++) {
-                // Выбираем случайный символ
-                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                
-                // Рисуем символ в текущей позиции колонки
-                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-
-                // Если капля улетела за низ экрана ИЛИ сработал случайный шанс
-                // отправляем её обратно наверх. 
-                // Math.random() > 0.975 добавляет хаотичности, чтобы они падали не стеной.
-                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    rainDrops[i] = 0;
-                }
-                
-                // Сдвигаем каплю вниз
-                rainDrops[i]++;
-            }
-        };
-
-        // Запускаем анимацию (30 кадров в секунду для плавности)
-        setInterval(draw, 33);
-
-        // Если изменят размер окна браузера, подстраиваем холст
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            // Пересчитываем колонки при ресайзе
-            const newColumns = canvas.width / fontSize;
-             // Заполняем новый массив капель
-             const newRainDrops = [];
-             for (let x = 0; x < newColumns; x++) {
-                 // Пытаемся сохранить старые позиции, если они были
-                 newRainDrops[x] = rainDrops[x] || 1;
-             }
-             // Обновляем основной массив (копируем данные)
-             // В JS массивы const менять нельзя, но можно менять их содержимое
-             rainDrops.length = 0; // Очищаем старый
-             for(let i=0; i < newRainDrops.length; i++) {
-                 rainDrops.push(newRainDrops[i]);
-             }
-
-        });
-
-        // --- ТУТ БУДЕТ ТВОЙ КОД WebRTC ---
-        // Пока просто заглушка для кнопки, чтобы было видно, что она живая
-        const startButton = document.getElementById('startButton');
-        const statusDiv = document.getElementById('status');
-        startButton.addEventListener('click', () => {
-             statusDiv.textContent = "СТАТУС: ПОИСК ЗАЩИЩЕННОГО КАНАЛА...";
-             statusDiv.style.backgroundColor = "rgba(0, 50, 0, 0.9)";
-             // Сюда потом вставим реальную логику соединения
-             setTimeout(() => {
-                  statusDiv.textContent = "ОШИБКА: КЛЮЧИ ШИФРОВАНИЯ НЕ НАЙДЕНЫ (Нужен сервер!)";
-                  statusDiv.style.color = "red";
-                  statusDiv.style.borderColor = "red";
-             }, 2000);
+        // Временная заглушка, чтобы кнопка "жила"
+        const btn = document.getElementById('startButton');
+        btn.addEventListener('click', function() {
+            this.style.backgroundColor = 'var(--matrix-green)';
+            this.style.color = 'var(--matrix-dark)';
+            this.innerText = '>>> ПОИСК СЕТИ... <<<';
+            setTimeout(() => {
+                 this.style.backgroundColor = 'var(--matrix-dark)';
+                 this.style.color = 'red';
+                 this.style.borderColor = 'red';
+                 this.style.boxShadow = '0 0 15px red';
+                 this.innerText = 'ОШИБКА: НЕТ КЛЮЧЕЙ ШИФРОВАНИЯ';
+            }, 2000);
         });
     </script>
+
 </body>
 </html>
