@@ -21,10 +21,11 @@
             border-radius: 1rem; 
             border: 2px solid #10b981; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            touch-action: none; /* Чтобы палец не скроллил страницу при движении */
+            touch-action: none; 
         }
-        /* Стиль для панели ввода, чтобы она была более прозрачной */
         .input-panel { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        /* Красивое свечение для нажатых кнопок пароля */
+        .sym-btn:active { background: rgba(16, 185, 129, 0.4); border-color: #10b981; transform: scale(0.95); }
     </style>
 </head>
 <body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden">
@@ -33,35 +34,36 @@
 
     <div id="auth-screen" class="glass-ui z-40 p-8 rounded-[2.5rem] w-full max-w-sm text-center space-y-6 mx-4">
         <h2 class="text-2xl font-black text-emerald-400 italic">GALAXY 4.0</h2>
-        <input type="password" id="room-pass" placeholder="ПАРОЛЬ" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white text-center font-bold focus:border-emerald-500 outline-none">
-        <button id="auth-btn" class="w-full bg-emerald-600 py-4 rounded-2xl font-black text-lg active:scale-95 transition-all">ВОЙТИ</button>
+        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">КЛЮЧ ЧАСТОТЫ</p>
+        
+        <div id="symbol-pad" class="grid grid-cols-5 gap-3"></div>
+        
+        <p class="text-[9px] text-gray-500 uppercase mt-2">Выбери с напарником один знак</p>
     </div>
 
     <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden">
         
         <div id="video-zone" class="absolute inset-0 bg-black flex items-center justify-center">
             <video id="remote-v" class="w-full h-full" autoplay playsinline></video>
-            
             <video id="local-v" class="top-4 right-4 transform scale-x-[-1]" autoplay playsinline muted></video>
 
             <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-emerald-500 space-y-2">
                 <div class="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-[8px] font-bold uppercase tracking-[0.5em]">Поиск частоты...</p>
+                <p class="text-[8px] font-bold uppercase tracking-[0.5em]">Эфир пуст...</p>
             </div>
         </div>
 
         <footer class="absolute bottom-0 left-0 w-full p-4 space-y-3 z-30">
-            
             <div id="msgs" class="max-h-36 overflow-y-auto no-scrollbar space-y-1 mb-2 px-2"></div>
 
             <div id="setup-controls" class="flex flex-col gap-2 glass-ui p-3 rounded-2xl">
                 <div class="flex justify-between items-center px-1">
-                    <span class="text-[8px] text-gray-400 uppercase font-bold">Твой ID: <span id="display-id" class="text-emerald-400 ml-1">----</span></span>
+                    <span class="text-[8px] text-gray-400 uppercase font-bold">Твой ID: <span id="display-id" class="text-emerald-400 ml-1 text-xs">----</span></span>
                     <button onclick="location.reload()" class="text-[8px] text-red-400 font-bold uppercase">Сброс</button>
                 </div>
                 <div class="flex gap-2">
-                    <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none uppercase font-mono">
-                    <button id="connect-btn" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">СВЯЗЬ</button>
+                    <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none uppercase font-mono font-bold tracking-widest">
+                    <button id="connect-btn" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/30">СВЯЗЬ</button>
                 </div>
             </div>
 
@@ -90,58 +92,72 @@
         function animate() { stars.rotation.y += 0.0002; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        // --- ЛОГИКА ПЕРЕТАСКИВАНИЯ (DRAG-AND-DROP) ---
+        // --- ЛОГИКА ПЕРЕТАСКИВАНИЯ ---
         const localV = document.getElementById('local-v');
-        let isDragging = false;
-        let startX, startY;
-
+        let isDragging = false; let startX, startY;
         localV.addEventListener('touchstart', (e) => {
             isDragging = true;
             startX = e.touches[0].clientX - localV.offsetLeft;
             startY = e.touches[0].clientY - localV.offsetTop;
-            localV.style.borderColor = "#60a5fa"; // Меняем цвет при касании
+            localV.style.borderColor = "#60a5fa";
         });
-
         document.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            let x = e.touches[0].clientX - startX;
-            let y = e.touches[0].clientY - startY;
-            
-            // Ограничения экрана
-            x = Math.max(0, Math.min(x, window.innerWidth - localV.offsetWidth));
-            y = Math.max(0, Math.min(y, window.innerHeight - localV.offsetHeight));
-            
-            localV.style.left = x + 'px';
-            localV.style.top = y + 'px';
-            localV.style.right = 'auto';
-            localV.style.bottom = 'auto';
+            let x = Math.max(0, Math.min(e.touches[0].clientX - startX, window.innerWidth - localV.offsetWidth));
+            let y = Math.max(0, Math.min(e.touches[0].clientY - startY, window.innerHeight - localV.offsetHeight));
+            localV.style.left = x + 'px'; localV.style.top = y + 'px';
+            localV.style.right = 'auto'; localV.style.bottom = 'auto';
         });
+        document.addEventListener('touchend', () => { isDragging = false; localV.style.borderColor = "#10b981"; });
 
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-            localV.style.borderColor = "#10b981";
-        });
-
-        // --- ЛОГИКА СВЯЗИ ---
+        // --- ЛОГИКА СВЯЗИ И ПАМЯТЬ ---
         let peer = null; let conn = null; let localStream = null; let roomPass = "";
 
-        document.getElementById('auth-btn').onclick = () => {
-            roomPass = document.getElementById('room-pass').value.trim().toLowerCase();
-            if(!roomPass) return;
-            initPeer();
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('chat-ui').style.display = 'flex';
+        // Восстановление ID напарника из памяти
+        window.onload = () => {
+            if(localStorage.getItem('lastTarget')) {
+                document.getElementById('target-id').value = localStorage.getItem('lastTarget');
+            }
         };
 
+        // 10 Космических символов (наш новый визуальный пароль)
+        const sysCode = [
+            { i: '👽', v: 'alien' }, { i: '🚀', v: 'rocket' }, { i: '🛰️', v: 'sat' }, 
+            { i: '🛸', v: 'ufo' }, { i: '🌍', v: 'earth' }, { i: '🌙', v: 'moon' }, 
+            { i: '🪐', v: 'planet' }, { i: '☄️', v: 'comet' }, { i: '🤖', v: 'bot' }, { i: '☢️', v: 'nuke' }
+        ];
+
+        // Рисуем кнопки-символы
+        const pad = document.getElementById('symbol-pad');
+        sysCode.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'sym-btn bg-white/5 border border-white/10 rounded-2xl text-2xl py-4 flex justify-center items-center transition-all';
+            btn.textContent = s.i;
+            btn.onclick = () => {
+                roomPass = s.v; // Код символа становится паролем
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('chat-ui').style.display = 'flex';
+                initPeer(); // Сразу запускаем подключение (экономим 1 клик)
+            };
+            pad.appendChild(btn);
+        });
+
         function initPeer() {
-            const shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
+            // Ищем СВОЙ постоянный ID или создаем его навсегда
+            let shortId = localStorage.getItem('myGalaxyId');
+            if(!shortId) {
+                shortId = Math.random().toString(36).substring(2, 6).toUpperCase();
+                localStorage.setItem('myGalaxyId', shortId);
+            }
+
             peer = new Peer(roomPass + '-' + shortId.toLowerCase(), {
                 config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
             });
+            
             peer.on('open', () => document.getElementById('display-id').textContent = shortId);
             peer.on('connection', c => { conn = c; bindEvents(); });
             peer.on('call', async call => {
-                if(confirm('ПРИНЯТЬ ВЫЗОВ?')) {
+                if(confirm('ПРИНЯТЬ СИГНАЛ?')) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         localV.srcObject = localStream;
@@ -150,34 +166,32 @@
                             document.getElementById('remote-v').srcObject = s;
                             document.getElementById('video-wait').style.display = 'none';
                         });
-                        call.on('close', () => { // Обработка завершения звонка
+                        call.on('close', () => { 
                              document.getElementById('remote-v').srcObject = null;
                              document.getElementById('video-wait').style.display = 'flex';
-                             addMsg('СИГНАЛ ПОТЕРЯН', true);
+                             addMsg('ЭФИР ЗАКРЫТ', true);
                         });
-                    } catch (e) {
-                        alert("Ошибка доступа к камере/микрофону");
-                        console.error(e);
-                    }
+                    } catch (e) { alert("Ошибка камеры!"); }
                 }
             });
         }
 
         document.getElementById('connect-btn').onclick = () => {
-            const tid = document.getElementById('target-id').value.trim().toLowerCase();
+            const tid = document.getElementById('target-id').value.trim().toUpperCase();
             if(!tid) return;
-            conn = peer.connect(roomPass + '-' + tid);
+            localStorage.setItem('lastTarget', tid); // Запоминаем ID напарника
+            conn = peer.connect(roomPass + '-' + tid.toLowerCase());
             bindEvents();
         };
 
         function bindEvents() {
             conn.on('open', () => {
-                addMsg('ЭФИР УСТАНОВЛЕН', true);
+                addMsg('КАНАЛ ЗАЩИЩЕН', true);
                 document.getElementById('setup-controls').style.display = 'none';
                 document.getElementById('chat-controls').classList.remove('hidden');
             });
             conn.on('data', d => addMsg(d, false));
-            conn.on('close', () => addMsg('СВЯЗЬ ПРЕРВАНА', true)); // Обработка разрыва соединения
+            conn.on('close', () => addMsg('СВЯЗЬ ПРЕРВАНА', true));
         }
 
         function addMsg(text, isSys) {
@@ -189,7 +203,6 @@
                 const isMine = text.startsWith('me:');
                 const clean = isMine ? text.replace('me:', '') : text;
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
-                // Сделал фон сообщений более прозрачным (bg-emerald-600/40 и bg-white/5)
                 d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/40' : 'bg-white/5'} px-3 py-1 rounded-xl text-xs max-w-[80%] backdrop-blur-sm">${clean}</div>`;
             }
             const msgs = document.getElementById('msgs');
@@ -216,26 +229,18 @@
                     document.getElementById('remote-v').srcObject = s;
                     document.getElementById('video-wait').style.display = 'none';
                 });
-                call.on('close', () => { // Обработка завершения звонка
+                call.on('close', () => { 
                      document.getElementById('remote-v').srcObject = null;
                      document.getElementById('video-wait').style.display = 'flex';
-                     addMsg('СИГНАЛ ПОТЕРЯН', true);
+                     addMsg('ЭФИР ЗАКРЫТ', true);
                 });
-            } catch(e) { 
-                alert("Ошибка камеры!"); 
-                console.error(e);
-            }
+            } catch(e) { alert("Ошибка камеры!"); }
         };
 
-        // Фикс для клавиатуры: поднимаем панель при фокусе
         const msgIn = document.getElementById('msg-in');
         const chatControls = document.getElementById('chat-controls');
-        msgIn.addEventListener('focus', () => {
-            chatControls.classList.add('mb-8'); 
-        });
-        msgIn.addEventListener('blur', () => {
-            chatControls.classList.remove('mb-8');
-        });
+        msgIn.addEventListener('focus', () => chatControls.classList.add('mb-8'));
+        msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-8'));
     </script>
 </body>
 </html>
