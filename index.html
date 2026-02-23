@@ -1,1 +1,117 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Secure</title>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>
+body { font-family: Arial; text-align:center; margin-top:40px; }
+button { padding:10px 20px; font-size:16px; }
+video { width:45%; margin:5px; background:#000; }
+</style>
+</head>
+<body>
+
+<h2>Galaxy Secure</h2>
+<div>Your ID: <b id="myid">...</b></div>
+<br>
+<input id="target" placeholder="Peer ID">
+<button onclick="connect()">Connect</button>
+<button onclick="callPeer()">Call</button>
+
+<br><br>
+<video id="local" autoplay muted playsinline></video>
+<video id="remote" autoplay playsinline></video>
+
+<script>
+const params = new URLSearchParams(location.search);
+const TURN_API = params.get("turn"); // передаётся только если нужно
+
+let peer;
+let conn;
+let localStream;
+
+async function getIceServers(){
+  const servers = [{ urls:"stun:stun.l.google.com:19302" }];
+
+  if (TURN_API) {
+    try {
+      const r = await fetch(TURN_API, { cache:"no-store" });
+      const data = await r.json();
+      if (data.username && data.credential && data.urls) {
+        servers.push({
+          urls: data.urls,
+          username: data.username,
+          credential: data.credential
+        });
+      }
+    } catch(e) {
+      console.log("TURN недоступен");
+    }
+  }
+
+  return servers;
+}
+
+async function init(){
+  const iceServers = await getIceServers();
+
+  peer = new Peer(undefined, {
+    config:{ iceServers }
+  });
+
+  peer.on("open", id=>{
+    document.getElementById("myid").textContent=id;
+  });
+
+  peer.on("connection", c=>{
+    conn=c;
+  });
+
+  peer.on("call", async call=>{
+    localStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    document.getElementById("local").srcObject=localStream;
+    call.answer(localStream);
+    call.on("stream", s=>{
+      document.getElementById("remote").srcObject=s;
+    });
+  });
+}
+
+function connect(){
+  const id=document.getElementById("target").value;
+  conn=peer.connect(id);
+}
+
+async function callPeer(){
+  const id=document.getElementById("target").value;
+  localStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+  document.getElementById("local").srcObject=localStream;
+  const call=peer.call(id,localStream);
+  call.on("stream", s=>{
+    document.getElementById("remote").srcObject=s;
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>
+🚀 Как использовать
+Без VPN
+Открываешь просто:
+Копировать код
+
+https://denisbrest.github.io/mi-repo/
+С VPN (через TURN)
+Открываешь:
+Копировать код
+
+https://denisbrest.github.io/mi-repo/?turn=https://ТВОЙ_ДОМЕН/turn
+⚠ В коде нигде нет твоего сервера.
+Теперь скажи:
+Хочешь подключить это к твоему turn-auth.js?
+Или сначала проверим, что через STUN всё работает?
