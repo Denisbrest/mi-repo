@@ -3,130 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy 4.0 | DK Cyber Link</title>
+    <title>Galaxy 4.0 | Premium Link</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: { sans: ['Inter', 'sans-serif'] },
+                extend: {
+                    colors: {
+                        // Наш новый акцентный цвет - благородный морской синий
+                        primary: { DEFAULT: '#0ea5e9', light: '#38bdf8', dark: '#0284c7' },
+                        // Цвет фона - сложный светло-серый, как дорогая штукатурка
+                        surface: '#f8fafc',
+                        // Цвет текста - не черный, а дорогой графит
+                        darktext: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; touch-action: none; }
-        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
+        /* ОСНОВНОЙ ФОН - СВЕТЛЫЙ ГРАДИЕНТ */
+        body { 
+            margin: 0; overflow: hidden; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #1e293b; font-family: 'Inter', sans-serif; touch-action: none; 
+        }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; opacity: 0.5; mix-blend-mode: multiply; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* УБИВАЕМ УРОДЛИВЫЕ КНОПКИ ANDROID WEBVIEW */
+        /* УБИВАЕМ КНОПКИ АНДРОИДА */
         video::-webkit-media-controls { display: none !important; }
         video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
         video { background-color: transparent; object-fit: cover; outline: none; border: none; }
 
-        .glass-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-        .sym-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.2s ease-in-out; }
-        .sym-btn:active { background: rgba(16, 185, 129, 0.2); border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); transform: scale(0.92); }
+        /* НОВОЕ СВЕТЛОЕ СТЕКЛО (Frosted Glass Light) */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.65); /* Светлый полупрозрачный */
+            backdrop-filter: blur(20px) saturate(180%); /* Сильное размытие и насыщенность */
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8); /* Белая каемка */
+            box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.15); /* Мягкая цветная тень */
+        }
+
+        /* КНОПКИ-СИМВОЛЫ - КАК ДОРОГАЯ КЕРАМИКА */
+        .sym-btn { 
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(230, 240, 255, 0.8);
+            color: #64748b; /* Спокойный серый цвет иконок */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Легкая тень */
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sym-btn:active { 
+            background: #0ea5e9; /* При нажатии - сочный синий */
+            color: white;
+            border-color: #0ea5e9;
+            transform: scale(0.95); 
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
         
-        #local-v { position: absolute; width: 100px; height: 140px; z-index: 50; border-radius: 1rem; border: 2px solid #10b981; box-shadow: 0 10px 30px rgba(0,0,0,0.8); touch-action: none; }
-        .input-panel { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        /* СВОЕ ВИДЕО - АККУРАТНАЯ РАМКА */
+        #local-v { 
+            position: absolute; width: 100px; height: 140px; z-index: 50; 
+            border-radius: 1rem; 
+            border: 3px solid white; /* Белая рамка */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Мягкая тень */
+            touch-action: none; 
+        }
+        
+        /* ПАНЕЛИ В ЧАТЕ */
+        .input-panel { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+        }
+        
+        /* СТИЛЬНЫЕ ИНПУТЫ */
+        .modern-input {
+            background: rgba(241, 245, 249, 0.8);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            color: #334155;
+            transition: all 0.3s;
+        }
+        .modern-input:focus {
+            background: white;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        }
     </style>
 </head>
-<body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden">
+<body class="h-[100dvh] w-screen flex items-center justify-center overflow-hidden bg-surface">
 
     <div id="canvas-container"></div>
 
-    <div id="auth-screen" class="glass-panel z-40 p-6 rounded-[2rem] w-full max-w-xs text-center space-y-5 mx-4 border-emerald-500/20 border-2 transition-all duration-300">
+    <div id="auth-screen" class="glass-panel z-40 p-8 rounded-[2.5rem] w-full max-w-xs text-center space-y-6 mx-4 transition-all duration-300">
         
-        <div class="w-24 h-24 mx-auto bg-black/40 border-2 border-emerald-500/50 rounded-2xl flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.4)] backdrop-blur-md">
-            <span class="text-5xl font-black text-emerald-400 italic tracking-tighter drop-shadow-[0_0_10px_rgba(16,185,129,0.9)]" style="-webkit-text-stroke: 1px rgba(16,185,129,0.3);">DK</span>
+        <div class="w-28 h-28 mx-auto bg-gradient-to-tr from-white to-blue-50 border border-white rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/10 p-1">
+            <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center border border-blue-100">
+                 <span class="text-5xl font-black text-primary tracking-tighter" style="background: linear-gradient(135deg, #0ea5e9, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DK</span>
+            </div>
         </div>
-        <p class="text-[9px] text-emerald-200/50 uppercase font-bold tracking-[0.4em] -mt-2">Secure Link System</p>
+        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.4em] -mt-3">Premium Connection</p>
         
-        <div id="symbol-pad" class="grid grid-cols-5 gap-2 mt-4"></div>
+        <div id="symbol-pad" class="grid grid-cols-5 gap-3 mt-6"></div>
         
-        <p class="text-[8px] text-gray-400/80 uppercase mt-2 tracking-wider">Синхронизация частоты</p>
+        <p class="text-[9px] text-slate-500/70 uppercase mt-3 font-medium tracking-widest">Выберите ключ доступа</p>
         
-        <div class="mt-4 pt-4 border-t border-white/10">
-            <p class="text-[10px] text-emerald-500/80 uppercase tracking-widest font-bold">Твой позывной: <span id="front-id" class="text-white text-xs ml-1 tracking-normal">----</span></p>
+        <div class="mt-6 pt-5 border-t border-slate-200/50">
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold flex justify-center items-center">Ваш ID: <span id="front-id" class="text-primary font-black text-sm ml-2 bg-blue-50 px-3 py-1 rounded-lg shadow-sm">----</span></p>
         </div>
     </div>
 
-    <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden">
-        <div id="video-zone" class="absolute inset-0 bg-black flex items-center justify-center">
-            <video id="remote-v" class="w-full h-full hidden" autoplay playsinline></video>
+    <main id="chat-ui" class="absolute inset-0 z-20 flex flex-col hidden bg-slate-50">
+        <div id="video-zone" class="absolute inset-0 flex items-center justify-center overflow-hidden rounded-b-[2.5rem]">
+            <video id="remote-v" class="w-full h-full hidden object-cover" autoplay playsinline></video>
             <video id="local-v" class="top-4 right-4 transform scale-x-[-1] hidden" autoplay playsinline muted></video>
             
-            <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-emerald-500 space-y-2 backdrop-blur-sm">
-                <div class="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
-                <p class="text-[8px] font-bold uppercase tracking-[0.5em] animate-pulse">Поиск частоты...</p>
+            <div id="video-wait" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100/80 text-primary space-y-4 backdrop-blur-md">
+                <div class="relative">
+                    <div class="w-12 h-12 border-4 border-blue-100 rounded-full"></div>
+                    <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                </div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 animate-pulse">Поиск сигнала...</p>
             </div>
         </div>
 
-        <footer class="absolute bottom-0 left-0 w-full p-4 space-y-3 z-30">
-            <div id="msgs" class="max-h-36 overflow-y-auto no-scrollbar space-y-1 mb-2 px-2"></div>
-            <div id="setup-controls" class="flex flex-col gap-2 glass-panel p-3 rounded-2xl">
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-[8px] text-gray-400 uppercase font-bold">ID: <span id="display-id" class="text-emerald-400 ml-1 text-[10px]">----</span></span>
-                    <button onclick="location.reload()" class="text-[8px] text-red-400/80 font-bold uppercase hover:text-red-400">Сброс</button>
+        <footer class="absolute bottom-0 left-0 w-full space-y-3 z-30 pb-6 pt-4 px-4">
+            <div id="msgs" class="max-h-40 overflow-y-auto no-scrollbar space-y-2 mb-4 px-2 mask-image: linear-gradient(to top, black 80%, transparent 100%);"></div>
+
+            <div id="setup-controls" class="flex flex-col gap-3 glass-panel p-4 rounded-3xl shadow-sm">
+                <div class="flex justify-between items-center px-2">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold">Ваш ID: <span id="display-id" class="text-primary font-black text-xs ml-1">----</span></span>
+                    <button onclick="location.reload()" class="text-[9px] text-rose-400 font-bold uppercase hover:text-rose-600 transition py-1 px-2 bg-rose-50 rounded-lg">Сброс</button>
                 </div>
-                <div class="flex gap-2">
-                    <input type="text" id="target-id" placeholder="ID НАПАРНИКА" class="flex-1 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-sm text-emerald-300 outline-none uppercase font-mono font-bold tracking-widest focus:border-emerald-500/50 transition-all">
-                    <button id="connect-btn" class="bg-emerald-600/90 px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">СВЯЗЬ</button>
+                <div class="flex gap-3">
+                    <input type="text" id="target-id" placeholder="ID напарника" class="flex-1 modern-input rounded-2xl px-4 py-3 text-sm font-bold outline-none uppercase tracking-widest text-center">
+                    <button id="connect-btn" class="bg-gradient-to-r from-primary to-primary-light text-white px-6 py-3 rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-500/25 active:scale-95 transition-all">СВЯЗЬ</button>
                 </div>
             </div>
             
-            <div id="chat-controls" class="flex gap-2 hidden input-panel p-3 rounded-2xl transition-all duration-300 items-center">
-                <button id="call-btn" class="bg-emerald-500 text-white px-5 py-2 rounded-xl text-lg shadow-[0_0_15px_rgba(16,185,129,0.6)] border border-emerald-300 active:scale-90 transition-all">🎥</button>
+            <div id="chat-controls" class="flex gap-3 hidden input-panel p-4 rounded-[2rem] transition-all duration-300 items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <button id="call-btn" class="bg-white text-primary p-3 rounded-2xl text-xl shadow-md border border-blue-100 active:scale-95 transition-all active:bg-blue-50">📹</button>
                 
-                <input type="text" id="msg-in" placeholder="Сигнал..." class="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-emerald-500/50 transition-all h-full">
-                <button id="send-btn" class="bg-indigo-600/80 px-5 py-2 rounded-xl font-bold active:scale-95 transition-all shadow-lg shadow-indigo-500/20 h-full">🚀</button>
+                <input type="text" id="msg-in" placeholder="Сообщение..." class="flex-1 modern-input rounded-2xl px-5 py-3 text-sm outline-none h-full font-medium">
+                <button id="send-btn" class="bg-gradient-to-tr from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold active:scale-95 transition-all shadow-lg shadow-indigo-500/25 h-full text-lg">➤</button>
             </div>
         </footer>
     </main>
 
     <script>
+        // ЗВЕЗДЫ ТЕПЕРЬ СВЕТЛЫЕ И ЕЛЕ ЗАМЕТНЫЕ (ПЫЛЬ В ЛУЧАХ СВЕТА)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
         camera.position.z = 5;
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0); // Прозрачный фон
         document.getElementById('canvas-container').appendChild(renderer.domElement);
         const starGeo = new THREE.BufferGeometry();
         const starPos = new Float32Array(20000 * 3);
         for(let i=0; i<60000; i++) starPos[i] = (Math.random() - 0.5) * 15;
         starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.02, color: 0x10b981, transparent: true, opacity: 0.3 }));
+        // Цвет звезд изменен на светло-голубой серый, прозрачность уменьшена
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.02, color: 0x94a3b8, transparent: true, opacity: 0.2 }));
         scene.add(stars);
-        function animate() { stars.rotation.y += 0.0002; renderer.render(scene, camera); requestAnimationFrame(animate); }
+        function animate() { stars.rotation.y += 0.0001; renderer.render(scene, camera); requestAnimationFrame(animate); }
         animate();
 
-        const localV = document.getElementById('local-v');
-        const remoteV = document.getElementById('remote-v');
+        const localV = document.getElementById('local-v'); const remoteV = document.getElementById('remote-v');
         let isDragging = false; let startX, startY;
-        localV.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX - localV.offsetLeft; startY = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#60a5fa"; });
+        localV.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX - localV.offsetLeft; startY = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#38bdf8"; });
         document.addEventListener('touchmove', (e) => { if (!isDragging) return; let x = Math.max(0, Math.min(e.touches[0].clientX - startX, window.innerWidth - localV.offsetWidth)); let y = Math.max(0, Math.min(e.touches[0].clientY - startY, window.innerHeight - localV.offsetHeight)); localV.style.left = x + 'px'; localV.style.top = y + 'px'; localV.style.right = 'auto'; localV.style.bottom = 'auto'; });
-        document.addEventListener('touchend', () => { isDragging = false; localV.style.borderColor = "#10b981"; });
+        document.addEventListener('touchend', () => { isDragging = false; localV.style.borderColor = "white"; });
 
         let roomPass = ""; let peer = null; let conn = null; let localStream = null;
-        
         let myStaticId = localStorage.getItem('myGalaxyId');
-        if(!myStaticId) {
-            myStaticId = Math.random().toString(36).substring(2, 6).toUpperCase();
-            localStorage.setItem('myGalaxyId', myStaticId);
-        }
+        if(!myStaticId) { myStaticId = Math.random().toString(36).substring(2, 6).toUpperCase(); localStorage.setItem('myGalaxyId', myStaticId); }
 
         window.onload = () => {
-            document.getElementById('front-id').textContent = myStaticId;
-            document.getElementById('display-id').textContent = myStaticId;
-            if(localStorage.getItem('lastTarget')) {
-                document.getElementById('target-id').value = localStorage.getItem('lastTarget');
-            }
+            document.getElementById('front-id').textContent = myStaticId; document.getElementById('display-id').textContent = myStaticId;
+            if(localStorage.getItem('lastTarget')) { document.getElementById('target-id').value = localStorage.getItem('lastTarget'); }
         };
 
         const sysCode = [ { i: '👽', v: 'alien' }, { i: '🚀', v: 'rocket' }, { i: '🛰️', v: 'sat' }, { i: '🛸', v: 'ufo' }, { i: '🌍', v: 'earth' }, { i: '🌙', v: 'moon' }, { i: '🪐', v: 'planet' }, { i: '☄️', v: 'comet' }, { i: '🤖', v: 'bot' }, { i: '☢️', v: 'nuke' } ];
         const pad = document.getElementById('symbol-pad');
         sysCode.forEach(s => {
             const btn = document.createElement('button');
-            btn.className = 'sym-btn rounded-xl text-2xl py-3 flex justify-center items-center'; 
+            btn.className = 'sym-btn rounded-2xl text-2xl py-4 flex justify-center items-center'; 
             btn.textContent = s.i;
             btn.onclick = () => {
                 roomPass = s.v;
                 const authScreen = document.getElementById('auth-screen');
-                authScreen.style.opacity = '0'; authScreen.style.transform = 'scale(0.9)';
+                authScreen.style.opacity = '0'; authScreen.style.transform = 'scale(0.95) translateY(20px)';
                 setTimeout(() => { authScreen.style.display = 'none'; document.getElementById('chat-ui').style.display = 'flex'; initPeer(); }, 300);
             };
             pad.appendChild(btn);
@@ -136,25 +210,14 @@
             peer = new Peer(roomPass + '-' + myStaticId.toLowerCase(), { config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] } });
             peer.on('connection', c => { conn = c; bindEvents(); });
             peer.on('call', async call => {
-                if(confirm('ПРИНЯТЬ СИГНАЛ?')) {
+                if(confirm('Входящий видеозвонок. Принять?')) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        localV.srcObject = localStream; 
-                        localV.classList.remove('hidden'); 
+                        localV.srcObject = localStream; localV.classList.remove('hidden'); 
                         call.answer(localStream);
-                        
-                        call.on('stream', s => { 
-                            remoteV.srcObject = s; 
-                            remoteV.classList.remove('hidden'); 
-                            document.getElementById('video-wait').style.display = 'none'; 
-                        });
-                        call.on('close', () => { 
-                            remoteV.srcObject = null; 
-                            remoteV.classList.add('hidden'); 
-                            document.getElementById('video-wait').style.display = 'flex'; 
-                            addMsg('ЭФИР ЗАКРЫТ', true); 
-                        });
-                    } catch (e) { alert("Ошибка камеры!"); }
+                        call.on('stream', s => { remoteV.srcObject = s; remoteV.classList.remove('hidden'); document.getElementById('video-wait').style.display = 'none'; });
+                        call.on('close', () => { remoteV.srcObject = null; remoteV.classList.add('hidden'); document.getElementById('video-wait').style.display = 'flex'; addMsg('Звонок завершен', true); });
+                    } catch (e) { alert("Ошибка доступа к камере!"); }
                 }
             });
         }
@@ -167,47 +230,35 @@
         };
 
         function bindEvents() {
-            conn.on('open', () => { addMsg('КАНАЛ ЗАЩИЩЕН', true); document.getElementById('setup-controls').style.display = 'none'; document.getElementById('chat-controls').classList.remove('hidden'); });
+            conn.on('open', () => { addMsg('Соединение установлено', true); document.getElementById('setup-controls').style.display = 'none'; document.getElementById('chat-controls').classList.remove('hidden'); });
             conn.on('data', d => addMsg(d, false));
-            conn.on('close', () => addMsg('СВЯЗЬ ПРЕРВАНА', true));
+            conn.on('close', () => addMsg('Соединение разорвано', true));
         }
 
         function addMsg(text, isSys) {
             const d = document.createElement('div');
-            if(isSys) { d.className = 'text-center text-[8px] text-emerald-400 font-bold uppercase opacity-60 tracking-wider'; d.textContent = text; } 
+            if(isSys) { d.className = 'text-center text-[9px] text-slate-400 font-bold uppercase tracking-wider py-2'; d.textContent = text; } 
             else {
                 const isMine = text.startsWith('me:'); const clean = isMine ? text.replace('me:', '') : text;
                 d.className = `flex ${isMine ? 'justify-end' : 'justify-start'}`;
-                d.innerHTML = `<div class="${isMine ? 'bg-emerald-600/30 border-emerald-500/20' : 'bg-white/5 border-white/10'} border px-3 py-2 rounded-xl text-xs max-w-[85%] backdrop-blur-md shadow-sm">${clean}</div>`;
+                // Светлые пузыри сообщений
+                d.innerHTML = `<div class="${isMine ? 'bg-gradient-to-br from-primary to-primary-light text-white shadow-blue-500/20' : 'bg-white text-darktext border border-slate-100 shadow-slate-200/50'} px-4 py-3 rounded-2xl text-sm max-w-[85%] shadow-md font-medium leading-tight">${clean}</div>`;
             }
             const msgs = document.getElementById('msgs'); msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
         }
 
         document.getElementById('send-btn').onclick = (e) => { e.preventDefault(); const v = document.getElementById('msg-in').value.trim(); if(v && conn && conn.open) { conn.send(v); addMsg('me:' + v, false); document.getElementById('msg-in').value = ''; } };
-        
         document.getElementById('call-btn').onclick = async () => {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localV.srcObject = localStream; 
-                localV.classList.remove('hidden'); 
-                
+                localV.srcObject = localStream; localV.classList.remove('hidden'); 
                 const call = peer.call(conn.peer, localStream);
-                call.on('stream', s => { 
-                    remoteV.srcObject = s; 
-                    remoteV.classList.remove('hidden'); 
-                    document.getElementById('video-wait').style.display = 'none'; 
-                });
-                call.on('close', () => { 
-                    remoteV.srcObject = null; 
-                    remoteV.classList.add('hidden'); 
-                    document.getElementById('video-wait').style.display = 'flex'; 
-                    addMsg('ЭФИР ЗАКРЫТ', true); 
-                });
-            } catch(e) { alert("Ошибка камеры!"); }
+                call.on('stream', s => { remoteV.srcObject = s; remoteV.classList.remove('hidden'); document.getElementById('video-wait').style.display = 'none'; });
+                call.on('close', () => { remoteV.srcObject = null; remoteV.classList.add('hidden'); document.getElementById('video-wait').style.display = 'flex'; addMsg('Звонок завершен', true); });
+            } catch(e) { alert("Ошибка доступа к камере!"); }
         };
-
         const msgIn = document.getElementById('msg-in'); const chatControls = document.getElementById('chat-controls');
-        msgIn.addEventListener('focus', () => chatControls.classList.add('mb-8')); msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-8'));
+        msgIn.addEventListener('focus', () => chatControls.classList.add('mb-4')); msgIn.addEventListener('blur', () => chatControls.classList.remove('mb-4'));
     </script>
 </body>
 </html>
