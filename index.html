@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Galaxy 4.2 | STEALTH Edition</title>
+  <title>Омега 1 | STEALTH Edition</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -247,8 +247,8 @@
 
   <div class="wrap" id="authWrap">
     <div class="card" id="auth-screen">
-      <div class="logoWrap"><div class="logo">DK</div></div>
-      <div class="cap">Premium Connection</div>
+      <div class="logoWrap"><div class="logo">Ω1</div></div>
+      <div class="cap">ОМЕГА 1 | СВЯЗЬ</div>
       <div class="sub">Выберите ключ доступа</div>
       <div class="pad" id="symbol-pad"></div>
       <div class="idRow">
@@ -256,7 +256,7 @@
         <span class="chip"><span id="front-id">----</span></span>
         <button class="copy" id="copy-id">⧉</button>
       </div>
-      <div class="hint" id="sec-hint">TURN: авто (безопасный режим).</div>
+      <div class="hint" id="sec-hint">TURN: Инициализация...</div>
       <div class="hint" id="diag" style="display:none; color:#ef4444; font-weight:800; letter-spacing:.08em; margin-top:10px;"></div>
     </div>
   </div>
@@ -299,12 +299,6 @@
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
   const diag = (t) => { $("diag").style.display = "block"; $("diag").textContent = t; setStatus("ОШИБКА", "#ef4444"); };
 
-  // === НАСТРОЙКА BACKEND URL ДЛЯ TURN ===
-  // ВАРИАНТ 1 (рекомендую): backend на твоём домене с https:
-  //   const TURN_API = "https://your-domain.com/turn";
-  // ВАРИАНТ 2 (тест): напрямую по IP и порту где Node.js:
-  const TURN_API = "http://89.124.78.246:8080/turn"; // <- поменяй на свой URL
-
   let myId = localStorage.getItem("myGalaxyId");
   if (!myId) { myId = Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
   $("front-id").textContent = myId;
@@ -341,26 +335,34 @@
     $("app").style.display = "block";
   }
 
+  // Вот они, твои новые хардкодные сервера от Metered
   async function getIceServers(){
-    // STUN всегда есть
-    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
-
-    // Пытаемся взять TURN с бэкенда (безопасно)
-    try {
-      const r = await fetch(TURN_API, { cache: "no-store" });
-      if (!r.ok) throw new Error("TURN API HTTP " + r.status);
-      const data = await r.json();
-      // ожидаем: { username, credential, ttl, urls: ["turn:IP:3478?transport=udp", "turn:IP:3478?transport=tcp"] }
-      if (data && data.username && data.credential && Array.isArray(data.urls)) {
-        iceServers.push({ urls: data.urls, username: data.username, credential: data.credential });
-        $("sec-hint").textContent = "TURN: активен (временные ключи).";
-      } else {
-        $("sec-hint").textContent = "TURN: формат ответа кривой. Работаю только на STUN.";
+    $("sec-hint").textContent = "TURN: активен (Metered Global Cloud).";
+    return [
+      {
+        urls: "stun:stun.relay.metered.ca:80",
+      },
+      {
+        urls: "turn:standard.relay.metered.ca:80",
+        username: "0d0bf8d106dd90657dca0a1d",
+        credential: "2D4ts2w87TtkX1xU",
+      },
+      {
+        urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+        username: "0d0bf8d106dd90657dca0a1d",
+        credential: "2D4ts2w87TtkX1xU",
+      },
+      {
+        urls: "turn:standard.relay.metered.ca:443",
+        username: "0d0bf8d106dd90657dca0a1d",
+        credential: "2D4ts2w87TtkX1xU",
+      },
+      {
+        urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+        username: "0d0bf8d106dd90657dca0a1d",
+        credential: "2D4ts2w87TtkX1xU",
       }
-    } catch (e) {
-      $("sec-hint").textContent = "TURN: недоступен. Работаю только на STUN.";
-    }
-    return iceServers;
+    ];
   }
 
   async function initPeer(){
@@ -464,64 +466,10 @@
   document.addEventListener("touchmove", (e)=>{ if(!drag) return; const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth)); const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight)); localV.style.left = x + "px"; localV.style.top = y + "px"; localV.style.right = "auto"; }, {passive:true});
   document.addEventListener("touchend", ()=>{ drag=false; localV.style.borderColor = "rgba(255,255,255,.95)"; });
 
+  // Сразу показываем, что пытаемся инициализировать
+  $("sec-hint").textContent = "TURN: Подготовка...";
   setStatus("ОЖИДАНИЕ", "#94a3b8");
 })();
 </script>
 </body>
 </html>
-2) BACKEND: turn-auth.js (на VDS)
-Это то, что нельзя класть на публичный GitHub с секретом.
-Секрет хранится в переменной окружения TURN_SECRET.
-JavaScript
-Копировать код
-const http = require("http");
-const crypto = require("crypto");
-
-const SECRET = process.env.TURN_SECRET;        // тот же что static-auth-secret в coturn
-const TURN_IP = process.env.TURN_IP;           // IP или домен сервера
-const TTL = 300;                               // 5 минут
-const PORT = process.env.PORT || 8080;
-
-if (!SECRET || !TURN_IP) {
-  console.error("Need TURN_SECRET and TURN_IP env vars");
-  process.exit(1);
-}
-
-function makeCreds() {
-  const username = String(Math.floor(Date.now() / 1000) + TTL);
-  const credential = crypto.createHmac("sha1", SECRET).update(username).digest("base64");
-  return {
-    username,
-    credential,
-    ttl: TTL,
-    urls: [
-      `turn:${TURN_IP}:3478?transport=udp`,
-      `turn:${TURN_IP}:3478?transport=tcp`
-    ]
-  };
-}
-
-http.createServer((req, res) => {
-  if (req.url !== "/turn") { res.writeHead(404); return res.end("not found"); }
-
-  // CORS чтобы фронт с GitHub Pages мог забрать JSON
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "no-store");
-  res.writeHead(200, { "Content-Type": "application/json" });
-
-  res.end(JSON.stringify(makeCreds()));
-}).listen(PORT, "0.0.0.0", () => {
-  console.log(`TURN auth on :${PORT}/turn`);
-});
-3) coturn: что должно быть в /etc/turnserver.conf
-Оставь TURN как TURN. Не мешай туда Node.js код.
-Минимально так (пример):
-Conf
-Копировать код
-listening-port=3478
-tls-listening-port=5349
-
-fingerprint
-lt-cred-mech
-
-listening-ip
