@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Galaxy 4.2 | APK Safe</title>
+  <title>Galaxy 4.2 | STEALTH Edition</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
     :root{
@@ -11,7 +17,6 @@
       --bg1:#f0f9ff; --bg2:#e0f2fe;
       --t:#0f172a; --m:#64748b;
       --g: rgba(255,255,255,.72);
-      --b: rgba(255,255,255,.85);
       --st: rgba(226,232,240,.95);
       --sh: rgba(2,132,199,.20);
     }
@@ -128,7 +133,6 @@
     }
     .hint{ margin-top:8px; font-size:11px; color:rgba(100,116,139,.75); }
 
-    /* APP */
     #app{ display:none; position:absolute; inset:0; z-index:20; background: rgba(248,250,252,.65); }
     #video-zone{ position:absolute; inset:0; overflow:hidden; border-bottom-left-radius:34px; border-bottom-right-radius:34px; }
     #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
@@ -232,53 +236,31 @@
     .msgIn{ flex:1; text-align:left; font-weight:700; letter-spacing: normal; text-transform:none; padding:0 14px; }
     .send{ width:64px; }
   </style>
-
-  <!-- Inter locally is ok without google fonts, but if you want: -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- PeerJS: 2 источника (если один заблокирован) -->
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <script>
-    // fallback если unpkg не загрузился
-    if (!window.Peer) {
-      const s = document.createElement('script');
-      s.src = "https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js";
-      document.head.appendChild(s);
-    }
-  </script>
 </head>
 
 <body>
   <div class="bg-dots"></div>
-
   <div class="status">
     <div id="dot" class="dot"></div>
     <div id="status" class="stxt">ОЖИДАНИЕ</div>
   </div>
 
-  <!-- AUTH -->
   <div class="wrap" id="authWrap">
     <div class="card" id="auth-screen">
       <div class="logoWrap"><div class="logo">DK</div></div>
       <div class="cap">Premium Connection</div>
       <div class="sub">Выберите ключ доступа</div>
-
       <div class="pad" id="symbol-pad"></div>
-
       <div class="idRow">
         ВАШ ID:
         <span class="chip"><span id="front-id">----</span></span>
         <button class="copy" id="copy-id">⧉</button>
       </div>
-      <div class="hint">ID сохраняется в устройстве</div>
-
+      <div class="hint" id="sec-hint">TURN: авто (безопасный режим).</div>
       <div class="hint" id="diag" style="display:none; color:#ef4444; font-weight:800; letter-spacing:.08em; margin-top:10px;"></div>
     </div>
   </div>
 
-  <!-- APP -->
   <div id="app">
     <div id="video-zone">
       <video id="remote-v" autoplay playsinline></video>
@@ -288,7 +270,6 @@
         <div class="stxt" style="letter-spacing:.34em;">ПОИСК СИГНАЛА…</div>
       </div>
     </div>
-
     <div id="footer">
       <div id="msgs"></div>
 
@@ -301,7 +282,7 @@
           <input class="in" id="target-id" placeholder="ID НАПАРНИКА" />
           <button class="cta" id="connect-btn">СВЯЗЬ</button>
         </div>
-        <div class="hint" style="margin-top:10px;">Оба должны выбрать <b>одинаковый</b> ключ (👽/🚀/…)</div>
+        <div class="hint" style="margin-top:10px;">Оба должны выбрать <b>одинаковый</b> ключ</div>
       </div>
 
       <div class="panel row2" id="chatControls">
@@ -318,7 +299,12 @@
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
   const diag = (t) => { $("diag").style.display = "block"; $("diag").textContent = t; setStatus("ОШИБКА", "#ef4444"); };
 
-  // ID
+  // === НАСТРОЙКА BACKEND URL ДЛЯ TURN ===
+  // ВАРИАНТ 1 (рекомендую): backend на твоём домене с https:
+  //   const TURN_API = "https://your-domain.com/turn";
+  // ВАРИАНТ 2 (тест): напрямую по IP и порту где Node.js:
+  const TURN_API = "http://89.124.78.246:8080/turn"; // <- поменяй на свой URL
+
   let myId = localStorage.getItem("myGalaxyId");
   if (!myId) { myId = Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
   $("front-id").textContent = myId;
@@ -329,59 +315,62 @@
     catch { setStatus("КОПИРАЙ РУКАМИ", "#f59e0b"); }
   };
 
-  // symbols
   const sysCode = [
     { i:'👽', v:'alien' }, { i:'🚀', v:'rocket' }, { i:'🛰️', v:'sat' }, { i:'🛸', v:'ufo' }, { i:'🌍', v:'earth' },
     { i:'🌙', v:'moon' }, { i:'🪐', v:'planet' }, { i:'☄️', v:'comet' }, { i:'🤖', v:'bot' }, { i:'☢️', v:'nuke' }
   ];
-  const pad = $("symbol-pad");
 
+  const pad = $("symbol-pad");
   let roomPass = "";
   let peer = null;
   let conn = null;
   let localStream = null;
 
-  // msg UI
   function addSys(text){
-    const d = document.createElement("div");
-    d.className = "sys";
-    d.textContent = text;
-    $("msgs").appendChild(d);
-    $("msgs").scrollTop = $("msgs").scrollHeight;
+    const d = document.createElement("div"); d.className = "sys"; d.textContent = text;
+    $("msgs").appendChild(d); $("msgs").scrollTop = $("msgs").scrollHeight;
   }
   function addChat(text, mine){
-    const row = document.createElement("div");
-    row.className = "row " + (mine ? "mine" : "their");
-    const b = document.createElement("div");
-    b.className = "bubble " + (mine ? "bMine" : "bTheir");
-    b.textContent = text;
-    row.appendChild(b);
-    $("msgs").appendChild(row);
-    $("msgs").scrollTop = $("msgs").scrollHeight;
+    const row = document.createElement("div"); row.className = "row " + (mine ? "mine" : "their");
+    const b = document.createElement("div"); b.className = "bubble " + (mine ? "bMine" : "bTheir"); b.textContent = text;
+    row.appendChild(b); $("msgs").appendChild(row); $("msgs").scrollTop = $("msgs").scrollHeight;
   }
 
-  // show app
   function enterApp(){
     $("authWrap").style.display = "none";
     $("app").style.display = "block";
   }
 
-  // init peer (почти как у тебя)
-  function initPeer(){
-    if (!window.Peer) { diag("PeerJS не загрузился (unpkg/jsdelivr заблокирован)."); return; }
+  async function getIceServers(){
+    // STUN всегда есть
+    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
 
+    // Пытаемся взять TURN с бэкенда (безопасно)
+    try {
+      const r = await fetch(TURN_API, { cache: "no-store" });
+      if (!r.ok) throw new Error("TURN API HTTP " + r.status);
+      const data = await r.json();
+      // ожидаем: { username, credential, ttl, urls: ["turn:IP:3478?transport=udp", "turn:IP:3478?transport=tcp"] }
+      if (data && data.username && data.credential && Array.isArray(data.urls)) {
+        iceServers.push({ urls: data.urls, username: data.username, credential: data.credential });
+        $("sec-hint").textContent = "TURN: активен (временные ключи).";
+      } else {
+        $("sec-hint").textContent = "TURN: формат ответа кривой. Работаю только на STUN.";
+      }
+    } catch (e) {
+      $("sec-hint").textContent = "TURN: недоступен. Работаю только на STUN.";
+    }
+    return iceServers;
+  }
+
+  async function initPeer(){
+    if (!window.Peer) { diag("PeerJS не загрузился."); return; }
     setStatus("СЕТЬ…", "#0ea5e9");
 
+    const myIceServers = await getIceServers();
+
     peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "turn:openrelay.metered.ca:80", username:"openrelayproject", credential:"openrelayproject" },
-          { urls: "turn:openrelay.metered.ca:443", username:"openrelayproject", credential:"openrelayproject" },
-          { urls: "turn:openrelay.metered.ca:443?transport=tcp", username:"openrelayproject", credential:"openrelayproject" },
-          { urls: "turns:openrelay.metered.ca:443?transport=tcp", username:"openrelayproject", credential:"openrelayproject" }
-        ]
-      }
+      config: { iceServers: myIceServers }
     });
 
     peer.on("open", () => { setStatus("ГОТОВО", "#22c55e"); addSys("Сеть активна"); });
@@ -395,22 +384,16 @@
         localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
         $("local-v").srcObject = localStream; $("local-v").style.display = "block";
         call.answer(localStream);
-
         call.on("stream", (s) => {
           $("remote-v").srcObject = s; $("remote-v").style.display = "block";
-          $("wait").style.display = "none";
-          setStatus("ВИДЕО", "#22c55e");
+          $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
         });
-
         call.on("close", () => {
           $("remote-v").srcObject = null; $("remote-v").style.display = "none";
-          $("wait").style.display = "flex";
-          addSys("Звонок завершён");
-          setStatus("НА СВЯЗИ", "#22c55e");
+          $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
         });
       } catch {
-        setStatus("КАМЕРА?", "#f59e0b");
-        addSys("Нет доступа к камере/микрофону");
+        setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
       }
     });
   }
@@ -427,20 +410,13 @@
     conn.on("close", () => { addSys("Соединение разорвано"); setStatus("РАЗРЫВ", "#f59e0b"); });
   }
 
-  // build pad
   sysCode.forEach(s => {
     const b = document.createElement("button");
-    b.className = "btn";
-    b.textContent = s.i;
-    b.onclick = () => {
-      roomPass = s.v;
-      enterApp();
-      initPeer();
-    };
+    b.className = "btn"; b.textContent = s.i;
+    b.onclick = async () => { roomPass = s.v; enterApp(); await initPeer(); };
     pad.appendChild(b);
   });
 
-  // connect
   const last = localStorage.getItem("lastTarget");
   if (last) $("target-id").value = last;
 
@@ -448,85 +424,104 @@
     const tid = ($("target-id").value || "").trim().toUpperCase();
     if (!tid) return;
     localStorage.setItem("lastTarget", tid);
-
     if (!peer) { addSys("Сеть не готова"); setStatus("СЕТЬ?", "#f59e0b"); return; }
     setStatus("КОННЕКТ…", "#0ea5e9");
-
     conn = peer.connect(roomPass + "-" + tid.toLowerCase());
     bindConn();
   };
 
-  // send
   function send(){
     const v = ($("msg-in").value || "").trim();
     if (!v) return;
     if (!conn || !conn.open) { addSys("Нет соединения"); setStatus("НЕТ СВЯЗИ", "#f59e0b"); return; }
-    conn.send(v);
-    addChat(v, true);
-    $("msg-in").value = "";
+    conn.send(v); addChat(v, true); $("msg-in").value = "";
   }
   $("send-btn").onclick = (e) => { e.preventDefault(); send(); };
   $("msg-in").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); send(); } });
 
-  // call
   $("call-btn").onclick = async () => {
     if (!conn || !conn.open) { addSys("Сначала подключись"); return; }
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
       $("local-v").srcObject = localStream; $("local-v").style.display = "block";
       const call = peer.call(conn.peer, localStream);
-
       call.on("stream", (s) => {
         $("remote-v").srcObject = s; $("remote-v").style.display = "block";
-        $("wait").style.display = "none";
-        setStatus("ВИДЕО", "#22c55e");
+        $("wait").style.display = "none"; setStatus("ВИДЕО", "#22c55e");
       });
-
       call.on("close", () => {
         $("remote-v").srcObject = null; $("remote-v").style.display = "none";
-        $("wait").style.display = "flex";
-        addSys("Звонок завершён");
-        setStatus("НА СВЯЗИ", "#22c55e");
+        $("wait").style.display = "flex"; addSys("Звонок завершён"); setStatus("НА СВЯЗИ", "#22c55e");
       });
     } catch {
-      setStatus("КАМЕРА?", "#f59e0b");
-      addSys("Нет доступа к камере/микрофону");
+      setStatus("КАМЕРА?", "#f59e0b"); addSys("Нет доступа к камере/микрофону");
     }
   };
 
-  // drag local video (как у тебя)
   const localV = $("local-v");
   let drag=false, sx=0, sy=0;
-  localV.addEventListener("touchstart", (e)=>{
-    drag=true;
-    sx = e.touches[0].clientX - localV.offsetLeft;
-    sy = e.touches[0].clientY - localV.offsetTop;
-    localV.style.borderColor = "#38bdf8";
-  }, {passive:true});
-  document.addEventListener("touchmove", (e)=>{
-    if(!drag) return;
-    const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth));
-    const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight));
-    localV.style.left = x + "px";
-    localV.style.top = y + "px";
-    localV.style.right = "auto";
-  }, {passive:true});
-  document.addEventListener("touchend", ()=>{
-    drag=false;
-    localV.style.borderColor = "rgba(255,255,255,.95)";
-  });
+  localV.addEventListener("touchstart", (e)=>{ drag=true; sx = e.touches[0].clientX - localV.offsetLeft; sy = e.touches[0].clientY - localV.offsetTop; localV.style.borderColor = "#38bdf8"; }, {passive:true});
+  document.addEventListener("touchmove", (e)=>{ if(!drag) return; const x = Math.max(0, Math.min(e.touches[0].clientX - sx, innerWidth - localV.offsetWidth)); const y = Math.max(0, Math.min(e.touches[0].clientY - sy, innerHeight - localV.offsetHeight)); localV.style.left = x + "px"; localV.style.top = y + "px"; localV.style.right = "auto"; }, {passive:true});
+  document.addEventListener("touchend", ()=>{ drag=false; localV.style.borderColor = "rgba(255,255,255,.95)"; });
 
   setStatus("ОЖИДАНИЕ", "#94a3b8");
 })();
 </script>
 </body>
 </html>
-Что это тебе даёт
-Работает в APK даже если Tailwind/Three блочатся
-PeerJS грузится с двух CDN (unpkg + jsdelivr)
-Если PeerJS не загрузился — покажет красным почему
-UI современный, но логика твоя (поэтому не ломается)
-И последнее (важно)
-Если ты открываешь через APK, убедись что WebView грузит github.io, а не github.com.
-WebView должен открывать сайт, не страницу репозитория.
-Если хочешь — кинь мне 1 скрин внутри APK: какой URL там сверху (github.com или github.io). Это 10 секунд и сразу станет ясно, где реально ломается.
+2) BACKEND: turn-auth.js (на VDS)
+Это то, что нельзя класть на публичный GitHub с секретом.
+Секрет хранится в переменной окружения TURN_SECRET.
+JavaScript
+Копировать код
+const http = require("http");
+const crypto = require("crypto");
+
+const SECRET = process.env.TURN_SECRET;        // тот же что static-auth-secret в coturn
+const TURN_IP = process.env.TURN_IP;           // IP или домен сервера
+const TTL = 300;                               // 5 минут
+const PORT = process.env.PORT || 8080;
+
+if (!SECRET || !TURN_IP) {
+  console.error("Need TURN_SECRET and TURN_IP env vars");
+  process.exit(1);
+}
+
+function makeCreds() {
+  const username = String(Math.floor(Date.now() / 1000) + TTL);
+  const credential = crypto.createHmac("sha1", SECRET).update(username).digest("base64");
+  return {
+    username,
+    credential,
+    ttl: TTL,
+    urls: [
+      `turn:${TURN_IP}:3478?transport=udp`,
+      `turn:${TURN_IP}:3478?transport=tcp`
+    ]
+  };
+}
+
+http.createServer((req, res) => {
+  if (req.url !== "/turn") { res.writeHead(404); return res.end("not found"); }
+
+  // CORS чтобы фронт с GitHub Pages мог забрать JSON
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "no-store");
+  res.writeHead(200, { "Content-Type": "application/json" });
+
+  res.end(JSON.stringify(makeCreds()));
+}).listen(PORT, "0.0.0.0", () => {
+  console.log(`TURN auth on :${PORT}/turn`);
+});
+3) coturn: что должно быть в /etc/turnserver.conf
+Оставь TURN как TURN. Не мешай туда Node.js код.
+Минимально так (пример):
+Conf
+Копировать код
+listening-port=3478
+tls-listening-port=5349
+
+fingerprint
+lt-cred-mech
+
+listening-ip
