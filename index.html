@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>DNK | Омега 3.0 VIP</title>
+  <title>DNK | Омега 3.1 VIP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -179,7 +179,7 @@
   <div class="wrap" id="authWrap">
     <div class="card">
       <div class="logoWrap"><div class="logo">DNK</div></div>
-      <div class="cap">DNK | OMEGA 3.0</div>
+      <div class="cap">DNK | OMEGA 3.1</div>
       <div class="sub">Секретный шлюз</div>
 
       <div class="pad" id="pad"></div>
@@ -221,7 +221,6 @@
   const $ = (id) => document.getElementById(id);
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
 
-  // === ВАЖНО: TURN из Metered (как на твоём скрине) ===
   const ICE_SERVERS = [
     { urls: "stun:stun.relay.metered.ca:80" },
     {
@@ -263,7 +262,6 @@
     else setStatus("КОПИРУЙ РУКАМИ", "#f59e0b");
   };
 
-  // Ключи (как у тебя)
   const keys = [
     {i:'КИЕВ',v:'kyiv'},{i:'РИМ',v:'rome'},
     {i:'ПАРИЖ',v:'paris'},{i:'ТОКИО',v:'tokyo'},
@@ -272,7 +270,7 @@
     {i:'БАКУ',v:'baku'},{i:'ДОХА',v:'doha'}
   ];
 
-  let roomPass = "", peer = null, conn = null, localStream = null;
+  let roomPass = "", peer = null, conn = null, localStream = null, pingTimer = null;
 
   function enterApp(){
     $("authWrap").style.display = "none";
@@ -301,7 +299,7 @@
     peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
       config: {
         iceServers: ICE_SERVERS,
-        iceTransportPolicy: "relay" // <<< главное для VPN
+        iceTransportPolicy: "relay"
       },
       debug: 0
     });
@@ -309,6 +307,14 @@
     peer.on("open", () => {
       setStatus("В СЕТИ", "#22c55e");
       showHints("relay-only ✅", "#22c55e", "готов ✅", "#22c55e");
+    });
+    
+    // Авто-реконнект если сигнальный сервер решит уснуть
+    peer.on("disconnected", () => {
+      if (!peer.destroyed) {
+        console.log("Реконнект к сети...");
+        peer.reconnect();
+      }
     });
 
     peer.on("error", (e) => {
@@ -352,8 +358,18 @@
       $("setup").style.display = "none";
       $("controls").style.display = "flex";
       setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
+      
+      // СЕКРЕТНЫЙ ПУЛЬС: не дает серверам отрубить связь через 5 минут
+      clearInterval(pingTimer);
+      pingTimer = setInterval(() => {
+        if (conn && conn.open) conn.send("pulse");
+      }, 3000);
     });
+    
+    conn.on("data", (d) => { /* Игнорируем пульс, он нужен только для удержания канала */ });
+    
     conn.on("close", () => {
+      clearInterval(pingTimer);
       setStatus("ОБРЫВ", "#ef4444");
       $("setup").style.display = "block";
       $("controls").style.display = "none";
@@ -371,7 +387,6 @@
     $("hang").style.display = "none";
   }
 
-  // Рендер кнопок
   $("pad").innerHTML = "";
   keys.forEach(k => {
     const b = document.createElement("button");
@@ -381,7 +396,6 @@
     $("pad").appendChild(b);
   });
 
-  // Connect
   $("connect").onclick = () => {
     const tid = ($("target").value || "").trim().toUpperCase();
     if (!tid || !peer) return;
@@ -393,7 +407,6 @@
   const last = localStorage.getItem("lastTarget");
   if (last) $("target").value = last;
 
-  // Start call
   $("video").onclick = async () => {
     if (!conn || !conn.open) return;
     try{
@@ -418,10 +431,8 @@
     }
   };
 
-  // Hang
   $("hang").onclick = () => location.reload();
 
-  // Стартовые подсказки
   showHints("готов (metered)", "#22c55e", "ожидание", "#64748b");
 })();
 </script>
