@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Омега 2.3a | PROXY-ULTRA</title>
+  <title>Омега 2.4 | APK-ULTRA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- PeerJS грузим defer, чтобы не ломало загрузку страницы -->
+  <!-- PeerJS -->
   <script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
@@ -21,8 +21,9 @@
       --st: rgba(226,232,240,.95);
       --sh: rgba(2,132,199,.20);
       --ok:#22c55e; --warn:#facc15; --bad:#ef4444;
+      --dark: rgba(15, 23, 42, 0.90);
     }
-    *{ box-sizing:border-box; outline:none; }
+    *{ box-sizing:border-box; outline:none; -webkit-tap-highlight-color:transparent; }
     html,body{ height:100%; margin:0; overflow:hidden; touch-action:none; }
     body{
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -54,7 +55,7 @@
       display:flex; align-items:center; justify-content:center; padding:16px;
     }
     .card{
-      width:min(380px, 92vw);
+      width:min(390px, 92vw);
       border-radius: 34px;
       background: var(--g);
       border:1px solid var(--st);
@@ -63,6 +64,7 @@
       padding: 28px;
       text-align:center;
     }
+
     .logoWrap{
       width:112px; height:112px; margin:0 auto 10px;
       border-radius: 30px; padding:6px;
@@ -74,24 +76,23 @@
       width:100%; height:100%;
       border-radius: 24px;
       display:flex; align-items:center; justify-content:center;
-      font-weight:900; font-size:44px;
+      font-weight:900; font-size:46px;
       background: linear-gradient(135deg, var(--p), var(--p2));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
-      text-shadow: 0 10px 30px rgba(14,165,233,.35);
+      text-shadow: 0 12px 34px rgba(14,165,233,.35);
     }
     .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:800; color:var(--m); }
     .sub{ margin-top:8px; font-size:12px; font-weight:700; color:rgba(100,116,139,.85); text-transform:uppercase; letter-spacing:.2em; }
 
-    .pad{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:18px; min-height:56px; }
+    .pad{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:18px; }
     .btn{
       height:56px; border-radius:18px; font-size:24px;
-      background: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.92);
       border:1px solid rgba(226,232,240,.95);
       color:#64748b;
       box-shadow: 0 10px 25px -20px rgba(0,0,0,.20);
-      transition: transform .10s ease, background .12s ease, border-color .12s ease;
-      -webkit-tap-highlight-color:transparent;
+      transition: transform .10s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
       cursor:pointer;
     }
     .btn:active{
@@ -126,26 +127,143 @@
       cursor:pointer;
     }
     .copy:active{ background:#e0f2fe; }
+
     .hint{ margin-top:8px; font-size:11px; color:rgba(100,116,139,.78); }
 
-    /* Плашка “JS выключен” */
-    .nos{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:14px;
-      background: rgba(239,68,68,.12);
-      border:1px solid rgba(239,68,68,.25);
-      color:#b91c1c;
+    /* APP */
+    #app{ display:none; position:absolute; inset:0; z-index:20; background: rgba(248,250,252,.65); }
+    #video-zone{ position:absolute; inset:0; overflow:hidden; }
+    #remote-v{ width:100%; height:100%; object-fit:cover; display:none; background:#000; }
+    #local-v{
+      position:absolute; top:14px; right:14px;
+      width:110px; height:154px; border-radius:18px;
+      border:2px solid rgba(255,255,255,.95);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+      transform: scaleX(-1);
+      display:none;
+      background:#000;
+      touch-action:none;
+    }
+    #wait{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+      background: rgba(241,245,249,.80);
+      backdrop-filter: blur(14px);
+      color: var(--p);
+    }
+    .spin{
+      width:46px; height:46px; border-radius:999px;
+      border:4px solid rgba(148,163,184,.22);
+      border-top-color: var(--p);
+      animation: rot 1s linear infinite;
+    }
+    @keyframes rot{ to{ transform: rotate(360deg); } }
+
+    #footer{ position:absolute; left:0; right:0; bottom:0; padding: 14px 14px 22px; z-index:30; }
+
+    /* SIGNAL PANEL (ultra graph) */
+    #signal-panel{
+      display:none;
+      margin-bottom: 10px;
+      background: var(--dark);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px -30px rgba(0,0,0,.55);
+      backdrop-filter: blur(18px);
+      padding: 12px;
+    }
+    .sig-top{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:10px;
+      gap:12px;
+    }
+    .radar-title{
+      font-size:10px; font-weight:900; letter-spacing:.28em; text-transform:uppercase;
+      color: #7dd3fc;
+      display:flex; align-items:center; gap:10px;
+    }
+    .pingBadge{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:74px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(56,189,248,.14);
+      border:1px solid rgba(56,189,248,.22);
+      color:#e0f2fe;
       font-weight:900;
       letter-spacing:.08em;
-      font-size:12px;
-      text-transform:uppercase;
     }
+    .sigSub{
+      font-size:10px;
+      color: rgba(226,232,240,.78);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    .canvasWrap{
+      border-radius:14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 2px 14px rgba(0,0,0,.55);
+    }
+    #radar-canvas{ width:100%; height:74px; display:block; }
+
+    .panel{
+      background: rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.90);
+      border-radius: 26px;
+      box-shadow: 0 18px 55px -30px rgba(0,0,0,.20);
+      backdrop-filter: blur(18px);
+      padding: 14px;
+    }
+    .row2{ display:flex; gap:8px; align-items:center; }
+    .in{
+      flex:1;
+      height:48px;
+      border-radius: 18px;
+      border:1px solid rgba(203,213,225,.85);
+      background: rgba(241,245,249,.90);
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      outline:none;
+    }
+    .in:focus{ background:white; border-color:var(--p); box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
+    .cta{
+      height:48px;
+      padding: 0 18px;
+      border-radius: 18px;
+      border:none;
+      color:white;
+      font-weight:900;
+      letter-spacing:.22em;
+      background: linear-gradient(90deg, var(--p), var(--p2));
+      box-shadow: 0 18px 45px -30px rgba(14,165,233,.85);
+      cursor:pointer;
+    }
+    .cta:active{ transform: scale(.98); }
+
+    #callControls{ display:none; gap:10px; align-items:center; justify-content:center; }
+    .bigBtn{
+      flex: 1;
+      height:56px; border-radius:18px;
+      border:1px solid rgba(226,232,240,.9);
+      background: rgba(255,255,255,.96);
+      font-size:24px; font-weight: 900; color: var(--m);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 10px 20px -10px rgba(0,0,0,.15);
+      cursor:pointer;
+    }
+    .bigBtn:active{ background:var(--p); color:white; border-color:var(--p); }
+    .btn-red{ color: var(--bad); }
+    .btn-red:active{ background: var(--bad); color:white; border-color: var(--bad); }
 
     /* error box */
     #errBox{
       position:absolute; left:14px; right:14px; bottom:14px;
-      z-index:80;
+      z-index:90;
       display:none;
       border-radius:18px;
       background: rgba(15,23,42,.92);
@@ -168,7 +286,7 @@
       white-space:pre-wrap;
       word-break:break-word;
       line-height:1.25;
-      max-height: 160px;
+      max-height: 170px;
       overflow:auto;
     }
     #errClose{
@@ -193,8 +311,8 @@
 
   <div class="wrap" id="authWrap">
     <div class="card">
-      <div class="logoWrap"><div class="logo">Ω2.3a</div></div>
-      <div class="cap">ОМЕГА 2.3A | PROXY-ULTRA</div>
+      <div class="logoWrap"><div class="logo">Ω2.4</div></div>
+      <div class="cap">ОМЕГА 2.4 | APK-ULTRA</div>
       <div class="sub">Выберите ключ доступа</div>
 
       <div class="pad" id="symbol-pad"></div>
@@ -205,11 +323,48 @@
         <button class="copy" id="copy-id">⧉</button>
       </div>
 
-      <div class="hint" id="sec-hint" style="color:var(--p); font-weight:800;">Загрузка…</div>
+      <div class="hint" id="sec-hint" style="color:var(--p); font-weight:900;">TURN: инициализация…</div>
+      <div class="hint" id="peer-hint" style="color:rgba(100,116,139,.85); font-weight:800;">Peer: ожидание</div>
+    </div>
+  </div>
 
-      <noscript>
-        <div class="nos">JS ВЫКЛЮЧЕН — в WebView нужно включить JavaScript</div>
-      </noscript>
+  <div id="app">
+    <div id="video-zone">
+      <video id="remote-v" autoplay playsinline></video>
+      <video id="local-v" autoplay playsinline muted></video>
+      <div id="wait">
+        <div class="spin"></div>
+        <div class="stxt" style="letter-spacing:.34em;">ПОИСК СИГНАЛА…</div>
+      </div>
+    </div>
+
+    <div id="footer">
+      <div id="signal-panel">
+        <div class="sig-top">
+          <div class="radar-title">PING <span class="pingBadge"><span id="ping-val">--</span> ms</span></div>
+          <div class="sigSub" id="sig-q">канал: нет данных</div>
+        </div>
+        <div class="canvasWrap">
+          <canvas id="radar-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="panel" id="setup-controls">
+        <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
+          <div class="stxt" style="letter-spacing:.22em;">ВАШ ID: <b style="color:var(--p)" id="display-id">----</b></div>
+          <button onclick="location.reload()" title="Сброс" style="width:48px; height:48px; border-radius:14px; border:1px solid #e2e8f0; background:#fff; font-size:18px; cursor:pointer;">↻</button>
+        </div>
+        <div class="row2">
+          <input class="in" id="target-id" placeholder="ID НАПАРНИКА" maxlength="4" />
+          <button class="cta" id="connect-btn">СВЯЗЬ</button>
+        </div>
+      </div>
+
+      <div class="panel row2" id="callControls">
+        <button class="bigBtn" id="audio-btn">📞 Аудио</button>
+        <button class="bigBtn" id="call-btn">📹 Видео</button>
+        <button class="bigBtn btn-red" id="drop-btn" style="display:none; flex:0.45;">✖</button>
+      </div>
     </div>
   </div>
 
@@ -227,26 +382,28 @@
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
 
   const showErr = (msg) => {
-    try{
-      $("errBox").style.display = "block";
-      $("errText").textContent = ($("errText").textContent ? $("errText").textContent + "\n\n" : "") + String(msg);
-      setStatus("ОШИБКА", "#ef4444");
-    }catch{}
+    $("errBox").style.display = "block";
+    $("errText").textContent = ($("errText").textContent ? $("errText").textContent + "\n\n" : "") + String(msg);
+    setStatus("ОШИБКА", "#ef4444");
   };
-  $("errClose").onclick = () => { $("errBox").style.display = "none"; };
+  $("errClose").onclick = () => $("errBox").style.display = "none";
 
   window.addEventListener("error", (e) => showErr("JS ERROR: " + (e.message || e.error || "unknown")));
   window.addEventListener("unhandledrejection", (e) => showErr("PROMISE: " + (e.reason?.message || e.reason || "unknown")));
 
-  // ID
+  // ==== CONFIG (у тебя уже есть этот endpoint) ====
+  const TURN_HTTP_ENDPOINT = "http://89.124.78.246:8080/get-turn"; // твой VDS отдаёт JSON массива ICE
+  const ALLORIGINS = "https://api.allorigins.win/raw?url=";        // мост чтобы получить http через https
+
+  // ==== ID ====
   let myId = localStorage.getItem("myGalaxyId");
   if (!myId) {
     myId = Math.random().toString(36).substring(2,6).toUpperCase();
     localStorage.setItem("myGalaxyId", myId);
   }
   $("front-id").textContent = myId;
+  $("display-id").textContent = myId;
 
-  // копирование
   $("copy-id").onclick = async () => {
     try{
       await navigator.clipboard.writeText(myId);
@@ -257,32 +414,190 @@
     }
   };
 
-  // ВАЖНО: если ты видишь “JS: OK”, значит JS реально работает
-  const hint = $("sec-hint");
-  hint.textContent = "JS: OK ✅  (если кнопок нет — файл обрезан или DOM не тот)";
-  hint.style.color = "var(--ok)";
-
-  // рисуем кнопки тут же (это то, чего на скрине нет)
+  // ==== UI PAD ====
   const sysCode = [
     { i:'👽', v:'alien' }, { i:'🚀', v:'rocket' }, { i:'🛰️', v:'sat' }, { i:'🛸', v:'ufo' }, { i:'🌍', v:'earth' },
     { i:'🌙', v:'moon' }, { i:'🪐', v:'planet' }, { i:'☄️', v:'comet' }, { i:'🤖', v:'bot' }, { i:'☢️', v:'nuke' }
   ];
-  const pad = $("symbol-pad");
-  pad.innerHTML = "";
-  sysCode.forEach(s => {
-    const b = document.createElement("button");
-    b.className = "btn";
-    b.textContent = s.i;
-    b.onclick = () => {
-      // тут просто тест: если нажалось — JS точно работает
-      setStatus("НАЖАТО", "#22c55e");
-      hint.textContent = "КНОПКА РАБОТАЕТ ✅  (значит JS норм, дальше подключим Peer)";
-      hint.style.color = "var(--ok)";
-    };
-    pad.appendChild(b);
-  });
 
-})();
-</script>
-</body>
-</html>
+  // ==== CANVAS ULTRA GRAPH ====
+  const canvas = $("radar-canvas");
+  const ctx = canvas.getContext("2d", { alpha: true });
+
+  let W=0,H=0,DPR=1;
+  const MAX = 1000;                // потолок графика по ms
+  const N = 60;                    // точек
+  const pings = new Array(N).fill(0);
+  let phase = 0;
+
+  function resizeCanvas(){
+    DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const rect = canvas.getBoundingClientRect();
+    W = Math.max(1, Math.floor(rect.width));
+    H = Math.max(1, Math.floor(rect.height));
+    canvas.width  = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function lerp(a,b,t){ return a + (b-a)*t; }
+
+  function qualityColor(ms){
+    if(ms <= 0) return "rgba(255,255,255,.9)";
+    if(ms < 150) return "rgba(34,197,94,.95)";
+    if(ms < 400) return "rgba(250,204,21,.95)";
+    return "rgba(239,68,68,.95)";
+  }
+
+  function draw(){
+    if(W===0||H===0) resizeCanvas();
+
+    // фон
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0, "rgba(56,189,248,.14)");
+    g.addColorStop(1, "rgba(34,197,94,.06)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // сетка
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,.08)";
+    ctx.beginPath();
+    const mid = H*0.55;
+    ctx.moveTo(0, mid);
+    ctx.lineTo(W, mid);
+    ctx.stroke();
+
+    ctx.beginPath();
+    for(let i=1;i<5;i++){
+      const x = (W/5)*i + (Math.sin(phase*0.6+i)*0.2);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+    }
+    ctx.stroke();
+
+    // линия (сглаженная)
+    const step = W / (N-1);
+    const last = pings[N-1];
+    const col = qualityColor(last);
+
+    // “свечение”
+    ctx.save();
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = 3.6;
+    ctx.strokeStyle = col;
+
+    ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const v = Math.min(MAX, Math.max(0, pings[i]));
+      const t = v / MAX;
+      const y = lerp(H-8, 8, t);
+      const x = i*step;
+
+      if(i===0) ctx.moveTo(x, y);
+      else{
+        // лёгкое сглаживание
+        const px = (i-1)*step;
+        const pv = Math.min(MAX, Math.max(0, pings[i-1]));
+        const pt = pv / MAX;
+        const py = lerp(H-8, 8, pt);
+        const cx = (px + x)/2;
+        ctx.quadraticCurveTo(px, py, cx, (py+y)/2);
+      }
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // бегущий “скан”
+    const scanX = ((phase*55) % (W+120)) - 120;
+    const scan = ctx.createLinearGradient(scanX,0,scanX+120,0);
+    scan.addColorStop(0, "rgba(56,189,248,0)");
+    scan.addColorStop(0.5, "rgba(56,189,248,.18)");
+    scan.addColorStop(1, "rgba(56,189,248,0)");
+    ctx.fillStyle = scan;
+    ctx.fillRect(scanX,0,120,H);
+
+    phase += 0.018;
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  setTimeout(resizeCanvas, 0);
+  requestAnimationFrame(draw);
+
+  // ==== PEER / WEBRTC ====
+  let roomPass = "";
+  let peer = null;
+  let conn = null;
+  let localStream = null;
+  let pingTimer = null;
+
+  const secHint = $("sec-hint");
+  const peerHint = $("peer-hint");
+
+  async function getIceServers(){
+    // 1) пробуем получить TURN с VDS через https мост
+    secHint.textContent = "TURN: получаем ключи…";
+    secHint.style.color = "var(--p)";
+
+    try{
+      const url = ALLORIGINS + encodeURIComponent(TURN_HTTP_ENDPOINT + "?t=" + Date.now());
+      const res = await fetch(url, { cache: "no-store" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const txt = await res.text();
+      const data = JSON.parse(txt);
+      if(!Array.isArray(data)) throw new Error("Bad ICE format");
+      secHint.textContent = "TURN: ключи получены ✅";
+      secHint.style.color = "var(--ok)";
+      return data;
+    }catch(e){
+      // 2) fallback — STUN
+      secHint.textContent = "TURN: не доступен (перехожу на STUN)";
+      secHint.style.color = "var(--warn)";
+      return [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" }
+      ];
+    }
+  }
+
+  function enterApp(){
+    $("authWrap").style.display = "none";
+    $("app").style.display = "block";
+    setTimeout(resizeCanvas, 0);
+  }
+
+  async function initPeer(){
+    if(!window.Peer){
+      peerHint.textContent = "Peer: НЕ ЗАГРУЗИЛСЯ (unpkg блок?)";
+      peerHint.style.color = "var(--bad)";
+      showErr("PeerJS не загрузился. В APK возможно блок CDN. Решение: встроить peerjs локально (скачать peerjs.min.js и положить рядом).");
+      return;
+    }
+
+    setStatus("СЕТЬ…", "#0ea5e9");
+    peerHint.textContent = "Peer: инициализация…";
+    peerHint.style.color = "var(--p)";
+
+    const iceServers = await getIceServers();
+
+    try{
+      peer?.destroy();
+    }catch{}
+
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
+      config: { iceServers },
+      debug: 0
+    });
+
+    peer.on("open", () => {
+      setStatus("ГОТОВО", "#22c55e");
+      peerHint.textContent = "Peer: ГОТОВО ✅";
+      peerHint.style.color = "var(--ok)";
+    });
+
+    peer.on("error", (e) => {
+      setStatus("ОШИБКА", "#ef4444");
+      pe
