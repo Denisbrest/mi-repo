@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Омега 2.3 | PROXY-ULTRA</title>
+  <title>Омега 2.3a | PROXY-ULTRA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- PeerJS грузим defer, чтобы не ломало загрузку страницы -->
+  <script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
     :root{
@@ -82,7 +83,7 @@
     .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:800; color:var(--m); }
     .sub{ margin-top:8px; font-size:12px; font-weight:700; color:rgba(100,116,139,.85); text-transform:uppercase; letter-spacing:.2em; }
 
-    .pad{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:18px; }
+    .pad{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:18px; min-height:56px; }
     .btn{
       height:56px; border-radius:18px; font-size:24px;
       background: rgba(255,255,255,.90);
@@ -127,113 +128,21 @@
     .copy:active{ background:#e0f2fe; }
     .hint{ margin-top:8px; font-size:11px; color:rgba(100,116,139,.78); }
 
-    /* APP */
-    #app{ display:none; position:absolute; inset:0; z-index:20; background: rgba(248,250,252,.55); }
-    #video-zone{ position:absolute; inset:0; overflow:hidden; }
-    #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
-    #local-v{
-      position:absolute; top:14px; right:14px;
-      width:104px; height:146px; border-radius:18px;
-      border:2px solid rgba(255,255,255,.95);
-      box-shadow: 0 14px 32px rgba(0,0,0,0.12);
-      transform: scaleX(-1);
-      display:none;
-      z-index:40;
-    }
-    #wait{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
-      background: rgba(241,245,249,.80);
-      backdrop-filter: blur(14px);
-      color: var(--p);
-    }
-    .spin{
-      width:46px; height:46px; border-radius:999px;
-      border:4px solid rgba(148,163,184,.22);
-      border-top-color: var(--p);
-      animation: rot 1s linear infinite;
-    }
-    @keyframes rot{ to{ transform: rotate(360deg); } }
-
-    #footer{ position:absolute; left:0; right:0; bottom:0; padding: 14px 14px 22px; z-index:30; }
-
-    /* Radar panel */
-    #signal-panel{
-      display:none;
-      margin-bottom: 10px;
-      background: rgba(15, 23, 42, 0.86);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius: 20px;
-      box-shadow: 0 18px 55px -30px rgba(0,0,0,.55);
-      backdrop-filter: blur(18px);
-      padding: 12px;
-    }
-    .radar-head{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      margin-bottom: 8px;
-    }
-    .radar-title{
-      font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase;
-      color: #38bdf8;
-    }
-    .radar-badge{
-      font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      color:#e2e8f0;
-      background: rgba(255,255,255,.06);
-    }
-    #radar-canvas{
-      width: 100%;
-      height: 70px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 30% 20%, rgba(56,189,248,.18), rgba(0,0,0,.35));
-      box-shadow: inset 0 2px 12px rgba(0,0,0,.55);
-      display:block;
-    }
-
-    .panel{
-      background: rgba(255,255,255,.80);
-      border:1px solid rgba(255,255,255,.92);
-      border-radius: 26px;
-      box-shadow: 0 18px 55px -30px rgba(0,0,0,.25);
-      backdrop-filter: blur(18px);
-      padding: 14px;
-    }
-    .row2{ display:flex; gap:8px; align-items:center; }
-    .in{
-      flex:1; height:48px; border-radius: 18px;
-      border:1px solid rgba(203,213,225,.85);
-      background: rgba(241,245,249,.85);
-      text-align:center;
+    /* Плашка “JS выключен” */
+    .nos{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.25);
+      color:#b91c1c;
       font-weight:900;
-      letter-spacing:.22em;
+      letter-spacing:.08em;
+      font-size:12px;
       text-transform:uppercase;
     }
-    .in:focus{ background:white; border-color:var(--p); box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
-    .cta{
-      height:48px; padding: 0 18px; border-radius: 18px; border:none;
-      color:white; font-weight:900; letter-spacing:.22em;
-      background: linear-gradient(90deg, var(--p), var(--p2));
-      box-shadow: 0 18px 45px -30px rgba(14,165,233,.85);
-      cursor:pointer;
-    }
-    #callControls{ display:none; gap:10px; align-items:center; justify-content:center; }
-    .bigBtn{
-      flex: 1; height:56px; border-radius:18px;
-      border:1px solid rgba(226,232,240,.9);
-      background: rgba(255,255,255,.94);
-      font-size:24px; font-weight: 800; color: var(--m);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 10px 20px -10px rgba(0,0,0,.15);
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-    .bigBtn:active{ background:var(--p); color:white; border-color:var(--p); }
-    .btn-red{ color: var(--bad); }
-    .btn-red:active{ background: var(--bad); color:#fff; border-color: var(--bad); }
 
-    /* On-screen error console */
+    /* error box */
     #errBox{
       position:absolute; left:14px; right:14px; bottom:14px;
       z-index:80;
@@ -284,9 +193,10 @@
 
   <div class="wrap" id="authWrap">
     <div class="card">
-      <div class="logoWrap"><div class="logo">Ω2.3</div></div>
-      <div class="cap">ОМЕГА 2.3 | PROXY-ULTRA</div>
+      <div class="logoWrap"><div class="logo">Ω2.3a</div></div>
+      <div class="cap">ОМЕГА 2.3A | PROXY-ULTRA</div>
       <div class="sub">Выберите ключ доступа</div>
+
       <div class="pad" id="symbol-pad"></div>
 
       <div class="idRow">
@@ -295,45 +205,11 @@
         <button class="copy" id="copy-id">⧉</button>
       </div>
 
-      <div class="hint" id="sec-hint" style="color:var(--p); font-weight:800;">Ждем команду…</div>
-    </div>
-  </div>
+      <div class="hint" id="sec-hint" style="color:var(--p); font-weight:800;">Загрузка…</div>
 
-  <div id="app">
-    <div id="video-zone">
-      <video id="remote-v" autoplay playsinline></video>
-      <video id="local-v" autoplay playsinline muted></video>
-      <div id="wait">
-        <div class="spin"></div>
-        <div class="stxt" style="letter-spacing:.34em;">ПОИСК СИГНАЛА…</div>
-      </div>
-    </div>
-
-    <div id="footer">
-      <div id="signal-panel">
-        <div class="radar-head">
-          <div class="radar-title">CARDIO PING</div>
-          <div class="radar-badge"><span id="ping-val">--</span> ms</div>
-        </div>
-        <canvas id="radar-canvas"></canvas>
-      </div>
-
-      <div class="panel" id="setup-controls">
-        <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
-          <div class="stxt" style="letter-spacing:.22em;">ВАШ ID: <b style="color:var(--p)" id="display-id">----</b></div>
-          <button onclick="location.reload()" title="Сброс" style="width:48px; height:48px; border-radius:14px; border:1px solid #e2e8f0; background:#fff; font-size:18px; cursor:pointer;">↻</button>
-        </div>
-        <div class="row2">
-          <input class="in" id="target-id" placeholder="ID НАПАРНИКА" maxlength="4" />
-          <button class="cta" id="connect-btn">СВЯЗЬ</button>
-        </div>
-      </div>
-
-      <div class="panel row2" id="callControls">
-        <button class="bigBtn" id="audio-btn">📞</button>
-        <button class="bigBtn" id="call-btn">📹</button>
-        <button class="bigBtn btn-red" id="drop-btn" style="display:none; flex:0.4;">✖</button>
-      </div>
+      <noscript>
+        <div class="nos">JS ВЫКЛЮЧЕН — в WebView нужно включить JavaScript</div>
+      </noscript>
     </div>
   </div>
 
@@ -348,20 +224,12 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+  const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
 
-  const setStatus = (t, c) => {
-    $("status").textContent = t;
-    $("dot").style.background = c || "#94a3b8";
-  };
-
-  // --- экран ошибок (чтобы без консоли) ---
   const showErr = (msg) => {
     try{
-      const box = $("errBox");
-      const pre = $("errText");
-      if (!box || !pre) return;
-      box.style.display = "block";
-      pre.textContent = (pre.textContent ? (pre.textContent + "\n\n") : "") + String(msg);
+      $("errBox").style.display = "block";
+      $("errText").textContent = ($("errText").textContent ? $("errText").textContent + "\n\n" : "") + String(msg);
       setStatus("ОШИБКА", "#ef4444");
     }catch{}
   };
@@ -370,245 +238,51 @@
   window.addEventListener("error", (e) => showErr("JS ERROR: " + (e.message || e.error || "unknown")));
   window.addEventListener("unhandledrejection", (e) => showErr("PROMISE: " + (e.reason?.message || e.reason || "unknown")));
 
-  // --- ID ---
+  // ID
   let myId = localStorage.getItem("myGalaxyId");
   if (!myId) {
     myId = Math.random().toString(36).substring(2,6).toUpperCase();
     localStorage.setItem("myGalaxyId", myId);
   }
   $("front-id").textContent = myId;
-  $("display-id").textContent = myId;
 
   // копирование
   $("copy-id").onclick = async () => {
-    try {
+    try{
       await navigator.clipboard.writeText(myId);
       setStatus("СКОПИРОВАНО", "#22c55e");
       setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"), 900);
-    } catch {
+    }catch{
       setStatus("КОПИРУЙ РУКАМИ", "#f59e0b");
     }
   };
 
-  // --- кнопки ключа ---
+  // ВАЖНО: если ты видишь “JS: OK”, значит JS реально работает
+  const hint = $("sec-hint");
+  hint.textContent = "JS: OK ✅  (если кнопок нет — файл обрезан или DOM не тот)";
+  hint.style.color = "var(--ok)";
+
+  // рисуем кнопки тут же (это то, чего на скрине нет)
   const sysCode = [
     { i:'👽', v:'alien' }, { i:'🚀', v:'rocket' }, { i:'🛰️', v:'sat' }, { i:'🛸', v:'ufo' }, { i:'🌍', v:'earth' },
     { i:'🌙', v:'moon' }, { i:'🪐', v:'planet' }, { i:'☄️', v:'comet' }, { i:'🤖', v:'bot' }, { i:'☢️', v:'nuke' }
   ];
-
-  // --- RADAR ---
-  const cvs = $("radar-canvas");
-  const ctx = cvs.getContext("2d");
-  const pings = new Array(50).fill(0);
-
-  function resizeRadar() {
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const w = Math.max(200, cvs.clientWidth || 400);
-    const h = Math.max(60,  cvs.clientHeight || 70);
-    const rw = Math.floor(w * dpr);
-    const rh = Math.floor(h * dpr);
-    if (cvs.width !== rw || cvs.height !== rh) {
-      cvs.width = rw; cvs.height = rh;
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function pingColor(ms){
-    if (!ms) return "rgba(226,232,240,0.9)";
-    if (ms < 150) return "rgba(34,197,94,0.95)";
-    if (ms < 400) return "rgba(250,204,21,0.95)";
-    return "rgba(239,68,68,0.95)";
-  }
-
-  function drawRadar(){
-    resizeRadar();
-
-    const w = cvs.clientWidth || 400;
-    const h = cvs.clientHeight || 70;
-
-    ctx.clearRect(0,0,w,h);
-
-    // glow background grid
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.strokeStyle = "rgba(56,189,248,0.55)";
-    ctx.lineWidth = 1;
-
-    // vertical grid
-    const cols = 10;
-    for(let i=0;i<=cols;i++){
-      const x = (w/cols)*i;
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
-    }
-    // horizontal grid
-    const rows = 4;
-    for(let i=0;i<=rows;i++){
-      const y = (h/rows)*i;
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
-    }
-    ctx.restore();
-
-    // baseline
-    ctx.strokeStyle = "rgba(255,255,255,0.12)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, h/2);
-    ctx.lineTo(w, h/2);
-    ctx.stroke();
-
-    // smooth cardio line
-    const last = pings[pings.length-1];
-    const col = pingColor(last);
-
-    const maxMs = 900; // scale ceiling
-    const pad = 6;
-
-    // glow pass
-    ctx.save();
-    ctx.shadowColor = col;
-    ctx.shadowBlur = 18;
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 3.5;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-
-    const step = w / (pings.length - 1);
-
-    // build points
-    const pts = [];
-    for(let i=0;i<pings.length;i++){
-      const ms = Math.min(maxMs, Math.max(0, pings[i]));
-      const t = ms / maxMs;
-      const y = (h - pad) - t * (h - pad*2);
-      pts.push({ x: i*step, y });
-    }
-
-    // quadratic smoothing
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i=1;i<pts.length-1;i++){
-      const xc = (pts[i].x + pts[i+1].x) / 2;
-      const yc = (pts[i].y + pts[i+1].y) / 2;
-      ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
-    }
-    ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
-    ctx.stroke();
-    ctx.restore();
-
-    // highlight dot
-    ctx.beginPath();
-    ctx.fillStyle = col;
-    ctx.arc(pts[pts.length-1].x, pts[pts.length-1].y, 3.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // ping label color
-    $("ping-val").style.color = col;
-  }
-
-  window.addEventListener("resize", drawRadar);
-
-  // --- NETWORK ---
-  let roomPass = "";
-  let peer = null;
-  let conn = null;
-  let localStream = null;
-  let pingInterval = null;
-  let fetchAbort = null;
-
-  function enterApp(){
-    $("authWrap").style.display = "none";
-    $("app").style.display = "block";
-    setTimeout(drawRadar, 0);
-  }
-
-  function safeCloseConn(){
-    try{ if(conn && conn.open) conn.close(); }catch{}
-    conn = null;
-    clearInterval(pingInterval);
-    pingInterval = null;
-  }
-
-  function safeDestroyPeer(){
-    try{ if(peer && !peer.destroyed) peer.destroy(); }catch{}
-    peer = null;
-  }
-
-  function stopMedia(){
-    try{
-      if(localStream){
-        localStream.getTracks().forEach(t => t.stop());
-      }
-    }catch{}
-    localStream = null;
-    $("local-v").srcObject = null;
-    $("local-v").style.display = "none";
-  }
-
-  function closeCallUI(){
-    $("remote-v").srcObject = null;
-    $("remote-v").style.display = "none";
-    stopMedia();
-    $("wait").style.display = "flex";
-    setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
-    $("audio-btn").style.display = "flex";
-    $("call-btn").style.display = "flex";
-    $("drop-btn").style.display = "none";
-  }
-
-  // fetch with timeout
-  async function fetchTextWithTimeout(url, ms){
-    if (fetchAbort) { try{ fetchAbort.abort(); }catch{} }
-    fetchAbort = new AbortController();
-    const t = setTimeout(() => { try{ fetchAbort.abort(); }catch{} }, ms);
-
-    const res = await fetch(url, { cache:"no-store", signal: fetchAbort.signal });
-    clearTimeout(t);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return await res.text();
-  }
-
-  async function getIceServers(){
-    const hint = $("sec-hint");
-    hint.textContent = "TURN: Обход блокировки…";
-    hint.style.color = "var(--p)";
-
-    // ТВОЙ VDS / МОСТ:
-    const vdsUrl = "http://89.124.78.246:8080/get-turn?t=" + Date.now();
-    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(vdsUrl);
-
-    try{
-      const txt = await fetchTextWithTimeout(proxyUrl, 6000);
-      const data = JSON.parse(txt);
-
-      if (!Array.isArray(data) || !data.length) throw new Error("Bad ICE array");
-      const ok = data.every(x => x && x.urls);
-      if (!ok) throw new Error("ICE objects missing urls");
-
-      hint.textContent = "TURN: Ключи получены ✅";
+  const pad = $("symbol-pad");
+  pad.innerHTML = "";
+  sysCode.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "btn";
+    b.textContent = s.i;
+    b.onclick = () => {
+      // тут просто тест: если нажалось — JS точно работает
+      setStatus("НАЖАТО", "#22c55e");
+      hint.textContent = "КНОПКА РАБОТАЕТ ✅  (значит JS норм, дальше подключим Peer)";
       hint.style.color = "var(--ok)";
-      return data;
-    }catch(e){
-      hint.textContent = "TURN: Ошибка моста (fallback STUN)";
-      hint.style.color = "var(--bad)";
-      showErr("TURN FETCH FAIL: " + (e.message || e));
-      return [{ urls: "stun:stun.l.google.com:19302" }];
-    }
-  }
+    };
+    pad.appendChild(b);
+  });
 
-  async function initPeer(){
-    if (!window.Peer){
-      showErr("PeerJS не загрузился (unpkg заблокирован?)");
-      setStatus("НЕТ PEERJS", "#ef4444");
-      return;
-    }
-
-    setStatus("СЕТЬ…", "#0ea5e9");
-
-    // пересоздаём всё чисто
-    safeCloseConn();
-    safeDestroyPeer();
-
-    const ice = await getIceServers();
-
-    const myPeerId = roomPass + "-" + myId.toLowerCase();
-    peer = new Peer(myPeerI
+})();
+</script>
+</body>
+</html>
