@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Омега 2.1 | SECURE</title>
+  <title>Омега 2.2 | PROXY</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -126,13 +126,12 @@
 
   <div class="wrap" id="authWrap">
     <div class="card" id="auth-screen">
-      <div class="logoWrap"><div class="logo">Ω2.1</div></div>
-      <div class="cap">ОМЕГА 2.1 | SECURE</div>
+      <div class="logoWrap"><div class="logo">Ω2.2</div></div>
+      <div class="cap">ОМЕГА 2.2 | PROXY</div>
       <div class="sub">Выберите ключ доступа</div>
       <div class="pad" id="symbol-pad"></div>
       <div class="idRow">ВАШ ID: <span class="chip"><span id="front-id">----</span></span><button class="copy" id="copy-id">⧉</button></div>
       <div class="hint" id="sec-hint" style="color:#0ea5e9; font-weight:bold;">Ждем команду...</div>
-      <div class="hint" id="diag" style="display:none; color:#ef4444; font-weight:800; margin-top:10px;"></div>
     </div>
   </div>
 
@@ -169,7 +168,6 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
-  const diag = (t) => { $("diag").style.display = "block"; $("diag").textContent = t; setStatus("ОШИБКА", "#ef4444"); };
 
   let myId = localStorage.getItem("myGalaxyId");
   if (!myId) { myId = Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
@@ -196,27 +194,30 @@
   }
   drawRadar();
 
-  // --- ВОТ ТУТ МЫ ЗАПРАШИВАЕМ КЛЮЧИ С ТВОЕГО СЕРВЕРА ---
+  // --- ИДЕМ НА VDS ЧЕРЕЗ ЗАЩИЩЕННЫЙ МОСТ ---
   async function getIceServers(){
-    $("sec-hint").textContent = "TURN: Связь с базой (VDS)...";
+    $("sec-hint").textContent = "TURN: Обход HTTP блокировки...";
     try {
-      const res = await fetch("http://89.124.78.246:8080/get-turn");
+      const vdsUrl = "http://89.124.78.246:8080/get-turn?t=" + Date.now();
+      const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(vdsUrl);
+      
+      const res = await fetch(proxyUrl);
       const data = await res.json();
       $("sec-hint").textContent = "TURN: Ключи получены! 🔓";
+      $("sec-hint").style.color = "#22c55e";
       return data;
     } catch (e) {
       console.error(e);
-      $("sec-hint").textContent = "TURN: Блок HTTP! (Смотри консоль)";
+      $("sec-hint").textContent = "TURN: Ошибка моста!";
       $("sec-hint").style.color = "#ef4444";
-      return [{ urls: "stun:stun.l.google.com:19302" }]; // Резервный слабенький STUN
+      return [{ urls: "stun:stun.l.google.com:19302" }];
     }
   }
 
   async function initPeer(){
-    if (!window.Peer) { diag("PeerJS не загружен"); return; }
+    if (!window.Peer) return;
     setStatus("СЕТЬ…", "#0ea5e9");
     
-    // Ждем ключи от базы
     const myIceServers = await getIceServers();
 
     peer = new Peer(roomPass + "-" + myId.toLowerCase(), { config: { iceServers: myIceServers } });
