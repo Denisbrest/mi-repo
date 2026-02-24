@@ -3,256 +3,147 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Омега 2.4 | APK-ULTRA</title>
+  <title>Омега 3.0 | VIP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
   <script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
     :root{
-      --p:#0ea5e9; --p2:#38bdf8;
-      --bg1:#f0f9ff; --bg2:#e0f2fe;
-      --t:#0f172a; --m:#64748b;
-      --glass: rgba(255,255,255,.74);
+      --p:#0ea5e9; --p2:#38bdf8; --bg1:#f0f9ff; --bg2:#e0f2fe;
+      --t:#0f172a; --m:#64748b; --glass: rgba(255,255,255,.85);
       --st: rgba(226,232,240,.92);
-      --ok:#22c55e; --warn:#facc15; --bad:#ef4444;
-      --dark: rgba(15,23,42,.88);
     }
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html,body{ height:100%; margin:0; overflow:hidden; touch-action:none; }
     body{
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: Inter, sans-serif;
       background: linear-gradient(135deg,var(--bg1),var(--bg2));
       color:var(--t);
     }
     .bg{
-      position:fixed; inset:0; pointer-events:none; opacity:.55;
+      position:fixed; inset:0; pointer-events:none; opacity:.4;
       background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
       background-size: 18px 18px;
-      mask-image: radial-gradient(circle at 35% 25%, #000 0%, #000 45%, transparent 78%);
     }
     .status{
       position:fixed; top:14px; left:14px; z-index:50;
       display:flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:16px;
-      background: var(--glass);
-      border:1px solid var(--st);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 14px 40px -26px rgba(0,0,0,.30);
+      padding:10px 14px; border-radius:16px;
+      background: var(--glass); border:1px solid var(--st);
+      box-shadow: 0 4px 15px rgba(0,0,0,.05);
     }
-    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; transition:background .2s; }
+    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; transition:background .3s; }
     .stxt{ font-size:10px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:var(--m); }
 
-    .wrap{
-      position:relative; z-index:10;
-      width:100%; height:100%;
-      display:flex; align-items:center; justify-content:center;
-      padding:16px;
-    }
+    .wrap{ position:relative; z-index:10; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px; }
     .card{
-      width:min(390px, 92vw);
-      border-radius: 34px;
-      background: var(--glass);
-      border:1px solid var(--st);
-      backdrop-filter: blur(18px) saturate(180%);
-      box-shadow: 0 20px 70px -34px rgba(2,132,199,.35);
-      padding: 26px;
-      text-align:center;
+      width:min(390px, 92vw); border-radius: 34px;
+      background: var(--glass); border:1px solid var(--st);
+      box-shadow: 0 10px 40px rgba(2,132,199,.12);
+      padding: 28px; text-align:center;
     }
     .logoWrap{
-      width:116px; height:116px; margin:0 auto 8px;
-      border-radius: 30px; padding:7px;
-      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(56,189,248,.20));
-      border:1px solid rgba(255,255,255,.70);
-      box-shadow: 0 18px 55px -32px rgba(14,165,233,.55);
+      width:110px; height:110px; margin:0 auto 10px; border-radius: 30px; padding:6px;
+      background: linear-gradient(135deg, #fff, rgba(56,189,248,.15));
+      border:1px solid rgba(255,255,255,.8);
     }
     .logo{
-      width:100%; height:100%;
-      border-radius: 24px;
+      width:100%; height:100%; border-radius: 24px;
       display:flex; align-items:center; justify-content:center;
-      background: rgba(255,255,255,.88);
-      border:1px solid rgba(56,189,248,.22);
-      font-weight:1000; font-size:54px;
+      background: #fff; border:1px solid rgba(56,189,248,.2);
+      font-weight:900; font-size:46px; letter-spacing: -2px;
       background: linear-gradient(135deg, var(--p), var(--p2));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     }
     .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:900; color:var(--m); }
-    .sub{ margin-top:8px; font-size:12px; font-weight:800; color:rgba(100,116,139,.85); text-transform:uppercase; letter-spacing:.18em; }
+    .sub{ margin-top:8px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.15em; }
 
-    .pad{
-      display:grid; grid-template-columns: repeat(5, 1fr);
-      gap:12px; margin-top:16px;
-    }
+    .pad{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:20px; }
     .btn{
-      height:56px; border-radius:18px;
-      font-size:24px; font-weight:900;
-      background: rgba(255,255,255,.90);
-      border:1px solid rgba(226,232,240,.95);
-      color:#64748b;
-      box-shadow: 0 10px 24px -18px rgba(0,0,0,.25);
-      transition: transform .12s ease, background .12s ease;
+      height:50px; border-radius:16px; font-size:14px; font-weight:900; letter-spacing: .1em;
+      background: #fff; border:1px solid #e2e8f0; color:var(--p);
+      box-shadow: 0 4px 10px rgba(0,0,0,.03); transition: transform .1s, background .1s, color .1s;
     }
     .btn:active{ transform: scale(.95); background: var(--p); color:#fff; border-color: var(--p); }
 
     .row{
-      margin-top:16px; padding-top:14px;
-      border-top:1px solid rgba(226,232,240,.65);
+      margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;
       display:flex; align-items:center; justify-content:center; gap:10px;
-      font-size:11px; font-weight:900; letter-spacing:.28em; text-transform:uppercase; color:var(--m);
+      font-size:11px; font-weight:900; letter-spacing:.28em; color:var(--m);
     }
-    .chip{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:8px 14px; min-width:88px;
-      border-radius:14px;
-      background: rgba(14,165,233,.10);
-      border:1px solid rgba(14,165,233,.22);
-      color: var(--p);
-      font-weight:1000;
-      letter-spacing:.18em;
-    }
-    .copy{
-      width:46px; height:40px;
-      border-radius:14px;
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(226,232,240,.95);
-      font-weight:1000;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .hint{ margin-top:8px; font-size:12px; font-weight:800; color:rgba(100,116,139,.85); }
+    .chip{ padding:8px 16px; min-width:88px; border-radius:14px; background: rgba(14,165,233,.10); color: var(--p); font-weight:900; letter-spacing:.18em; }
+    .copy{ width:46px; height:40px; border-radius:14px; background: #fff; border:1px solid #e2e8f0; font-weight:900; display:flex; align-items:center; justify-content:center; }
+    .hint{ margin-top:12px; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.05em;}
     .hint b{ color: var(--p); }
 
     /* App */
-    #app{ display:none; position:fixed; inset:0; z-index:30; background: rgba(248,250,252,.62); }
+    #app{ display:none; position:fixed; inset:0; z-index:30; background: #000; }
     #video-zone{ position:absolute; inset:0; overflow:hidden; }
     #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
     #local-v{
-      position:absolute; top:14px; right:14px;
-      width:104px; height:146px; border-radius:18px;
-      border:2px solid rgba(255,255,255,.95);
-      box-shadow: 0 14px 34px rgba(0,0,0,.12);
-      transform: scaleX(-1);
-      display:none;
+      position:absolute; top:14px; right:14px; width:110px; height:150px; border-radius:18px;
+      border:2px solid rgba(255,255,255,.2); box-shadow: 0 8px 25px rgba(0,0,0,.4); transform: scaleX(-1); display:none; object-fit:cover; z-index:40;
     }
     #wait{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center; flex-direction:column;
-      gap:12px;
-      background: rgba(241,245,249,.80);
-      backdrop-filter: blur(14px);
-      color: var(--p);
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+      gap:16px; background: rgba(15,23,42,.95); color: var(--p); z-index:20;
     }
     .spin{
-      width:46px; height:46px; border-radius:999px;
-      border:4px solid rgba(148,163,184,.22);
-      border-top-color: var(--p);
+      width:50px; height:50px; border-radius:999px;
+      border:4px solid rgba(148,163,184,.1); border-top-color: var(--p);
       animation: rot 1s linear infinite;
     }
     @keyframes rot{ to{ transform: rotate(360deg); } }
 
-    #footer{
-      position:absolute; left:0; right:0; bottom:0;
-      padding: 14px 14px 22px;
-    }
-    #signal{
-      display:none; margin-bottom:10px;
-      background: var(--dark);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius: 20px;
-      padding: 12px;
-      box-shadow: 0 18px 60px -38px rgba(0,0,0,.60);
-      backdrop-filter: blur(18px);
-    }
-    .radar-title{
-      font-size:10px; font-weight:1000; letter-spacing:.28em; text-transform:uppercase;
-      color: #38bdf8; margin: 0 0 8px 0;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    #pingVal{ color:#fff; font-weight:1000; letter-spacing:.12em; }
-    #radar{ width:100%; height:70px; display:block; border-radius:12px; background: rgba(0,0,0,.35); }
-
-    .panel{
-      background: rgba(255,255,255,.78);
-      border:1px solid rgba(255,255,255,.88);
-      border-radius: 26px;
-      box-shadow: 0 18px 55px -36px rgba(0,0,0,.25);
-      backdrop-filter: blur(18px);
-      padding: 14px;
-    }
-    .row2{ display:flex; gap:8px; align-items:center; }
+    #footer{ position:absolute; left:0; right:0; bottom:30px; display:flex; flex-direction:column; align-items:center; z-index:50; padding:0 20px;}
+    
+    .panel{ background: rgba(255,255,255,.9); border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.15); padding: 16px; width:100%; max-width:400px; backdrop-filter:blur(10px);}
+    .row2{ display:flex; gap:10px; align-items:center; }
     .in{
-      flex:1; height:48px;
-      border-radius: 18px;
-      border:1px solid rgba(203,213,225,.85);
-      background: rgba(241,245,249,.86);
-      text-align:center;
-      font-weight:1000;
-      letter-spacing:.22em;
-      text-transform:uppercase;
+      flex:1; height:50px; border-radius: 16px; border:1px solid #cbd5e1; background: #f8fafc;
+      text-align:center; font-weight:900; letter-spacing:.2em; text-transform:uppercase; outline:none;
     }
-    .in:focus{ background:#fff; border-color:var(--p); box-shadow: 0 0 0 4px rgba(14,165,233,.12); }
+    .in:focus{ background:#fff; border-color:var(--p); }
     .cta{
-      height:48px; padding:0 18px;
-      border-radius: 18px;
-      border:none;
-      color:#fff;
-      font-weight:1000;
-      letter-spacing:.18em;
-      background: linear-gradient(90deg, var(--p), var(--p2));
-      box-shadow: 0 18px 45px -34px rgba(14,165,233,.85);
+      height:50px; padding:0 24px; border-radius: 16px; border:none; color:#fff;
+      font-weight:900; letter-spacing:.15em; background: linear-gradient(90deg, var(--p), var(--p2));
     }
-    #controls{ display:none; gap:10px; align-items:center; justify-content:center; }
-    .bigBtn{
-      flex: 1;
-      height:56px; border-radius:18px;
-      border:1px solid rgba(226,232,240,.9);
-      background: rgba(255,255,255,.92);
-      font-size:24px; font-weight:1000;
-      color: var(--m);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 10px 22px -14px rgba(0,0,0,.18);
-    }
-    .bigBtn:active{ background:var(--p); color:#fff; border-color:var(--p); }
-    .red{ color: var(--bad); }
-    .red:active{ background: var(--bad); border-color: var(--bad); }
+    .tiny{ width:50px; height:50px; border-radius:16px; border:1px solid #e2e8f0; background:#fff; font-size:18px; font-weight:900; color:var(--m);}
 
-    .tiny{
-      width:48px; height:48px;
-      border-radius:14px;
-      border:1px solid rgba(226,232,240,.95);
-      background:#fff;
-      font-size:18px;
+    #controls{ display:none; justify-content:center; align-items:center; width:100%; margin-top:10px; }
+    
+    /* Новые круглые кнопки */
+    .circle-btn {
+      width: 76px; height: 76px; border-radius: 50%; border: none;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3); outline: none; cursor:pointer;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+    .circle-btn:active { transform: scale(0.85); }
+    .btn-blue { background: #0ea5e9; border: 3px solid rgba(255,255,255,.2);}
+    .btn-green { background: #22c55e; border: 3px solid rgba(255,255,255,.2); }
+
   </style>
 </head>
 
 <body>
   <div class="bg"></div>
-
-  <div class="status">
-    <div id="dot" class="dot"></div>
-    <div id="status" class="stxt">ОЖИДАНИЕ</div>
-  </div>
+  <div class="status"><div id="dot" class="dot"></div><div id="status" class="stxt">ОЖИДАНИЕ</div></div>
 
   <div class="wrap" id="authWrap">
     <div class="card">
-      <div class="logoWrap"><div class="logo">Ω2</div></div>
-      <div class="cap">ОМЕГА 2.4 | APK-ULTRA</div>
-      <div class="sub">Выберите ключ доступа</div>
-
+      <div class="logoWrap"><div class="logo">Ω3</div></div>
+      <div class="cap">ОМЕГА 3.0 | VIP</div>
+      <div class="sub">Секретный шлюз</div>
+      
       <div class="pad" id="pad"></div>
-
-      <div class="row">
-        ID:
-        <span class="chip" id="frontId">----</span>
-        <button class="copy" id="copyBtn">⧉</button>
-      </div>
-
-      <div class="hint" id="turnHint"><b>TURN:</b> инициализация…</div>
-      <div class="hint" id="peerHint"><b>Peer:</b> ожидание</div>
+      
+      <div class="row">ID: <span class="chip" id="frontId">----</span><button class="copy" id="copyBtn">⧉</button></div>
+      <div class="hint" id="turnHint"><b>TURN:</b> подготовка моста…</div>
+      <div class="hint" id="peerHint"><b>УЗЕЛ:</b> ожидание</div>
     </div>
   </div>
 
@@ -260,36 +151,24 @@
     <div id="video-zone">
       <video id="remote-v" autoplay playsinline></video>
       <video id="local-v" autoplay playsinline muted></video>
-      <div id="wait">
-        <div class="spin"></div>
-        <div class="stxt" style="letter-spacing:.34em;">ПОИСК СИГНАЛА…</div>
-      </div>
+      <div id="wait"><div class="spin"></div><div class="stxt" style="letter-spacing:.3em; color:#fff;">СИНХРОНИЗАЦИЯ...</div></div>
     </div>
-
+    
     <div id="footer">
-      <div id="signal">
-        <div class="radar-title">
-          <span>КАРДИОГРАММА</span>
-          <span>PING: <span id="pingVal">--</span> MS</span>
-        </div>
-        <canvas id="radar"></canvas>
-      </div>
-
       <div class="panel" id="setup">
-        <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
-          <div class="stxt" style="letter-spacing:.22em;">ВАШ ID: <b style="color:var(--p)" id="myIdTxt">----</b></div>
-          <button class="tiny" onclick="location.reload()" title="Сброс">↻</button>
+        <div class="row2" style="justify-content:space-between; margin-bottom:12px;">
+          <div class="stxt" style="letter-spacing:.2em;">МОЙ ID: <b style="color:var(--p); font-size:12px;" id="myIdTxt">----</b></div>
+          <button class="tiny" onclick="location.reload()">↻</button>
         </div>
         <div class="row2">
-          <input class="in" id="target" placeholder="ID НАПАРНИКА" maxlength="4" />
+          <input class="in" id="target" placeholder="ID ЦЕЛИ" maxlength="4" />
           <button class="cta" id="connect">СВЯЗЬ</button>
         </div>
       </div>
-
-      <div class="panel row2" id="controls">
-        <button class="bigBtn" id="audio">📞</button>
-        <button class="bigBtn" id="video">📹</button>
-        <button class="bigBtn red" id="hang" style="display:none; flex:0.45;">✖</button>
+      
+      <div id="controls">
+        <button class="circle-btn btn-blue" id="video"></button>
+        <button class="circle-btn btn-green" id="hang" style="display:none;"></button>
       </div>
     </div>
   </div>
@@ -298,364 +177,158 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
-
   const TURN_HTTP_ENDPOINT = "http://89.124.78.246:8080/get-turn"; 
-  const ALLOWORIGINS_RAW = "https://api.allorigins.win/raw?url=";   
 
   let myId = localStorage.getItem("myGalaxyId");
-  if (!myId) {
-    myId = Math.random().toString(36).slice(2,6).toUpperCase();
-    localStorage.setItem("myGalaxyId", myId);
+  if (!myId) { myId = Math.random().toString(36).slice(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
+  $("frontId").textContent = myId; $("myIdTxt").textContent = myId;
+
+  async function copyText(text){
+    try { await navigator.clipboard.writeText(text); return true; } 
+    catch {
+      try{
+        const ta = document.createElement("textarea"); ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+        document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); document.body.removeChild(ta); return ok;
+      } catch { return false; }
+    }
   }
-  $("frontId").textContent = myId;
-  $("myIdTxt").textContent = myId;
-
-    async function getIceServers(){
-    $("turnHint").innerHTML = "<b>TURN:</b> обход блокировки...";
-    try {
-      // Ставим жесткий таймер: если прокси тупит дольше 4 секунд - сбрасываем!
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 4000);
-
-      // Меняем тормознутый allorigins на быстрый corsproxy
-      const url = "https://corsproxy.io/?" + encodeURIComponent(TURN_HTTP_ENDPOINT + "?t=" + Date.now());
-      
-      const res = await fetch(url, { cache: "no-store", signal: controller.signal });
-      clearTimeout(timer);
-      
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      
-      const data = await res.json(); // Сразу парсим чистый JSON
-      
-      if (!Array.isArray(data)) throw new Error("Bad ICE format");
-      $("turnHint").innerHTML = "<b>TURN:</b> ключи получены ✅";
-      return data;
-    } catch(e) {
-      console.warn("Сбой моста TURN:", e);
-      $("turnHint").innerHTML = "<b>TURN:</b> сбой моста (STUN) ⚠️";
-      // Если мост упал, используем надежные резервные STUN-серверы
-      return [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:standard.relay.metered.ca:80" }
-      ];
-    }
-    }
   
   $("copyBtn").onclick = async () => {
-    const ok = await copyText(myId);
-    if (ok) { setStatus("СКОПИРОВАНО", "#22c55e"); setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"), 900); }
-    else { setStatus("КОПИРУЙ РУКАМИ", "#f59e0b"); }
+    if (await copyText(myId)) { setStatus("СКОПИРОВАНО", "#22c55e"); setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"), 900); }
+    else setStatus("РУЧНОЕ КОПИРОВАНИЕ", "#f59e0b");
   };
 
+  // Столицы вместо эмодзи
   const keys = [
-    { i:'👽', v:'alien' }, { i:'🚀', v:'rocket' }, { i:'🛰️', v:'sat' }, { i:'🛸', v:'ufo' }, { i:'🌍', v:'earth' },
-    { i:'🌙', v:'moon' }, { i:'🪐', v:'planet' }, { i:'☄️', v:'comet' }, { i:'🤖', v:'bot' }, { i:'☢️', v:'nuke' }
+    {i:'КИЕВ',v:'kyiv'},{i:'РИМ',v:'rome'},
+    {i:'ПАРИЖ',v:'paris'},{i:'ТОКИО',v:'tokyo'},
+    {i:'БЕРЛИН',v:'berlin'},{i:'ОСЛО',v:'oslo'},
+    {i:'СЕУЛ',v:'seoul'},{i:'ВЕНА',v:'vienna'},
+    {i:'БАКУ',v:'baku'},{i:'ДОХА',v:'doha'}
   ];
-  let roomPass = "";
-  let peer = null;
-  let conn = null;
-  let localStream = null;
-  let pingTimer = null;
+  
+  let roomPass = "", peer = null, conn = null, localStream = null;
 
-  const radar = $("radar");
-  const rctx = radar.getContext("2d");
-  const N = 44;
-  const pings = new Array(N).fill(0);
-  let phase = 0;
-
-  function qualityColor(ms){
-    if (!ms) return "rgba(255,255,255,.9)";
-    if (ms < 150) return "rgba(34,197,94,1)";
-    if (ms < 400) return "rgba(250,204,21,1)";
-    return "rgba(239,68,68,1)";
-  }
-
-  function resizeRadar(){
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const w = radar.clientWidth || 360;
-    const h = radar.clientHeight || 70;
-    radar.width = Math.floor(w * dpr);
-    radar.height = Math.floor(h * dpr);
-    rctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  function drawRadar(){
-    const W = radar.clientWidth || 360;
-    const H = radar.clientHeight || 70;
-    rctx.clearRect(0,0,W,H);
-
-    rctx.fillStyle = "rgba(0,0,0,.18)";
-    rctx.fillRect(0,0,W,H);
-
-    rctx.strokeStyle = "rgba(255,255,255,.08)";
-    rctx.lineWidth = 1;
-    for (let y of [H*0.25, H*0.5, H*0.75]){
-      rctx.beginPath(); rctx.moveTo(0,y); rctx.lineTo(W,y); rctx.stroke();
-    }
-
-    phase += 0.02;
-    const scanX = ((Math.sin(phase)+1)/2) * (W+120) - 60;
-    const g = rctx.createLinearGradient(scanX-80,0,scanX+80,0);
-    g.addColorStop(0,"rgba(56,189,248,0)");
-    g.addColorStop(0.5,"rgba(56,189,248,.14)");
-    g.addColorStop(1,"rgba(56,189,248,0)");
-    rctx.fillStyle = g;
-    rctx.fillRect(0,0,W,H);
-
-    const last = pings[N-1];
-    const col = qualityColor(last);
-
-    rctx.save();
-    rctx.shadowColor = col;
-    rctx.shadowBlur = 18;
-    rctx.lineWidth = 3.4;
-    rctx.strokeStyle = col;
-    rctx.lineJoin = "round";
-    rctx.lineCap = "round";
-
-    const MAX = 900;
-    const step = W/(N-1);
-
-    function mapY(ms){
-      const v = Math.min(MAX, Math.max(0, ms || 0));
-      const t = v/MAX; 
-      const y = H - (t * (H-10)) - 5;
-      return Math.max(5, Math.min(H-5, y));
-    }
-
-    rctx.beginPath();
-    for (let i=0;i<N;i++){
-      const x = i*step;
-      const y = mapY(pings[i]);
-      if (i===0) rctx.moveTo(x,y);
-      else {
-        const px = (i-1)*step;
-        const py = mapY(pings[i-1]);
-        const cx = (px + x)/2;
-        rctx.quadraticCurveTo(px, py, cx, (py+y)/2);
-        rctx.quadraticCurveTo(cx, (py+y)/2, x, y);
-      }
-    }
-    rctx.stroke();
-    rctx.restore();
-
-    requestAnimationFrame(drawRadar);
-  }
-
-  window.addEventListener("resize", resizeRadar);
-  setTimeout(resizeRadar, 0);
-  requestAnimationFrame(drawRadar);
-
-  function enterApp(){
-    $("authWrap").style.display = "none";
-    $("app").style.display = "block";
-    setTimeout(resizeRadar, 0);
-  }
+  function enterApp(){ $("authWrap").style.display = "none"; $("app").style.display = "block"; }
 
   async function getIceServers(){
-    $("turnHint").innerHTML = "<b>TURN:</b> получаем ключи…";
-    try{
-      const url = ALLOWORIGINS_RAW + encodeURIComponent(TURN_HTTP_ENDPOINT + "?t=" + Date.now());
-      const res = await fetch(url, { cache: "no-store" });
+    $("turnHint").innerHTML = "<b>TURN:</b> обход блокировки...";
+    try {
+      const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 4000);
+      const url = "https://corsproxy.io/?" + encodeURIComponent(TURN_HTTP_ENDPOINT + "?t=" + Date.now());
+      const res = await fetch(url, { cache: "no-store", signal: controller.signal });
+      clearTimeout(timer);
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const txt = await res.text();
-      const data = JSON.parse(txt);
-
-      if (!Array.isArray(data)) throw new Error("Bad ICE format");
-      $("turnHint").innerHTML = "<b>TURN:</b> ключи получены ✅";
-      return data;
-    } catch(e){
-      $("turnHint").innerHTML = "<b>TURN:</b> ошибка, fallback на STUN ⚠️";
-      return [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" }
-      ];
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Bad format");
+      $("turnHint").innerHTML = "<b>TURN:</b> ключи получены ✅"; return data;
+    } catch(e) {
+      $("turnHint").innerHTML = "<b>TURN:</b> резерв (STUN) ⚠️";
+      return [ { urls: "stun:stun.l.google.com:19302" }, { urls: "stun:standard.relay.metered.ca:80" } ];
     }
   }
 
   async function initPeer(){
-    if (!window.Peer){
-      $("peerHint").innerHTML = "<b>Peer:</b> не загрузился (CDN блок?) ❌";
-      setStatus("ОШИБКА", "#ef4444");
-      return;
-    }
-
-    setStatus("СЕТЬ…", "#0ea5e9");
-    $("peerHint").innerHTML = "<b>Peer:</b> инициализация…";
-
+    if (!window.Peer){ $("peerHint").innerHTML = "<b>УЗЕЛ:</b> ошибка загрузки ❌"; setStatus("ОШИБКА", "#ef4444"); return; }
+    setStatus("УЗЕЛ…", "#0ea5e9"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> подключение к VDS…";
     const iceServers = await getIceServers();
-
+    
     try{ peer && peer.destroy && peer.destroy(); }catch(_){}
-    peer = new Peer(roomPass + "-" + myId.toLowerCase(), { config: { iceServers }, debug: 0 });
-
-    peer.on("open", () => {
-      setStatus("ГОТОВО", "#22c55e");
-      $("peerHint").innerHTML = "<b>Peer:</b> готов ✅";
+    
+    // Подключение к твоему личному серверу связи в Амстердаме
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), { 
+      host: "89.124.78.246",
+      port: 9000,
+      path: "/chat",
+      key: "omega",
+      config: { iceServers }, 
+      debug: 0 
     });
 
-    peer.on("error", (e) => {
-      console.log(e);
-      setStatus("ОШИБКА", "#ef4444");
-      $("peerHint").innerHTML = "<b>Peer:</b> ошибка ❌";
-    });
-
+    peer.on("open", () => { setStatus("В СЕТИ", "#22c55e"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> прямой канал ✅"; });
+    peer.on("error", () => { setStatus("СБОЙ УЗЛА", "#ef4444"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> недоступен ❌"; });
     peer.on("connection", (c) => { conn = c; bindConn(); });
-
+    
     peer.on("call", async (call) => {
-      const isVideo = confirm("Входящий вызов! Включить камеру?\nОК = Видео, Отмена = Аудио");
       try{
-        localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
-        if (isVideo){
-          $("local-v").srcObject = localStream;
-          $("local-v").style.display = "block";
-        } else {
-          $("local-v").style.display = "none";
-        }
-
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        $("local-v").srcObject = localStream; $("local-v").style.display = "block";
         call.answer(localStream);
-
-        call.on("stream", (s) => {
-          $("remote-v").srcObject = s;
-          $("remote-v").style.display = "block";
-          $("wait").style.display = "none";
-          setStatus(isVideo ? "ВИДЕО" : "АУДИО", "#22c55e");
+        
+        call.on("stream", (s) => { 
+          $("remote-v").srcObject = s; 
+          $("remote-v").style.display = "block"; 
+          $("wait").style.display = "none"; 
+          
+          // Скрываем настройки, показываем только зеленую кнопку (сброс)
+          $("setup").style.display = "none";
+          $("controls").style.display = "flex";
+          $("video").style.display = "none";
+          $("hang").style.display = "block";
+          
+          setStatus("ШИФРОВАНИЕ", "#22c55e"); 
         });
-
         call.on("close", closeCallUI);
-      }catch(_){
-        setStatus("КАМЕРА/МИКРОФОН?", "#f59e0b");
-      }
+      }catch(_){ setStatus("ДОСТУП?", "#f59e0b"); }
     });
   }
 
   function bindConn(){
     if (!conn) return;
-
     conn.on("open", () => {
-      $("setup").style.display = "none";
-      $("controls").style.display = "flex";
-      $("signal").style.display = "block";
-      setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
-
-      clearInterval(pingTimer);
-      pingTimer = setInterval(() => {
-        if (conn && conn.open) conn.send(JSON.stringify({ t:"p", ts: Date.now() }));
-      }, 1000);
+      $("setup").style.display = "none"; 
+      $("controls").style.display = "flex"; 
+      setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
     });
-
-    conn.on("data", (d) => {
-      try{
-        const m = JSON.parse(d);
-        if (m.t === "p") conn.send(JSON.stringify({ t:"r", ts: m.ts }));
-        if (m.t === "r"){
-          const rtt = Date.now() - m.ts;
-          $("pingVal").textContent = rtt;
-          pings.push(rtt); pings.shift();
-          $("pingVal").style.color = qualityColor(rtt);
-        }
-      }catch(_){}
-    });
-
-    conn.on("close", () => {
-      clearInterval(pingTimer);
-      setStatus("РАЗРЫВ", "#f59e0b");
-      $("signal").style.display = "none";
-    });
+    conn.on("close", () => { setStatus("ОБРЫВ", "#ef4444"); $("setup").style.display = "block"; $("controls").style.display = "none"; });
   }
 
   function closeCallUI(){
-    $("remote-v").srcObject = null;
-    $("remote-v").style.display = "none";
-    $("local-v").style.display = "none";
-    $("wait").style.display = "flex";
-    setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
-    $("audio").style.display = "flex";
-    $("video").style.display = "flex";
+    $("remote-v").srcObject = null; $("remote-v").style.display = "none"; 
+    $("local-v").style.display = "none"; $("wait").style.display = "flex";
+    setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9"); 
+    
+    // Возвращаем синюю кнопку вызова
+    $("video").style.display = "block"; 
     $("hang").style.display = "none";
   }
 
-  function setupCall(call, modeText){
-    $("audio").style.display = "none";
-    $("video").style.display = "none";
-    $("hang").style.display = "flex";
-
-    call.on("stream", (s) => {
-      $("remote-v").srcObject = s;
-      $("remote-v").style.display = "block";
-      $("wait").style.display = "none";
-      setStatus(modeText, "#22c55e");
-    });
-
-    call.on("close", closeCallUI);
-  }
-
-  const pad = $("pad");
+  $("pad").innerHTML = "";
   keys.forEach(k => {
-    const b = document.createElement("button");
-    b.className = "btn";
-    b.textContent = k.i;
-    b.onclick = async () => {
-      roomPass = k.v;
-      enterApp();
-      await initPeer();
-    };
-    pad.appendChild(b);
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = k.i;
+    b.onclick = async () => { roomPass = k.v; enterApp(); await initPeer(); }; $("pad").appendChild(b);
   });
 
   $("connect").onclick = () => {
-    const tid = ($("target").value || "").trim().toUpperCase();
-    if (!tid) return;
-    
-    setStatus("КОННЕКТ…", "#0ea5e9");
-    localStorage.setItem("lastTarget", tid);
-
-    conn = peer.connect(roomPass + "-" + tid.toLowerCase());
-    bindConn();
+    const tid = ($("target").value || "").trim().toUpperCase(); if (!tid) return;
+    setStatus("ПОИСК…", "#0ea5e9"); localStorage.setItem("lastTarget", tid);
+    conn = peer.connect(roomPass + "-" + tid.toLowerCase()); bindConn();
   };
 
-  const last = localStorage.getItem("lastTarget");
-  if (last) $("target").value = last;
+  const last = localStorage.getItem("lastTarget"); if (last) $("target").value = last;
 
-  $("audio").onclick = async () => {
+  // Синий круг - начать вызов
+  $("video").onclick = async () => {
     if (!conn || !conn.open) return;
-
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({
-        video: false,
-        audio: true
+    try { 
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); 
+      $("local-v").srcObject = localStream; $("local-v").style.display = "block"; 
+      const call = peer.call(conn.peer, localStream); 
+      
+      $("video").style.display = "none"; 
+      $("hang").style.display = "block";
+      
+      call.on("stream", (s) => { 
+        $("remote-v").srcObject = s; $("remote-v").style.display = "block"; 
+        $("wait").style.display = "none"; setStatus("ШИФРОВАНИЕ", "#22c55e"); 
       });
-
-      const call = peer.call(conn.peer, localStream);
-      setupCall(call, "АУДИО");
-
-    } catch (e) {
-      setStatus("МИКРОФОН?", "#f59e0b");
-    }
+      call.on("close", closeCallUI);
+    } 
+    catch (e) { setStatus("ОШИБКА КАМЕРЫ", "#f59e0b"); }
   };
 
-    $("video").onclick = async () => {
-    if (!conn || !conn.open) return;
-
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
-
-      $("local-v").srcObject = localStream;
-      $("local-v").style.display = "block";
-
-      const call = peer.call(conn.peer, localStream);
-      setupCall(call, "ВИДЕО");
-
-    } catch (e) {
-      setStatus("КАМЕРА?", "#f59e0b");
-    }
-  };
-
-  $("hang").onclick = () => {
-    location.reload();
-  };
+  // Зеленый круг - сбросить
+  $("hang").onclick = () => location.reload();
 
 })();
 </script>
