@@ -228,24 +228,20 @@
     }
   }
 
-  async function initPeer(){
+    async function initPeer(){
     if (!window.Peer){ $("peerHint").innerHTML = "<b>УЗЕЛ:</b> ошибка загрузки ❌"; setStatus("ОШИБКА", "#ef4444"); return; }
-    setStatus("УЗЕЛ…", "#0ea5e9"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> подключение к VDS…";
+    setStatus("УЗЕЛ…", "#0ea5e9"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> подключение к облаку…";
     const iceServers = await getIceServers();
     
     try{ peer && peer.destroy && peer.destroy(); }catch(_){}
     
-    // Подключение к твоему личному серверу связи в Амстердаме
+    // Возвращаемся в публичное облако (оно работает по правильному HTTPS)
     peer = new Peer(roomPass + "-" + myId.toLowerCase(), { 
-      host: "89.124.78.246",
-      port: 9000,
-      path: "/chat",
-      key: "omega",
       config: { iceServers }, 
       debug: 0 
     });
 
-    peer.on("open", () => { setStatus("В СЕТИ", "#22c55e"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> прямой канал ✅"; });
+    peer.on("open", () => { setStatus("В СЕТИ", "#22c55e"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> публичный канал ✅"; });
     peer.on("error", () => { setStatus("СБОЙ УЗЛА", "#ef4444"); $("peerHint").innerHTML = "<b>УЗЕЛ:</b> недоступен ❌"; });
     peer.on("connection", (c) => { conn = c; bindConn(); });
     
@@ -260,7 +256,6 @@
           $("remote-v").style.display = "block"; 
           $("wait").style.display = "none"; 
           
-          // Скрываем настройки, показываем только зеленую кнопку (сброс)
           $("setup").style.display = "none";
           $("controls").style.display = "flex";
           $("video").style.display = "none";
@@ -271,7 +266,8 @@
         call.on("close", closeCallUI);
       }catch(_){ setStatus("ДОСТУП?", "#f59e0b"); }
     });
-  }
+    }
+  
 
   function bindConn(){
     if (!conn) return;
