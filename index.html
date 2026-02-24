@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Омега 2.2 | PROXY</title>
+  <title>Омега 2.2 | PROXY-FIX</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,11 +20,10 @@
       --st: rgba(226,232,240,.95);
       --sh: rgba(2,132,199,.20);
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{ box-sizing:border-box; outline: none; }
+    html,body{ height:100%; margin:0; overflow:hidden; touch-action:none; }
     body{
-      margin:0; overflow:hidden; touch-action:none;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
       background: linear-gradient(135deg,var(--bg1),var(--bg2));
       color:var(--t);
     }
@@ -32,87 +31,73 @@
       position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.55;
       background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
       background-size: 18px 18px;
-      mask-image: radial-gradient(circle at 30% 20%, black 0%, black 40%, transparent 75%);
     }
     .status{
       position:absolute; top:14px; left:14px; z-index:50;
       display:flex; align-items:center; gap:10px;
       padding:10px 12px; border-radius:16px;
-      background: rgba(255,255,255,.72);
-      border:1px solid var(--st);
-      box-shadow: 0 10px 28px -20px rgba(0,0,0,.28);
+      background: rgba(255,255,255,.72); border:1px solid var(--st);
       backdrop-filter: blur(14px);
     }
-    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; }
+    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; transition: background 0.3s; }
     .stxt{ font-size:10px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:var(--m); }
 
     .wrap{
-      position:relative; z-index:10;
-      width:100%; height:100%;
-      display:flex; align-items:center; justify-content:center;
-      padding:16px;
+      position:relative; z-index:10; width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center; padding:16px;
     }
     .card{
-      width:min(380px, 92vw);
-      border-radius: 34px;
-      background: var(--g);
-      border:1px solid var(--st);
+      width:min(380px, 92vw); border-radius: 34px;
+      background: var(--g); border:1px solid var(--st);
       box-shadow: 0 18px 60px -26px var(--sh);
       backdrop-filter: blur(18px) saturate(180%);
-      padding: 28px;
-      text-align:center;
+      padding: 28px; text-align:center;
     }
     .logoWrap{
       width:112px; height:112px; margin:0 auto 10px;
-      border-radius: 30px;
-      padding:6px;
+      border-radius: 30px; padding:6px;
       background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(56,189,248,.22));
       border:1px solid rgba(255,255,255,.75);
-      box-shadow: 0 18px 55px -28px rgba(14,165,233,.45);
     }
     .logo{
-      width:100%; height:100%;
-      border-radius: 24px;
+      width:100%; height:100%; border-radius: 24px;
       display:flex; align-items:center; justify-content:center;
-      background: rgba(255,255,255,.88);
-      border:1px solid rgba(56,189,248,.25);
-      font-weight:900; font-size:52px;
+      font-weight:900; font-size:42px;
       background: linear-gradient(135deg, var(--p), var(--p2));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     }
     .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:800; color:var(--m); }
     .sub{ margin-top:8px; font-size:12px; font-weight:700; color:rgba(100,116,139,.85); text-transform:uppercase; letter-spacing:.2em; }
 
     .pad{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:18px; }
-    .btn{ height:56px; border-radius:18px; font-size:24px; background: rgba(255,255,255,.88); border:1px solid rgba(226,232,240,.95); color:#64748b; box-shadow: 0 10px 25px -20px rgba(0,0,0,.25); transition: transform .12s ease; -webkit-tap-highlight-color:transparent; }
-    .btn:active{ transform: scale(.96); background: var(--p); color:white; }
+    .btn{ height:56px; border-radius:18px; font-size:24px; background: rgba(255,255,255,.88); border:1px solid rgba(226,232,240,.95); color:#64748b; transition: transform .1s; -webkit-tap-highlight-color:transparent; }
+    .btn:active{ transform: scale(.92); background: var(--p); color:white; }
 
     .idRow{ margin-top:18px; padding-top:16px; border-top:1px solid rgba(226,232,240,.65); display:flex; align-items:center; justify-content:center; gap:10px; font-size:11px; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:var(--m); }
-    .chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:14px; background: rgba(14,165,233,.10); border:1px solid rgba(14,165,233,.22); color: var(--p); font-weight:900; letter-spacing:.18em; }
-    .copy{ width:44px; height:38px; border-radius:14px; background: rgba(255,255,255,.92); border:1px solid rgba(226,232,240,.95); font-weight:900; }
-    .hint{ margin-top:8px; font-size:11px; color:rgba(100,116,139,.75); }
+    .chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:14px; background: rgba(14,165,233,.10); border:1px solid rgba(14,165,233,.22); color: var(--p); font-weight:900; }
+    .copy{ width:44px; height:38px; border-radius:14px; background: rgba(255,255,255,.92); border:1px solid rgba(226,232,240,.95); font-weight:900; cursor:pointer; }
+    .copy:active{ background: #e0f2fe; }
+    .hint{ margin-top:8px; font-size:11px; transition: color 0.3s; }
 
     #app{ display:none; position:absolute; inset:0; z-index:20; background: rgba(248,250,252,.65); }
-    #video-zone{ position:absolute; inset:0; overflow:hidden; border-bottom-left-radius:34px; border-bottom-right-radius:34px; }
+    #video-zone{ position:absolute; inset:0; overflow:hidden; }
     #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
-    #local-v{ position:absolute; top:14px; right:14px; width:104px; height:146px; border-radius:18px; border:2px solid rgba(255,255,255,.95); transform: scaleX(-1); display:none; touch-action:none; }
+    #local-v{ position:absolute; top:14px; right:14px; width:104px; height:146px; border-radius:18px; border:2px solid white; transform: scaleX(-1); display:none; }
     #wait{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; background: rgba(241,245,249,.80); backdrop-filter: blur(14px); color: var(--p); }
     .spin{ width:46px; height:46px; border-radius:999px; border:4px solid rgba(148,163,184,.22); border-top-color: var(--p); animation: rot 1s linear infinite; }
     @keyframes rot{ to{ transform: rotate(360deg); } }
 
     #footer{ position:absolute; left:0; right:0; bottom:0; padding: 14px 14px 22px; z-index:30; }
-    
     #signal-panel{ display:none; margin-bottom: 10px; background: rgba(15, 23, 42, 0.85); border:1px solid rgba(255,255,255,.2); border-radius: 20px; padding: 12px; text-align:center; }
     .radar-title{ font-size:10px; font-weight:800; letter-spacing:.28em; color: #38bdf8; margin-bottom: 8px; }
     #radar-canvas{ width: 100%; height: 60px; border-radius: 10px; background: rgba(0,0,0,0.4); }
 
     .panel{ background: rgba(255,255,255,.78); border:1px solid rgba(255,255,255,.88); border-radius: 26px; backdrop-filter: blur(18px); padding: 14px; }
     .row2{ display:flex; gap:8px; align-items:center; }
-    .in{ flex:1; height:48px; border-radius: 18px; border:1px solid rgba(203,213,225,.85); text-align:center; font-weight:900; letter-spacing:.22em; text-transform:uppercase; outline:none; }
-    .cta{ height:48px; padding: 0 18px; border-radius: 18px; border:none; color:white; font-weight:900; background: linear-gradient(90deg, var(--p), var(--p2)); }
-    #callControls{ display:none; gap:10px; align-items:center; justify-content:center; }
-    .bigBtn{ flex: 1; height:56px; border-radius:18px; border:1px solid rgba(226,232,240,.9); background: rgba(255,255,255,.92); font-size:24px; font-weight: 800; display:flex; align-items:center; justify-content:center; }
+    .in{ flex:1; height:48px; border-radius: 18px; border:1px solid rgba(203,213,225,.85); text-align:center; font-weight:900; letter-spacing:.22em; text-transform:uppercase; }
+    .cta{ height:48px; padding: 0 18px; border-radius: 18px; border:none; color:white; font-weight:900; background: linear-gradient(90deg, var(--p), var(--p2)); cursor:pointer; }
+    #callControls{ display:none; gap:10px; }
+    .bigBtn{ flex: 1; height:56px; border-radius:18px; border:1px solid rgba(226,232,240,.9); background: white; font-size:24px; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
     .btn-red{ color: #ef4444; }
   </style>
 </head>
@@ -125,13 +110,13 @@
   </div>
 
   <div class="wrap" id="authWrap">
-    <div class="card" id="auth-screen">
+    <div class="card">
       <div class="logoWrap"><div class="logo">Ω2.2</div></div>
-      <div class="cap">ОМЕГА 2.2 | PROXY</div>
+      <div class="cap">ОМЕГА 2.2 | PROXY-FIX</div>
       <div class="sub">Выберите ключ доступа</div>
       <div class="pad" id="symbol-pad"></div>
-      <div class="idRow">ВАШ ID: <span class="chip"><span id="front-id">----</span></span><button class="copy" id="copy-id">⧉</button></div>
-      <div class="hint" id="sec-hint" style="color:#0ea5e9; font-weight:bold;">Ждем команду...</div>
+      <div class="idRow">ID: <span class="chip"><span id="front-id">----</span></span><button class="copy" id="copy-id">⧉</button></div>
+      <div class="hint" id="sec-hint" style="color:var(--p); font-weight:bold;">Ждем команду...</div>
     </div>
   </div>
 
@@ -149,10 +134,10 @@
       <div class="panel" id="setup-controls">
         <div class="row2" style="justify-content:space-between; margin-bottom:10px;">
           <div class="stxt">ВАШ ID: <b style="color:var(--p)" id="display-id">----</b></div>
-          <button class="smallBtn" onclick="location.reload()" style="width:48px; border-radius:14px; background:#fff;">↻</button>
+          <button style="width:40px; border-radius:10px; border:1px solid #ddd; background:#fff;" onclick="location.reload()">↻</button>
         </div>
         <div class="row2">
-          <input class="in" id="target-id" placeholder="ID НАПАРНИКА" />
+          <input class="in" id="target-id" placeholder="ID НАПАРНИКА" maxlength="4" />
           <button class="cta" id="connect-btn">СВЯЗЬ</button>
         </div>
       </div>
@@ -173,41 +158,49 @@
   if (!myId) { myId = Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem("myGalaxyId", myId); }
   $("front-id").textContent = myId; $("display-id").textContent = myId;
 
+  // ФИКС №2: Оживляем кнопку копирования
+  $("copy-id").onclick = async () => {
+    try { 
+      await navigator.clipboard.writeText(myId); 
+      setStatus("СКОПИРОВАНО", "#22c55e"); 
+      setTimeout(() => setStatus("ОЖИДАНИЕ","#94a3b8"), 900); 
+    } catch { setStatus("КОПИРУЙ РУКАМИ", "#f59e0b"); }
+  };
+
   const sysCode = [{i:'👽',v:'alien'},{i:'🚀',v:'rocket'},{i:'🛰️',v:'sat'},{i:'🛸',v:'ufo'},{i:'🌍',v:'earth'},{i:'🌙',v:'moon'},{i:'🪐',v:'planet'},{i:'☄️',v:'comet'},{i:'🤖',v:'bot'},{i:'☢️',v:'nuke'}];
-  
   let roomPass = "", peer = null, conn = null, localStream = null, pingInterval = null;
   const cvs = $('radar-canvas'), ctx = cvs.getContext('2d'), pings = new Array(40).fill(0);
 
   function drawRadar() {
     ctx.clearRect(0, 0, cvs.width, cvs.height);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, cvs.height/2); ctx.lineTo(cvs.width, cvs.height/2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0,30); ctx.lineTo(400,30); ctx.stroke();
     ctx.beginPath(); ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
-    const step = cvs.width / (pings.length - 1);
-    for(let i=0; i<pings.length; i++) {
-      let val = Math.min(pings[i], 1000), h = (val / 1000) * cvs.height, y = cvs.height - h - 5;
-      if(y > cvs.height) y = cvs.height; if(y < 5) y = 5;
-      if(i===0) ctx.moveTo(i*step, y); else ctx.lineTo(i*step, y);
-    }
+    const step = 400 / 39;
+    pings.forEach((v, i) => {
+      let h = Math.min(v, 1000) / 1000 * 60;
+      let y = 60 - h - 5; if(i===0) ctx.moveTo(0, y); else ctx.lineTo(i*step, y);
+    });
     ctx.stroke();
-    const lp = pings[pings.length-1];
+    const lp = pings[39];
     $('ping-val').style.color = lp === 0 ? "#fff" : (lp < 150 ? "#22c55e" : (lp < 400 ? "#facc15" : "#ef4444"));
   }
-  drawRadar();
 
-  // --- ИДЕМ НА VDS ЧЕРЕЗ ЗАЩИЩЕННЫЙ МОСТ ---
+  // ФИКС №1: Надежный импорт ключей (Text -> JSON)
   async function getIceServers(){
     $("sec-hint").textContent = "TURN: Обход HTTP блокировки...";
+    $("sec-hint").style.color = "#0ea5e9";
     try {
       const vdsUrl = "http://89.124.78.246:8080/get-turn?t=" + Date.now();
       const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(vdsUrl);
-      
-      const res = await fetch(proxyUrl);
-      const data = await res.json();
+      const res = await fetch(proxyUrl, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const txt = await res.text();
+      const data = JSON.parse(txt);
+      if (!Array.isArray(data)) throw new Error("Bad format");
       $("sec-hint").textContent = "TURN: Ключи получены! 🔓";
       $("sec-hint").style.color = "#22c55e";
       return data;
     } catch (e) {
-      console.error(e);
       $("sec-hint").textContent = "TURN: Ошибка моста!";
       $("sec-hint").style.color = "#ef4444";
       return [{ urls: "stun:stun.l.google.com:19302" }];
@@ -217,16 +210,15 @@
   async function initPeer(){
     if (!window.Peer) return;
     setStatus("СЕТЬ…", "#0ea5e9");
+    const ice = await getIceServers();
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), { config: { iceServers: ice }, debug: 1 });
     
-    const myIceServers = await getIceServers();
-
-    peer = new Peer(roomPass + "-" + myId.toLowerCase(), { config: { iceServers: myIceServers } });
     peer.on("open", () => setStatus("ГОТОВО", "#22c55e"));
-    peer.on("error", () => setStatus("ОШИБКА", "#ef4444"));
+    peer.on("error", (err) => { console.error(err); setStatus("ОШИБКА", "#ef4444"); });
     peer.on("connection", (c) => { conn = c; bindConn(); });
 
     peer.on("call", async (call) => {
-      const isVideo = confirm("Входящий вызов! Включить камеру?\n(ОК = Видео, Отмена = Аудио)");
+      const isVideo = confirm("Входящий вызов! Включить камеру?");
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
         if (isVideo) { $("local-v").srcObject = localStream; $("local-v").style.display = "block"; } 
@@ -240,22 +232,22 @@
   function bindConn(){
     if (!conn) return;
     conn.on("open", () => {
+      // ФИКС №3: Чистим старый интервал перед запуском нового
+      clearInterval(pingInterval);
       $("setup-controls").style.display = "none"; $("callControls").style.display = "flex"; $("signal-panel").style.display = "block"; setStatus("СВЯЗЬ ЕСТЬ", "#22c55e");
-      pingInterval = setInterval(() => { if(conn && conn.open) conn.send(JSON.stringify({ type: 'ping', ts: Date.now() })); }, 1000);
+      pingInterval = setInterval(() => { if(conn && conn.open) conn.send(JSON.stringify({ type: 'p', ts: Date.now() })); }, 1000);
     });
     conn.on("data", (d) => {
       try {
-        const data = JSON.parse(d);
-        if (data.type === 'ping') conn.send(JSON.stringify({ type: 'pong', ts: data.ts }));
-        else if (data.type === 'pong') {
-          const rtt = Date.now() - data.ts; $('ping-val').textContent = rtt; pings.push(rtt); pings.shift(); drawRadar();
-        }
-      } catch (e) {}
+        const m = JSON.parse(d);
+        if (m.type === 'p') conn.send(JSON.stringify({ type: 'r', ts: m.ts }));
+        else if (m.type === 'r') { const r = Date.now() - m.ts; $('ping-val').textContent = r; pings.push(r); pings.shift(); drawRadar(); }
+      } catch(e){}
     });
     conn.on("close", () => { clearInterval(pingInterval); setStatus("РАЗРЫВ", "#f59e0b"); $("signal-panel").style.display = "none"; });
   }
 
-  function closeCallUI() { $("remote-v").srcObject = null; $("remote-v").style.display = "none"; $("local-v").style.display = "none"; $("wait").style.display = "flex"; setStatus("СВЯЗЬ ЕСТЬ", "#22c55e"); $("audio-btn").style.display = "flex"; $("call-btn").style.display = "flex"; $("drop-btn").style.display = "none"; }
+  function closeCallUI() { $("remote-v").srcObject = null; $("remote-v").style.display = "none"; $("local-v").style.display = "none"; $("wait").style.display = "flex"; $("audio-btn").style.display = "flex"; $("call-btn").style.display = "flex"; $("drop-btn").style.display = "none"; setStatus("СВЯЗЬ ЕСТЬ", "#22c55e"); }
 
   sysCode.forEach(s => {
     const b = document.createElement("button"); b.className = "btn"; b.textContent = s.i;
@@ -263,25 +255,22 @@
     $("symbol-pad").appendChild(b);
   });
 
-  const last = localStorage.getItem("lastTarget"); if (last) $("target-id").value = last;
   $("connect-btn").onclick = () => {
-    const tid = ($("target-id").value || "").trim().toUpperCase(); if (!tid) return;
-    localStorage.setItem("lastTarget", tid);
-    if (!peer) return;
-    setStatus("КОННЕКТ…", "#0ea5e9"); conn = peer.connect(roomPass + "-" + tid.toLowerCase()); bindConn();
+    const tid = ($("target-id").value || "").trim().toLowerCase(); if (!tid || !peer) return;
+    setStatus("КОННЕКТ…", "#0ea5e9"); conn = peer.connect(roomPass + "-" + tid); bindConn();
   };
 
   $("audio-btn").onclick = async () => {
-    if (!conn || !conn.open) return;
-    try { localStream = await navigator.mediaDevices.getUserMedia({ video:false, audio:true }); $("local-v").style.display = "none"; const call = peer.call(conn.peer, localStream); setupCallEvents(call, "АУДИО"); } catch {}
+    if (!conn?.open) return;
+    try { localStream = await navigator.mediaDevices.getUserMedia({ video:false, audio:true }); const call = peer.call(conn.peer, localStream); setupCall(call, "АУДИО"); } catch{}
   };
   $("call-btn").onclick = async () => {
-    if (!conn || !conn.open) return;
-    try { localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true }); $("local-v").srcObject = localStream; $("local-v").style.display = "block"; const call = peer.call(conn.peer, localStream); setupCallEvents(call, "ВИДЕО"); } catch {}
+    if (!conn?.open) return;
+    try { localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true }); $("local-v").srcObject = localStream; $("local-v").style.display = "block"; const call = peer.call(conn.peer, localStream); setupCall(call, "ВИДЕО"); } catch{}
   };
   $("drop-btn").onclick = () => location.reload();
 
-  function setupCallEvents(call, modeText) { $("audio-btn").style.display = "none"; $("call-btn").style.display = "none"; $("drop-btn").style.display = "flex"; call.on("stream", (s) => { $("remote-v").srcObject = s; $("remote-v").style.display = "block"; $("wait").style.display = "none"; setStatus(modeText, "#22c55e"); }); call.on("close", closeCallUI); }
+  function setupCall(call, txt) { $("audio-btn").style.display="none"; $("call-btn").style.display="none"; $("drop-btn").style.display="flex"; call.on("stream", (s) => { $("remote-v").srcObject = s; $("remote-v").style.display = "block"; $("wait").style.display = "none"; setStatus(txt, "#22c55e"); }); call.on("close", closeCallUI); }
 })();
 </script>
 </body>
