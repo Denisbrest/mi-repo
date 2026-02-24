@@ -299,7 +299,7 @@
     peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
       config: {
         iceServers: ICE_SERVERS,
-        iceTransportPolicy: "relay"
+        iceTransportPolicy: "all" // <<< Разрешаем прямую связь, а сервер используем только как запаску!
       },
       debug: 0
     });
