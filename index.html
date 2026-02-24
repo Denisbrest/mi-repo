@@ -1,304 +1,429 @@
-<!doctype html><html lang="ru"><head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>DNK 2.0 | Ω</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-<script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<style>
-:root{--p:#0ea5e9;--p2:#38bdf8;--bg1:#f0f9ff;--bg2:#e0f2fe;--t:#0f172a;--m:#64748b;--glass:rgba(255,255,255,.86);--st:rgba(226,232,240,.92);--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0;overflow:hidden}
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--t)}
-.bg{position:fixed;inset:0;pointer-events:none;opacity:.45;background-image:radial-gradient(rgba(148,163,184,.25) 1px,transparent 1px);background-size:18px 18px;mask-image:radial-gradient(circle at 35% 20%,#000 0%,#000 45%,transparent 78%)}
-.status{position:fixed;top:14px;left:14px;z-index:50;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--st);box-shadow:0 12px 35px -25px rgba(0,0,0,.25);backdrop-filter:blur(14px)}
-.dot{width:10px;height:10px;border-radius:999px;background:#94a3b8}
-.stxt{font-size:10px;font-weight:900;letter-spacing:.26em;text-transform:uppercase;color:var(--m)}
-.wrap{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:16px}
-.card{width:min(390px,92vw);border-radius:34px;background:var(--glass);border:1px solid var(--st);box-shadow:0 18px 70px -35px rgba(2,132,199,.30);backdrop-filter:blur(18px) saturate(170%);padding:28px;text-align:center}
-.logoWrap{width:110px;height:110px;margin:0 auto 10px;border-radius:30px;padding:6px;background:linear-gradient(135deg,#fff,rgba(56,189,248,.18));border:1px solid rgba(255,255,255,.85);box-shadow:0 22px 65px -45px rgba(14,165,233,.65)}
-.logo{width:100%;height:100%;border-radius:24px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:46px;letter-spacing:-2px;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;border:1px solid rgba(56,189,248,.18);background-color:rgba(255,255,255,.92)}
-.cap{font-size:10px;letter-spacing:.42em;text-transform:uppercase;font-weight:900;color:var(--m)}
-.sub{margin-top:8px;font-size:12px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.15em}
-.pad{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px}
-.btn{height:50px;border-radius:16px;font-size:14px;font-weight:900;letter-spacing:.12em;background:#fff;border:1px solid #e2e8f0;color:var(--p);box-shadow:0 10px 26px -22px rgba(0,0,0,.25);transition:transform .12s ease,background .12s ease,color .12s ease,border-color .12s ease}
-.btn:active{transform:scale(.96);background:var(--p);color:#fff;border-color:var(--p)}
-.row{margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;gap:10px;font-size:11px;font-weight:900;letter-spacing:.28em;color:var(--m)}
-.chip{padding:8px 16px;min-width:88px;border-radius:14px;background:rgba(14,165,233,.10);color:var(--p);font-weight:900;letter-spacing:.18em;border:1px solid rgba(14,165,233,.18)}
-.copy{width:46px;height:40px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -18px rgba(0,0,0,.25)}
-.copy:active{transform:scale(.96)}
-.hint{margin-top:12px;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;user-select:none}
-.hint b{color:var(--p)}
-#app{display:none;position:fixed;inset:0;z-index:30;background:#000}
-#video-zone{position:absolute;inset:0;overflow:hidden}
-#remote-v{width:100%;height:100%;object-fit:cover;display:none}
-#local-v{position:absolute;top:14px;right:14px;width:110px;height:150px;border-radius:18px;border:2px solid rgba(255,255,255,.22);box-shadow:0 14px 35px rgba(0,0,0,.45);transform:scaleX(-1);display:none;object-fit:cover;z-index:40;background:#111}
-#wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:rgba(15,23,42,.95);color:var(--p);z-index:20}
-.spin{width:50px;height:50px;border-radius:999px;border:4px solid rgba(148,163,184,.12);border-top-color:var(--p);animation:rot 1s linear infinite}
-@keyframes rot{to{transform:rotate(360deg)}}
-#footer{position:absolute;left:0;right:0;bottom:30px;display:flex;flex-direction:column;align-items:center;z-index:50;padding:0 20px}
-.panel{background:rgba(255,255,255,.92);border-radius:24px;box-shadow:0 18px 50px -30px rgba(0,0,0,.45);padding:16px;width:100%;max-width:400px;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.6)}
-.row2{display:flex;gap:10px;align-items:center}
-.in{flex:1;height:50px;border-radius:16px;border:1px solid #cbd5e1;background:#f8fafc;text-align:center;font-weight:900;letter-spacing:.2em;text-transform:uppercase;outline:none}
-.in:focus{background:#fff;border-color:var(--p)}
-.cta{height:50px;padding:0 24px;border-radius:16px;border:none;color:#fff;font-weight:900;letter-spacing:.15em;background:linear-gradient(90deg,var(--p),var(--p2));box-shadow:0 14px 35px -25px rgba(14,165,233,.75)}
-.tiny{width:50px;height:50px;border-radius:16px;border:1px solid #e2e8f0;background:#fff;font-size:18px;font-weight:900;color:var(--m)}
-#controls{display:none;justify-content:center;align-items:center;width:100%;margin-top:10px;gap:14px}
-.circle-btn{width:76px;height:76px;border-radius:50%;border:none;box-shadow:0 18px 45px rgba(0,0,0,.35);outline:none;cursor:pointer;transition:transform .18s cubic-bezier(.175,.885,.32,1.275),filter .18s;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff}
-.circle-btn:active{transform:scale(.86);filter:brightness(1.05)}
-.btn-blue{background:#0ea5e9;border:3px solid rgba(255,255,255,.20)}
-.btn-green{background:#22c55e;border:3px solid rgba(255,255,255,.20)}
-</style></head><body>
-<div class="bg"></div>
-<div class="status"><div id="dot" class="dot"></div><div id="status" class="stxt">ОЖИДАНИЕ</div></div>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>DNK | Омега 3.0 VIP</title>
 
-<div class="wrap" id="authWrap"><div class="card">
-  <div class="logoWrap"><div class="logo">Ω</div></div>
-  <div class="cap">DNK 2.0</div><div class="sub">секретный шлюз</div>
-  <div class="pad" id="pad"></div>
-  <div class="row">ID: <span class="chip" id="frontId">----</span><button class="copy" id="copyBtn">⧉</button></div>
-  <div class="hint" id="turnHint"><b>TURN:</b> готово</div>
-  <div class="hint" id="peerHint"><b>УЗЕЛ:</b> ожидание</div>
-</div></div>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-<div id="app"><div id="video-zone">
-  <video id="remote-v" autoplay playsinline></video>
-  <video id="local-v" autoplay playsinline muted></video>
-  <div id="wait"><div class="spin"></div><div class="stxt" style="letter-spacing:.3em;color:#fff">СИНХРОНИЗАЦИЯ...</div></div>
-</div>
-<div id="footer">
-  <div class="panel" id="setup">
-    <div class="row2" style="justify-content:space-between;margin-bottom:12px">
-      <div class="stxt" style="letter-spacing:.2em">МОЙ ID: <b style="color:var(--p);font-size:12px" id="myIdTxt">----</b></div>
-      <button class="tiny" id="resetBtn">↻</button>
-    </div>
-    <div class="row2">
-      <input class="in" id="target" placeholder="ID ЦЕЛИ" maxlength="4"/>
-      <button class="cta" id="connect">СВЯЗЬ</button>
+  <script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+  <style>
+    :root{
+      --p:#0ea5e9; --p2:#38bdf8; --bg1:#f0f9ff; --bg2:#e0f2fe;
+      --t:#0f172a; --m:#64748b; --glass: rgba(255,255,255,.86);
+      --st: rgba(226,232,240,.92);
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ height:100%; margin:0; overflow:hidden; touch-action:none; }
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--t);
+    }
+
+    .bg{
+      position:fixed; inset:0; pointer-events:none; opacity:.45;
+      background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mask-image: radial-gradient(circle at 35% 20%, #000 0%, #000 45%, transparent 78%);
+    }
+
+    .status{
+      position:fixed; top:14px; left:14px; z-index:50;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:16px;
+      background: var(--glass); border:1px solid var(--st);
+      box-shadow: 0 12px 35px -25px rgba(0,0,0,.25);
+      backdrop-filter: blur(14px);
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; transition:background .25s; }
+    .stxt{ font-size:10px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:var(--m); }
+
+    .wrap{ position:relative; z-index:10; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px; }
+    .card{
+      width:min(390px, 92vw); border-radius: 34px;
+      background: var(--glass); border:1px solid var(--st);
+      box-shadow: 0 18px 70px -35px rgba(2,132,199,.30);
+      backdrop-filter: blur(18px) saturate(170%);
+      padding: 28px; text-align:center;
+    }
+
+    .logoWrap{
+      width:110px; height:110px; margin:0 auto 10px; border-radius: 30px; padding:6px;
+      background: linear-gradient(135deg, #fff, rgba(56,189,248,.18));
+      border:1px solid rgba(255,255,255,.85);
+      box-shadow: 0 22px 65px -45px rgba(14,165,233,.65);
+    }
+    .logo{
+      width:100%; height:100%; border-radius: 24px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,.92); border:1px solid rgba(56,189,248,.18);
+      font-weight:900; font-size:46px; letter-spacing:-2px;
+      background: linear-gradient(135deg, var(--p), var(--p2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:900; color:var(--m); }
+    .sub{ margin-top:8px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.15em; }
+
+    .pad{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:20px; }
+    .btn{
+      height:50px; border-radius:16px; font-size:14px; font-weight:900; letter-spacing:.12em;
+      background:#fff; border:1px solid #e2e8f0; color:var(--p);
+      box-shadow: 0 10px 26px -22px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .btn:active{ transform: scale(.96); background: var(--p); color:#fff; border-color: var(--p); }
+
+    .row{
+      margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-size:11px; font-weight:900; letter-spacing:.28em; color:var(--m);
+    }
+    .chip{
+      padding:8px 16px; min-width:88px; border-radius:14px;
+      background: rgba(14,165,233,.10); color: var(--p);
+      font-weight:900; letter-spacing:.18em;
+      border:1px solid rgba(14,165,233,.18);
+    }
+    .copy{
+      width:46px; height:40px; border-radius:14px; background:#fff;
+      border:1px solid #e2e8f0; font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 10px 22px -18px rgba(0,0,0,.25);
+    }
+    .copy:active{ transform: scale(.96); }
+    .hint{
+      margin-top:12px; font-size:11px; font-weight:800;
+      color:#64748b; text-transform:uppercase; letter-spacing:.05em;
+      user-select:none;
+    }
+    .hint b{ color: var(--p); }
+
+    /* App */
+    #app{ display:none; position:fixed; inset:0; z-index:30; background:#000; }
+    #video-zone{ position:absolute; inset:0; overflow:hidden; }
+    #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
+    #local-v{
+      position:absolute; top:14px; right:14px; width:110px; height:150px; border-radius:18px;
+      border:2px solid rgba(255,255,255,.22);
+      box-shadow: 0 14px 35px rgba(0,0,0,.45);
+      transform: scaleX(-1);
+      display:none; object-fit:cover; z-index:40;
+      background:#111;
+    }
+    #wait{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+      gap:16px; background: rgba(15,23,42,.95); color: var(--p); z-index:20;
+    }
+    .spin{
+      width:50px; height:50px; border-radius:999px;
+      border:4px solid rgba(148,163,184,.12); border-top-color: var(--p);
+      animation: rot 1s linear infinite;
+    }
+    @keyframes rot{ to{ transform: rotate(360deg); } }
+
+    #footer{ position:absolute; left:0; right:0; bottom:30px; display:flex; flex-direction:column; align-items:center; z-index:50; padding:0 20px; }
+    .panel{
+      background: rgba(255,255,255,.92);
+      border-radius: 24px;
+      box-shadow: 0 18px 50px -30px rgba(0,0,0,.45);
+      padding: 16px;
+      width:100%; max-width:400px;
+      backdrop-filter: blur(12px);
+      border:1px solid rgba(255,255,255,.6);
+    }
+    .row2{ display:flex; gap:10px; align-items:center; }
+    .in{
+      flex:1; height:50px; border-radius: 16px; border:1px solid #cbd5e1; background:#f8fafc;
+      text-align:center; font-weight:900; letter-spacing:.2em; text-transform:uppercase; outline:none;
+    }
+    .in:focus{ background:#fff; border-color:var(--p); }
+    .cta{
+      height:50px; padding:0 24px; border-radius: 16px; border:none; color:#fff;
+      font-weight:900; letter-spacing:.15em; background: linear-gradient(90deg, var(--p), var(--p2));
+      box-shadow: 0 14px 35px -25px rgba(14,165,233,.75);
+    }
+    .tiny{
+      width:50px; height:50px; border-radius:16px; border:1px solid #e2e8f0; background:#fff;
+      font-size:18px; font-weight:900; color:var(--m);
+    }
+
+    #controls{ display:none; justify-content:center; align-items:center; width:100%; margin-top:10px; gap:14px; }
+    .circle-btn{
+      width:76px; height:76px; border-radius:50%; border:none;
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+      outline:none; cursor:pointer;
+      transition: transform .18s cubic-bezier(.175,.885,.32,1.275), filter .18s;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; color:#fff;
+    }
+    .circle-btn:active{ transform: scale(.86); filter:brightness(1.05); }
+    .btn-blue{ background:#0ea5e9; border:3px solid rgba(255,255,255,.20); }
+    .btn-green{ background:#22c55e; border:3px solid rgba(255,255,255,.20); }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="status">
+    <div id="dot" class="dot"></div>
+    <div id="status" class="stxt">ОЖИДАНИЕ</div>
+  </div>
+
+  <div class="wrap" id="authWrap">
+    <div class="card">
+      <div class="logoWrap"><div class="logo">DNK</div></div>
+      <div class="cap">DNK | OMEGA 3.0</div>
+      <div class="sub">Секретный шлюз</div>
+
+      <div class="pad" id="pad"></div>
+
+      <div class="row">ID: <span class="chip" id="frontId">----</span><button class="copy" id="copyBtn">⧉</button></div>
+      <div class="hint" id="turnHint"><b>TURN:</b> готово</div>
+      <div class="hint" id="peerHint"><b>УЗЕЛ:</b> ожидание</div>
     </div>
   </div>
 
-  <div id="controls">
-    <button class="circle-btn btn-blue" id="video">📹</button>
-    <button class="circle-btn btn-green" id="hang" style="display:none">⏹</button>
+  <div id="app">
+    <div id="video-zone">
+      <video id="remote-v" autoplay playsinline></video>
+      <video id="local-v" autoplay playsinline muted></video>
+      <div id="wait"><div class="spin"></div><div class="stxt" style="letter-spacing:.3em; color:#fff;">СИНХРОНИЗАЦИЯ...</div></div>
+    </div>
+
+    <div id="footer">
+      <div class="panel" id="setup">
+        <div class="row2" style="justify-content:space-between; margin-bottom:12px;">
+          <div class="stxt" style="letter-spacing:.2em;">МОЙ ID: <b style="color:var(--p); font-size:12px;" id="myIdTxt">----</b></div>
+          <button class="tiny" onclick="location.reload()">↻</button>
+        </div>
+        <div class="row2">
+          <input class="in" id="target" placeholder="ID ЦЕЛИ" maxlength="4" />
+          <button class="cta" id="connect">СВЯЗЬ</button>
+        </div>
+      </div>
+
+      <div id="controls">
+        <button class="circle-btn btn-blue" id="video">📹</button>
+        <button class="circle-btn btn-green" id="hang" style="display:none;">⏹</button>
+      </div>
+    </div>
   </div>
-</div></div>
 
 <script>
-(()=>{const $=id=>document.getElementById(id);
-const setStatus=(t,c)=>{$("status").textContent=t;$("dot").style.background=c||"#94a3b8"};
-const showHints=(turnText,turnColor,peerText,peerColor)=>{
-  $("turnHint").innerHTML="<b>TURN:</b> "+turnText; $("turnHint").style.color=turnColor||"#64748b";
-  $("peerHint").innerHTML="<b>УЗЕЛ:</b> "+peerText; $("peerHint").style.color=peerColor||"#64748b";
-};
-function genId(n=4){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<n;i++)s+=A[(Math.random()*A.length)|0];return s;}
-async function copyText(text){
-  try{await navigator.clipboard.writeText(text);return true;}
-  catch{
-    try{const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
-      document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");document.body.removeChild(ta);return ok;
-    }catch{return false;}
-  }
-}
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
 
-/* TURN (Metered) */
-const ICE_SERVERS=[
-  {urls:"stun:stun.relay.metered.ca:80"},
-  {urls:["turn:standard.relay.metered.ca:80","turn:standard.relay.metered.ca:80?transport=tcp","turn:standard.relay.metered.ca:443","turns:standard.relay.metered.ca:443?transport=tcp"],
-   username:"0d0bf8d106dd90657dca0a1d",credential:"2D4ts2w87TtkX1xU"}
-];
-
-let myId=localStorage.getItem("dnk_id");
-if(!myId||myId.length!==4){myId=genId(4);localStorage.setItem("dnk_id",myId);}
-$("frontId").textContent=myId;$("myIdTxt").textContent=myId;
-
-$("copyBtn").onclick=async()=>{
-  if(await copyText(myId)){setStatus("СКОПИРОВАНО","#22c55e");setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"),900);}
-  else setStatus("КОПИРУЙ РУКАМИ","#f59e0b");
-};
-
-const keys=[{i:"КИЕВ",v:"kyiv"},{i:"РИМ",v:"rome"},{i:"ПАРИЖ",v:"paris"},{i:"ТОКИО",v:"tokyo"},{i:"БЕРЛИН",v:"berlin"},{i:"ОСЛО",v:"oslo"},{i:"СЕУЛ",v:"seoul"},{i:"ВЕНА",v:"vienna"},{i:"БАКУ",v:"baku"},{i:"ДОХА",v:"doha"}];
-
-let roomPass=localStorage.getItem("dnk_room")||"", peer=null, conn=null, localStream=null, currentCall=null;
-
-function enterApp(){ $("authWrap").style.display="none"; $("app").style.display="block"; }
-function stopMedia(){ try{if(localStream){localStream.getTracks().forEach(t=>t.stop());}}catch(_){} localStream=null; }
-function resetUI(){
-  try{$("remote-v").srcObject=null;}catch(_){}
-  try{$("local-v").srcObject=null;}catch(_){}
-  $("remote-v").style.display="none"; $("local-v").style.display="none"; $("wait").style.display="flex";
-  $("setup").style.display="block"; $("controls").style.display="none";
-  $("video").style.display="block"; $("hang").style.display="none";
-}
-function hangUp(){
-  try{ if(currentCall){ currentCall.close(); } }catch(_){}
-  currentCall=null;
-  try{ if(conn){ conn.close(); } }catch(_){}
-  conn=null;
-  stopMedia(); resetUI();
-  if(peer&&peer.open){ setStatus("В СЕТИ","#22c55e"); }
-}
-function destroyPeer(){
-  hangUp();
-  try{ peer&&peer.destroy&&peer.destroy(); }catch(_){}
-  peer=null;
-}
-function hardRecreate(reason){
-  if(!roomPass) return;
-  destroyPeer();
-  initPeer();
-}
-async function ensureMedia(){
-  if(localStream) return localStream;
-  localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-  $("local-v").srcObject=localStream; $("local-v").style.display="block";
-  return localStream;
-}
-
-function bindConn(){
-  if(!conn) return;
-  conn.on("open",()=>{
-    $("setup").style.display="none"; $("controls").style.display="flex";
-    setStatus("КАНАЛ ОТКРЫТ","#0ea5e9");
-  });
-  conn.on("close",()=>{
-    setStatus("ОБРЫВ","#ef4444");
-    $("setup").style.display="block"; $("controls").style.display="none";
-  });
-}
-
-function closeCallUI(){
-  try{$("remote-v").srcObject=null;}catch(_){}
-  $("remote-v").style.display="none";
-  $("wait").style.display="flex";
-  setStatus(peer&&peer.open?"КАНАЛ ОТКРЫТ":"ОЖИДАНИЕ", peer&&peer.open?"#0ea5e9":"#94a3b8");
-  $("video").style.display="block"; $("hang").style.display="none";
-}
-
-function initPeer(){
-  if(!window.Peer){
-    showHints("не загружен (CDN?)","#ef4444","ошибка","#ef4444");
-    setStatus("ОШИБКА","#ef4444"); return;
-  }
-  showHints("готов (relay-only)","#22c55e","подключение…","#0ea5e9");
-  setStatus("УЗЕЛ…","#0ea5e9");
-
-  try{ peer&&peer.destroy&&peer.destroy(); }catch(_){}
-  peer=new Peer(roomPass+"-"+myId.toLowerCase(),{
-    config:{iceServers:ICE_SERVERS,iceTransportPolicy:"relay"},
-    debug:0
-  });
-
-  peer.on("open",()=>{
-    setStatus("В СЕТИ","#22c55e");
-    showHints("relay-only ✅","#22c55e","готов ✅","#22c55e");
-  });
-
-  peer.on("connection",(c)=>{ conn=c; bindConn(); });
-
-  peer.on("call", async (call)=>{
-    try{
-      currentCall=call;
-      await ensureMedia();
-      call.answer(localStream);
-      call.on("stream",(s)=>{
-        $("remote-v").srcObject=s; $("remote-v").style.display="block"; $("wait").style.display="none";
-        $("setup").style.display="none"; $("controls").style.display="flex";
-        $("video").style.display="none"; $("hang").style.display="block";
-        setStatus("НА СВЯЗИ","#22c55e");
-      });
-      call.on("close",()=>{ currentCall=null; closeCallUI(); });
-      call.on("error",()=>{ currentCall=null; closeCallUI(); });
-    }catch(_){
-      setStatus("ДОСТУП?","#f59e0b");
+  // === ВАЖНО: TURN из Metered (как на твоём скрине) ===
+  const ICE_SERVERS = [
+    { urls: "stun:stun.relay.metered.ca:80" },
+    {
+      urls: [
+        "turn:standard.relay.metered.ca:80",
+        "turn:standard.relay.metered.ca:80?transport=tcp",
+        "turn:standard.relay.metered.ca:443",
+        "turns:standard.relay.metered.ca:443?transport=tcp"
+      ],
+      username: "0d0bf8d106dd90657dca0a1d",
+      credential: "2D4ts2w87TtkX1xU"
     }
-  });
+  ];
 
-  peer.on("disconnected",()=>{
-    setStatus("ОБРЫВ…","#f59e0b");
-    showHints("relay-only ⚠️","#f59e0b","переподключение…","#0ea5e9");
-    try{ peer.reconnect(); }catch(_){}
-    setTimeout(()=>{ if(peer && !peer.open) hardRecreate("disc"); },2000);
-  });
+  let myId = localStorage.getItem("myGalaxyId");
+  if (!myId) {
+    myId = Math.random().toString(36).slice(2,6).toUpperCase();
+    localStorage.setItem("myGalaxyId", myId);
+  }
+  $("frontId").textContent = myId;
+  $("myIdTxt").textContent = myId;
 
-  peer.on("close",()=>{
-    setStatus("СБОЙ УЗЛА","#ef4444");
-    showHints("relay-only ⚠️","#f59e0b","закрыт","#ef4444");
-  });
+  async function copyText(text){
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+        document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      } catch { return false; }
+    }
+  }
 
-  peer.on("error",(e)=>{
-    console.error(e);
-    if(e && e.type==="unavailable-id"){
-      myId=genId(4); localStorage.setItem("dnk_id",myId);
-      $("frontId").textContent=myId; $("myIdTxt").textContent=myId;
-      setStatus("ID ЗАНЯТ → НОВЫЙ","#f59e0b");
-      hardRecreate("newid");
+  $("copyBtn").onclick = async () => {
+    if (await copyText(myId)) { setStatus("СКОПИРОВАНО", "#22c55e"); setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"), 900); }
+    else setStatus("КОПИРУЙ РУКАМИ", "#f59e0b");
+  };
+
+  // Ключи (как у тебя)
+  const keys = [
+    {i:'КИЕВ',v:'kyiv'},{i:'РИМ',v:'rome'},
+    {i:'ПАРИЖ',v:'paris'},{i:'ТОКИО',v:'tokyo'},
+    {i:'БЕРЛИН',v:'berlin'},{i:'ОСЛО',v:'oslo'},
+    {i:'СЕУЛ',v:'seoul'},{i:'ВЕНА',v:'vienna'},
+    {i:'БАКУ',v:'baku'},{i:'ДОХА',v:'doha'}
+  ];
+
+  let roomPass = "", peer = null, conn = null, localStream = null;
+
+  function enterApp(){
+    $("authWrap").style.display = "none";
+    $("app").style.display = "block";
+  }
+
+  function showHints(turnText, turnColor, peerText, peerColor){
+    $("turnHint").innerHTML = "<b>TURN:</b> " + turnText;
+    $("turnHint").style.color = turnColor || "#64748b";
+    $("peerHint").innerHTML = "<b>УЗЕЛ:</b> " + peerText;
+    $("peerHint").style.color = peerColor || "#64748b";
+  }
+
+  async function initPeer(){
+    if (!window.Peer){
+      showHints("не загружен (CDN блок?)", "#ef4444", "ошибка", "#ef4444");
+      setStatus("ОШИБКА", "#ef4444");
       return;
     }
-    setStatus("СБОЙ УЗЛА","#ef4444");
-    showHints("relay-only ⚠️","#f59e0b","ошибка ❌","#ef4444");
-    setTimeout(()=>hardRecreate("err"),1500);
-  });
-}
 
-/* render keys */
-$("pad").innerHTML="";
-keys.forEach(k=>{
-  const b=document.createElement("button");
-  b.className="btn"; b.textContent=k.i;
-  b.onclick=async()=>{
-    roomPass=k.v; localStorage.setItem("dnk_room",roomPass);
-    enterApp(); initPeer();
-  };
-  $("pad").appendChild(b);
-});
+    showHints("готов (relay-only)", "#22c55e", "подключение…", "#0ea5e9");
+    setStatus("УЗЕЛ…", "#0ea5e9");
 
-/* connect data-channel */
-$("connect").onclick=()=>{
-  const tid=(($("target").value||"").trim().toUpperCase());
-  if(!tid || tid.length!==4 || !peer) return;
-  setStatus("ПОИСК…","#0ea5e9");
-  localStorage.setItem("dnk_lastTarget",tid);
-  try{ if(conn) conn.close(); }catch(_){}
-  conn=peer.connect(roomPass+"-"+tid.toLowerCase());
-  bindConn();
-};
-const last=localStorage.getItem("dnk_lastTarget"); if(last) $("target").value=last;
+    try{ peer && peer.destroy && peer.destroy(); } catch(_){}
 
-/* start call */
-$("video").onclick=async()=>{
-  if(!conn || !conn.open) return;
-  try{
-    await ensureMedia();
-    const call=peer.call(conn.peer, localStream);
-    currentCall=call;
-    $("video").style.display="none"; $("hang").style.display="block";
-    // watchdog: если 12с нет remote stream — пересоздать peer (мобилки/VPN)
-    let got=false;
-    const t=setTimeout(()=>{ if(!got){ setStatus("RESTART…","#f59e0b"); hardRecreate("nostream"); } },12000);
-
-    call.on("stream",(s)=>{
-      got=true; clearTimeout(t);
-      $("remote-v").srcObject=s; $("remote-v").style.display="block";
-      $("wait").style.display="none"; setStatus("НА СВЯЗИ","#22c55e");
+    peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
+      config: {
+        iceServers: ICE_SERVERS,
+        iceTransportPolicy: "relay" // <<< главное для VPN
+      },
+      debug: 0
     });
-    call.on("close",()=>{ clearTimeout(t); currentCall=null; closeCallUI(); });
-    call.on("error",()=>{ clearTimeout(t); currentCall=null; closeCallUI(); });
-  }catch(e){
-    console.error(e); setStatus("ОШИБКА КАМЕРЫ","#f59e0b");
+
+    peer.on("open", () => {
+      setStatus("В СЕТИ", "#22c55e");
+      showHints("relay-only ✅", "#22c55e", "готов ✅", "#22c55e");
+    });
+
+    peer.on("error", (e) => {
+      console.error(e);
+      setStatus("СБОЙ УЗЛА", "#ef4444");
+      showHints("relay-only ⚠️", "#f59e0b", "ошибка ❌", "#ef4444");
+    });
+
+    peer.on("connection", (c) => { conn = c; bindConn(); });
+
+    peer.on("call", async (call) => {
+      try{
+        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+        $("local-v").srcObject = localStream;
+        $("local-v").style.display = "block";
+        call.answer(localStream);
+
+        call.on("stream", (s) => {
+          $("remote-v").srcObject = s;
+          $("remote-v").style.display = "block";
+          $("wait").style.display = "none";
+
+          $("setup").style.display = "none";
+          $("controls").style.display = "flex";
+          $("video").style.display = "none";
+          $("hang").style.display = "block";
+
+          setStatus("НА СВЯЗИ", "#22c55e");
+        });
+
+        call.on("close", closeCallUI);
+      } catch(_) {
+        setStatus("ДОСТУП?", "#f59e0b");
+      }
+    });
   }
-};
 
-/* buttons */
-$("hang").onclick=()=>hangUp();
-$("resetBtn").onclick=()=>{ hangUp(); hardRecreate("manual"); };
+  function bindConn(){
+    if (!conn) return;
+    conn.on("open", () => {
+      $("setup").style.display = "none";
+      $("controls").style.display = "flex";
+      setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
+    });
+    conn.on("close", () => {
+      setStatus("ОБРЫВ", "#ef4444");
+      $("setup").style.display = "block";
+      $("controls").style.display = "none";
+    });
+  }
 
-/* auto heal on resume/network */
-document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState==="visible" && roomPass) hardRecreate("resume");
-});
-window.addEventListener("online",()=>{ if(roomPass) hardRecreate("online"); });
+  function closeCallUI(){
+    try{ $("remote-v").srcObject = null; }catch(_){}
+    $("remote-v").style.display = "none";
+    $("local-v").style.display = "none";
+    $("wait").style.display = "flex";
 
-/* start hints */
-showHints("готов (metered)","#22c55e", roomPass?"готово":"ожидание", roomPass?"#22c55e":"#64748b");
+    setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
+    $("video").style.display = "block";
+    $("hang").style.display = "none";
+  }
+
+  // Рендер кнопок
+  $("pad").innerHTML = "";
+  keys.forEach(k => {
+    const b = document.createElement("button");
+    b.className = "btn";
+    b.textContent = k.i;
+    b.onclick = async () => { roomPass = k.v; enterApp(); await initPeer(); };
+    $("pad").appendChild(b);
+  });
+
+  // Connect
+  $("connect").onclick = () => {
+    const tid = ($("target").value || "").trim().toUpperCase();
+    if (!tid || !peer) return;
+    setStatus("ПОИСК…", "#0ea5e9");
+    localStorage.setItem("lastTarget", tid);
+    conn = peer.connect(roomPass + "-" + tid.toLowerCase());
+    bindConn();
+  };
+  const last = localStorage.getItem("lastTarget");
+  if (last) $("target").value = last;
+
+  // Start call
+  $("video").onclick = async () => {
+    if (!conn || !conn.open) return;
+    try{
+      localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+      $("local-v").srcObject = localStream;
+      $("local-v").style.display = "block";
+
+      const call = peer.call(conn.peer, localStream);
+      $("video").style.display = "none";
+      $("hang").style.display = "block";
+
+      call.on("stream", (s) => {
+        $("remote-v").srcObject = s;
+        $("remote-v").style.display = "block";
+        $("wait").style.display = "none";
+        setStatus("НА СВЯЗИ", "#22c55e");
+      });
+      call.on("close", closeCallUI);
+    } catch(e){
+      console.error(e);
+      setStatus("ОШИБКА КАМЕРЫ", "#f59e0b");
+    }
+  };
+
+  // Hang
+  $("hang").onclick = () => location.reload();
+
+  // Стартовые подсказки
+  showHints("готов (metered)", "#22c55e", "ожидание", "#64748b");
 })();
-</script></body></html>
+</script>
+</body>
+</html>
