@@ -431,7 +431,34 @@
     }
   };
 
-  $("hang").onclick = () => location.reload();
+    // === ФУНКЦИЯ ЯДЕРНОЙ ЗАЧИСТКИ ВСЕХ СЕАНСОВ ===
+  function killAll() {
+    setStatus("ОТКЛЮЧЕНИЕ...", "#f59e0b");
+    
+    // 1. Выдираем шнур из камеры и микрофона
+    if (localStream) {
+      localStream.getTracks().forEach(t => t.stop());
+      localStream = null;
+    }
+    
+    // 2. Глушим наш секретный пульс
+    if (typeof pingTimer !== 'undefined') clearInterval(pingTimer);
+    
+    // 3. Рвём прямое соединение с собеседником
+    if (conn) { conn.close(); conn = null; }
+    
+    // 4. Уничтожаем сам узел связи (чтобы сервер про нас забыл)
+    if (peer) { peer.destroy(); peer = null; }
+    
+    // 5. Даем полсекунды на остывание проводов и перезагружаем интерфейс
+    setTimeout(() => location.reload(), 500);
+  }
+
+  // Вешаем зачистку на зеленую кнопку (завершить вызов)
+  $("hang").onclick = killAll;
+
+  // И заодно повесим её на маленькую кнопку ↻ возле твоего ID (ручной сброс)
+  document.querySelector('.tiny').onclick = killAll;
 
   showHints("готов (metered)", "#22c55e", "ожидание", "#64748b");
 })();
