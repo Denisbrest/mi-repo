@@ -1,429 +1,230 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>DNK | Омега 3.0 VIP</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-
-  <script defer src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-
-  <style>
-    :root{
-      --p:#0ea5e9; --p2:#38bdf8; --bg1:#f0f9ff; --bg2:#e0f2fe;
-      --t:#0f172a; --m:#64748b; --glass: rgba(255,255,255,.86);
-      --st: rgba(226,232,240,.92);
-      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-    }
-    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html,body{ height:100%; margin:0; overflow:hidden; touch-action:none; }
-    body{
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg,var(--bg1),var(--bg2));
-      color:var(--t);
-    }
-
-    .bg{
-      position:fixed; inset:0; pointer-events:none; opacity:.45;
-      background-image: radial-gradient(rgba(148,163,184,.25) 1px, transparent 1px);
-      background-size: 18px 18px;
-      mask-image: radial-gradient(circle at 35% 20%, #000 0%, #000 45%, transparent 78%);
-    }
-
-    .status{
-      position:fixed; top:14px; left:14px; z-index:50;
-      display:flex; align-items:center; gap:10px;
-      padding:10px 14px; border-radius:16px;
-      background: var(--glass); border:1px solid var(--st);
-      box-shadow: 0 12px 35px -25px rgba(0,0,0,.25);
-      backdrop-filter: blur(14px);
-    }
-    .dot{ width:10px; height:10px; border-radius:999px; background:#94a3b8; transition:background .25s; }
-    .stxt{ font-size:10px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:var(--m); }
-
-    .wrap{ position:relative; z-index:10; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px; }
-    .card{
-      width:min(390px, 92vw); border-radius: 34px;
-      background: var(--glass); border:1px solid var(--st);
-      box-shadow: 0 18px 70px -35px rgba(2,132,199,.30);
-      backdrop-filter: blur(18px) saturate(170%);
-      padding: 28px; text-align:center;
-    }
-
-    .logoWrap{
-      width:110px; height:110px; margin:0 auto 10px; border-radius: 30px; padding:6px;
-      background: linear-gradient(135deg, #fff, rgba(56,189,248,.18));
-      border:1px solid rgba(255,255,255,.85);
-      box-shadow: 0 22px 65px -45px rgba(14,165,233,.65);
-    }
-    .logo{
-      width:100%; height:100%; border-radius: 24px;
-      display:flex; align-items:center; justify-content:center;
-      background: rgba(255,255,255,.92); border:1px solid rgba(56,189,248,.18);
-      font-weight:900; font-size:46px; letter-spacing:-2px;
-      background: linear-gradient(135deg, var(--p), var(--p2));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-
-    .cap{ font-size:10px; letter-spacing:.42em; text-transform:uppercase; font-weight:900; color:var(--m); }
-    .sub{ margin-top:8px; font-size:12px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.15em; }
-
-    .pad{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:20px; }
-    .btn{
-      height:50px; border-radius:16px; font-size:14px; font-weight:900; letter-spacing:.12em;
-      background:#fff; border:1px solid #e2e8f0; color:var(--p);
-      box-shadow: 0 10px 26px -22px rgba(0,0,0,.25);
-      transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
-    }
-    .btn:active{ transform: scale(.96); background: var(--p); color:#fff; border-color: var(--p); }
-
-    .row{
-      margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      font-size:11px; font-weight:900; letter-spacing:.28em; color:var(--m);
-    }
-    .chip{
-      padding:8px 16px; min-width:88px; border-radius:14px;
-      background: rgba(14,165,233,.10); color: var(--p);
-      font-weight:900; letter-spacing:.18em;
-      border:1px solid rgba(14,165,233,.18);
-    }
-    .copy{
-      width:46px; height:40px; border-radius:14px; background:#fff;
-      border:1px solid #e2e8f0; font-weight:900;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 10px 22px -18px rgba(0,0,0,.25);
-    }
-    .copy:active{ transform: scale(.96); }
-    .hint{
-      margin-top:12px; font-size:11px; font-weight:800;
-      color:#64748b; text-transform:uppercase; letter-spacing:.05em;
-      user-select:none;
-    }
-    .hint b{ color: var(--p); }
-
-    /* App */
-    #app{ display:none; position:fixed; inset:0; z-index:30; background:#000; }
-    #video-zone{ position:absolute; inset:0; overflow:hidden; }
-    #remote-v{ width:100%; height:100%; object-fit:cover; display:none; }
-    #local-v{
-      position:absolute; top:14px; right:14px; width:110px; height:150px; border-radius:18px;
-      border:2px solid rgba(255,255,255,.22);
-      box-shadow: 0 14px 35px rgba(0,0,0,.45);
-      transform: scaleX(-1);
-      display:none; object-fit:cover; z-index:40;
-      background:#111;
-    }
-    #wait{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
-      gap:16px; background: rgba(15,23,42,.95); color: var(--p); z-index:20;
-    }
-    .spin{
-      width:50px; height:50px; border-radius:999px;
-      border:4px solid rgba(148,163,184,.12); border-top-color: var(--p);
-      animation: rot 1s linear infinite;
-    }
-    @keyframes rot{ to{ transform: rotate(360deg); } }
-
-    #footer{ position:absolute; left:0; right:0; bottom:30px; display:flex; flex-direction:column; align-items:center; z-index:50; padding:0 20px; }
-    .panel{
-      background: rgba(255,255,255,.92);
-      border-radius: 24px;
-      box-shadow: 0 18px 50px -30px rgba(0,0,0,.45);
-      padding: 16px;
-      width:100%; max-width:400px;
-      backdrop-filter: blur(12px);
-      border:1px solid rgba(255,255,255,.6);
-    }
-    .row2{ display:flex; gap:10px; align-items:center; }
-    .in{
-      flex:1; height:50px; border-radius: 16px; border:1px solid #cbd5e1; background:#f8fafc;
-      text-align:center; font-weight:900; letter-spacing:.2em; text-transform:uppercase; outline:none;
-    }
-    .in:focus{ background:#fff; border-color:var(--p); }
-    .cta{
-      height:50px; padding:0 24px; border-radius: 16px; border:none; color:#fff;
-      font-weight:900; letter-spacing:.15em; background: linear-gradient(90deg, var(--p), var(--p2));
-      box-shadow: 0 14px 35px -25px rgba(14,165,233,.75);
-    }
-    .tiny{
-      width:50px; height:50px; border-radius:16px; border:1px solid #e2e8f0; background:#fff;
-      font-size:18px; font-weight:900; color:var(--m);
-    }
-
-    #controls{ display:none; justify-content:center; align-items:center; width:100%; margin-top:10px; gap:14px; }
-    .circle-btn{
-      width:76px; height:76px; border-radius:50%; border:none;
-      box-shadow: 0 18px 45px rgba(0,0,0,.35);
-      outline:none; cursor:pointer;
-      transition: transform .18s cubic-bezier(.175,.885,.32,1.275), filter .18s;
-      display:flex; align-items:center; justify-content:center;
-      font-size:26px; color:#fff;
-    }
-    .circle-btn:active{ transform: scale(.86); filter:brightness(1.05); }
-    .btn-blue{ background:#0ea5e9; border:3px solid rgba(255,255,255,.20); }
-    .btn-green{ background:#22c55e; border:3px solid rgba(255,255,255,.20); }
-  </style>
-</head>
-
-<body>
-  <div class="bg"></div>
-  <div class="status">
-    <div id="dot" class="dot"></div>
-    <div id="status" class="stxt">ОЖИДАНИЕ</div>
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DNK</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0f14;color:#e8eef6}
+.w{max-width:920px;margin:0 auto;padding:12px}
+.c{background:#121824;border:1px solid #1e2a3b;border-radius:14px;padding:12px}
+.r{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,button,label{border-radius:12px;border:1px solid #243246;background:#0e141f;color:#e8eef6;padding:10px 12px;font:inherit}
+input{flex:1;min-width:200px}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #243246;background:#0e141f}
+.dot{width:10px;height:10px;border-radius:50%;background:#555}.ok{background:#22c55e}.w1{background:#f59e0b}.bad{background:#ef4444}
+.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+video{width:100%;background:#000;border-radius:14px;border:1px solid #1e2a3b;aspect-ratio:16/9;object-fit:cover}
+small{opacity:.78}#log{margin-top:8px;white-space:pre-wrap;word-break:break-word;max-height:120px;overflow:auto}
+</style></head><body><div class="w"><div class="c">
+  <div class="r" style="justify-content:space-between">
+    <div class="badge"><span id="dot" class="dot w1"></span><b id="st">init…</b></div>
+    <small class="m">PeerJS 1.5.2 • relay-only</small>
   </div>
 
-  <div class="wrap" id="authWrap">
-    <div class="card">
-      <div class="logoWrap"><div class="logo">DNK</div></div>
-      <div class="cap">DNK | OMEGA 3.0</div>
-      <div class="sub">Секретный шлюз</div>
+  <div style="height:10px"></div>
 
-      <div class="pad" id="pad"></div>
+  <div class="r">
+    <button id="btnMedia">🎥 Камера</button>
+    <button id="btnNew" disabled>🆕 Новый сеанс</button>
+    <button id="btnIce" disabled>🧊 ICE</button>
 
-      <div class="row">ID: <span class="chip" id="frontId">----</span><button class="copy" id="copyBtn">⧉</button></div>
-      <div class="hint" id="turnHint"><b>TURN:</b> готово</div>
-      <div class="hint" id="peerHint"><b>УЗЕЛ:</b> ожидание</div>
-    </div>
+    <label style="display:flex;gap:8px;align-items:center;padding:10px 12px">
+      <input id="tcpOnly" type="checkbox" style="width:18px;height:18px;margin:0"> TCP-only (VPN)
+    </label>
+
+    <label style="display:flex;gap:8px;align-items:center;padding:10px 12px">
+      <input id="fresh" type="checkbox" checked style="width:18px;height:18px;margin:0"> Fresh session
+    </label>
   </div>
 
-  <div id="app">
-    <div id="video-zone">
-      <video id="remote-v" autoplay playsinline></video>
-      <video id="local-v" autoplay playsinline muted></video>
-      <div id="wait"><div class="spin"></div><div class="stxt" style="letter-spacing:.3em; color:#fff;">СИНХРОНИЗАЦИЯ...</div></div>
-    </div>
+  <div style="height:10px"></div>
 
-    <div id="footer">
-      <div class="panel" id="setup">
-        <div class="row2" style="justify-content:space-between; margin-bottom:12px;">
-          <div class="stxt" style="letter-spacing:.2em;">МОЙ ID: <b style="color:var(--p); font-size:12px;" id="myIdTxt">----</b></div>
-          <button class="tiny" onclick="location.reload()">↻</button>
-        </div>
-        <div class="row2">
-          <input class="in" id="target" placeholder="ID ЦЕЛИ" maxlength="4" />
-          <button class="cta" id="connect">СВЯЗЬ</button>
-        </div>
-      </div>
-
-      <div id="controls">
-        <button class="circle-btn btn-blue" id="video">📹</button>
-        <button class="circle-btn btn-green" id="hang" style="display:none;">⏹</button>
-      </div>
-    </div>
+  <div class="r">
+    <button id="btnCopy" disabled>📋 Copy ID</button>
+    <span class="m" id="myId">—</span>
   </div>
 
+  <div style="height:10px"></div>
+
+  <div class="r">
+    <input id="peerId" placeholder="ID собеседника">
+    <button id="btnCall" disabled>📞</button>
+    <button id="btnHang" disabled>⛔</button>
+  </div>
+
+  <div class="grid">
+    <div><small>Локально</small><video id="vLocal" playsinline muted></video></div>
+    <div><small>Удалённо</small><video id="vRemote" playsinline></video></div>
+  </div>
+
+  <div id="log" class="m"></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-  const setStatus = (t, c) => { $("status").textContent = t; $("dot").style.background = c || "#94a3b8"; };
+(()=>{const $=id=>document.getElementById(id);
+const log=(s)=>{const el=$("log"); el.textContent=(el.textContent+"\n"+s).slice(-2200); el.scrollTop=1e9;};
+const st=(msg,cls)=>{$("st").textContent=msg; $("dot").className="dot "+(cls||"w1"); log(msg);};
+const safePlay=v=>{const p=v.play(); if(p&&p.catch)p.catch(()=>{});};
 
-  // === ВАЖНО: TURN из Metered (как на твоём скрине) ===
-  const ICE_SERVERS = [
-    { urls: "stun:stun.relay.metered.ca:80" },
-    {
-      urls: [
-        "turn:standard.relay.metered.ca:80",
-        "turn:standard.relay.metered.ca:80?transport=tcp",
-        "turn:standard.relay.metered.ca:443",
-        "turns:standard.relay.metered.ca:443?transport=tcp"
-      ],
-      username: "0d0bf8d106dd90657dca0a1d",
-      credential: "2D4ts2w87TtkX1xU"
-    }
-  ];
+const TURN_USER="YOUR_USERNAME";   // <-- Metered username
+const TURN_PASS="YOUR_CREDENTIAL"; // <-- Metered credential
 
-  let myId = localStorage.getItem("myGalaxyId");
-  if (!myId) {
-    myId = Math.random().toString(36).slice(2,6).toUpperCase();
-    localStorage.setItem("myGalaxyId", myId);
-  }
-  $("frontId").textContent = myId;
-  $("myIdTxt").textContent = myId;
+const ICE_BASE=[
+ {urls:"stun:stun.relay.metered.ca:80"},
+ {urls:"turn:standard.relay.metered.ca:80",username:TURN_USER,credential:TURN_PASS},
+ {urls:"turn:standard.relay.metered.ca:443",username:TURN_USER,credential:TURN_PASS},
+ {urls:"turns:standard.relay.metered.ca:443?transport=tcp",username:TURN_USER,credential:TURN_PASS}
+];
+const ICE_TCP=[{urls:"turns:standard.relay.metered.ca:443?transport=tcp",username:TURN_USER,credential:TURN_PASS}];
 
-  async function copyText(text){
-    try { await navigator.clipboard.writeText(text); return true; }
-    catch {
-      try{
-        const ta = document.createElement("textarea");
-        ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
-        document.body.appendChild(ta); ta.select();
-        const ok = document.execCommand("copy");
-        document.body.removeChild(ta);
-        return ok;
-      } catch { return false; }
-    }
-  }
+let peer=null, localStream=null, call=null, streamT=null;
+const vL=$("vLocal"), vR=$("vRemote");
 
-  $("copyBtn").onclick = async () => {
-    if (await copyText(myId)) { setStatus("СКОПИРОВАНО", "#22c55e"); setTimeout(()=>setStatus("ОЖИДАНИЕ","#94a3b8"), 900); }
-    else setStatus("КОПИРУЙ РУКАМИ", "#f59e0b");
-  };
+function cfg(){return {iceTransportPolicy:"relay",iceServers: $("tcpOnly").checked?ICE_TCP:ICE_BASE};}
 
-  // Ключи (как у тебя)
-  const keys = [
-    {i:'КИЕВ',v:'kyiv'},{i:'РИМ',v:'rome'},
-    {i:'ПАРИЖ',v:'paris'},{i:'ТОКИО',v:'tokyo'},
-    {i:'БЕРЛИН',v:'berlin'},{i:'ОСЛО',v:'oslo'},
-    {i:'СЕУЛ',v:'seoul'},{i:'ВЕНА',v:'vienna'},
-    {i:'БАКУ',v:'baku'},{i:'ДОХА',v:'doha'}
-  ];
+async function media(){
+ if(localStream) return localStream;
+ st("Запрос камеры/микрофона…","w1");
+ localStream=await navigator.mediaDevices.getUserMedia({
+  audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+  video:{facingMode:"user",width:{ideal:640},height:{ideal:360},frameRate:{ideal:24,max:30}}
+ });
+ vL.srcObject=localStream; safePlay(vL);
+ st("Камера включена","ok");
+ return localStream;
+}
 
-  let roomPass = "", peer = null, conn = null, localStream = null;
+function clearCall(){
+ clearTimeout(streamT);
+ if(call){ try{call.close()}catch(e){} }
+ call=null; vR.srcObject=null;
+ $("btnHang").disabled=true; $("btnIce").disabled=true;
+}
 
-  function enterApp(){
-    $("authWrap").style.display = "none";
-    $("app").style.display = "block";
-  }
+function destroyPeer(){
+ clearCall();
+ if(peer){ try{peer.destroy()}catch(e){} }
+ peer=null;
+ $("myId").textContent="—";
+ $("btnCopy").disabled=true;
+ $("btnCall").disabled=true;
+ $("btnNew").disabled=true;
+}
 
-  function showHints(turnText, turnColor, peerText, peerColor){
-    $("turnHint").innerHTML = "<b>TURN:</b> " + turnText;
-    $("turnHint").style.color = turnColor || "#64748b";
-    $("peerHint").innerHTML = "<b>УЗЕЛ:</b> " + peerText;
-    $("peerHint").style.color = peerColor || "#64748b";
-  }
+function initPeer(){
+ if(peer) return;
+ if(!window.Peer){ st("PeerJS не загрузился (CDN)","bad"); return; }
+ st("Peer connecting…","w1");
+ peer=new Peer(undefined,{debug:1,config:cfg()});
 
-  async function initPeer(){
-    if (!window.Peer){
-      showHints("не загружен (CDN блок?)", "#ef4444", "ошибка", "#ef4444");
-      setStatus("ОШИБКА", "#ef4444");
-      return;
-    }
+ peer.on("open",id=>{
+  $("myId").textContent=id;
+  $("btnCopy").disabled=false;
+  $("btnNew").disabled=false;
+  $("btnCall").disabled=!($("peerId").value.trim()&&localStream);
+  st("Готов (ID получен)","ok");
+ });
 
-    showHints("готов (relay-only)", "#22c55e", "подключение…", "#0ea5e9");
-    setStatus("УЗЕЛ…", "#0ea5e9");
+ peer.on("call", async c=>{
+  await media();
+  clearCall();
+  call=c; bindCall(call);
+  st("Входящий…","w1");
+  call.answer(localStream);
+  $("btnHang").disabled=false; $("btnIce").disabled=false;
+ });
 
-    try{ peer && peer.destroy && peer.destroy(); } catch(_){}
+ // Важно: если сигналка упала — не оставляем “мертвого” peer
+ peer.on("disconnected",()=>{ st("Peer disconnected → новый сеанс","bad"); if($("fresh").checked) newSession(); else try{peer.reconnect()}catch(e){} });
+ peer.on("close",()=>st("Peer closed","bad"));
+ peer.on("error",e=>st("Peer error: "+(e&&e.type?e.type:e),"bad"));
+}
 
-    peer = new Peer(roomPass + "-" + myId.toLowerCase(), {
-      config: {
-        iceServers: ICE_SERVERS,
-        iceTransportPolicy: "relay" // <<< главное для VPN
-      },
-      debug: 0
-    });
+function bindCall(c){
+ clearTimeout(streamT);
+ c.on("stream",s=>{
+  vR.srcObject=s; safePlay(vR);
+  st("Соединено (relay)","ok");
+ });
+ c.on("close",()=>end("Завершено"));
+ c.on("error",e=>end("Call error: "+(e&&e.type?e.type:e),true));
 
-    peer.on("open", () => {
-      setStatus("В СЕТИ", "#22c55e");
-      showHints("relay-only ✅", "#22c55e", "готов ✅", "#22c55e");
-    });
+ // Если нет remote stream — 1 попытка ICE restart
+ streamT=setTimeout(()=>{ if(call===c && !vR.srcObject){ st("Нет видео → ICE restart","w1"); iceRestart(); } },12000);
+}
 
-    peer.on("error", (e) => {
-      console.error(e);
-      setStatus("СБОЙ УЗЛА", "#ef4444");
-      showHints("relay-only ⚠️", "#f59e0b", "ошибка ❌", "#ef4444");
-    });
+function end(msg,bad){
+ clearCall();
+ st(msg,bad?"bad":"w1");
+}
 
-    peer.on("connection", (c) => { conn = c; bindConn(); });
+function iceRestart(){
+ if(!call){ st("Нет активного звонка","w1"); return; }
+ try{
+  const pc=call.peerConnection;
+  if(pc && pc.restartIce){ pc.restartIce(); st("ICE restart отправлен","w1"); }
+  else st("ICE restart недоступен","w1");
+ }catch(e){ st("ICE restart ошибка","bad"); }
+}
 
-    peer.on("call", async (call) => {
-      try{
-        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-        $("local-v").srcObject = localStream;
-        $("local-v").style.display = "block";
-        call.answer(localStream);
+function newSession(){
+ if(!localStream){ st("Сначала включи камеру","w1"); return; }
+ st("Новый сеанс…","w1");
+ destroyPeer();
+ initPeer();
+}
 
-        call.on("stream", (s) => {
-          $("remote-v").srcObject = s;
-          $("remote-v").style.display = "block";
-          $("wait").style.display = "none";
+$("btnMedia").onclick=async()=>{
+ try{ await media(); newSession(); }
+ catch(e){ st("Media error: "+(e&&e.name?e.name:"unknown"),"bad"); }
+};
 
-          $("setup").style.display = "none";
-          $("controls").style.display = "flex";
-          $("video").style.display = "none";
-          $("hang").style.display = "block";
+$("btnNew").onclick=newSession;
+$("btnIce").onclick=iceRestart;
 
-          setStatus("НА СВЯЗИ", "#22c55e");
-        });
+$("btnCopy").onclick=async()=>{
+ const id=$("myId").textContent.trim(); if(!id||id==="—") return;
+ try{ await navigator.clipboard.writeText(id); st("ID скопирован","ok"); }
+ catch(e){ st("Clipboard blocked","w1"); }
+};
 
-        call.on("close", closeCallUI);
-      } catch(_) {
-        setStatus("ДОСТУП?", "#f59e0b");
-      }
-    });
-  }
+$("peerId").oninput=()=>{ $("btnCall").disabled=!($("peerId").value.trim()&&peer&&localStream); };
 
-  function bindConn(){
-    if (!conn) return;
-    conn.on("open", () => {
-      $("setup").style.display = "none";
-      $("controls").style.display = "flex";
-      setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
-    });
-    conn.on("close", () => {
-      setStatus("ОБРЫВ", "#ef4444");
-      $("setup").style.display = "block";
-      $("controls").style.display = "none";
-    });
-  }
+$("btnCall").onclick=async()=>{
+ const t=$("peerId").value.trim(); if(!t) return;
+ await media(); initPeer();
+ if(!peer||peer.disconnected){ st("Peer не готов","bad"); return; }
+ clearCall();
+ st("Звоним…","w1");
+ call=peer.call(t,localStream);
+ if(!call){ st("Call не создан","bad"); return; }
+ bindCall(call);
+ $("btnHang").disabled=false; $("btnIce").disabled=false;
+};
 
-  function closeCallUI(){
-    try{ $("remote-v").srcObject = null; }catch(_){}
-    $("remote-v").style.display = "none";
-    $("local-v").style.display = "none";
-    $("wait").style.display = "flex";
+$("btnHang").onclick=()=>end("Сброшено");
 
-    setStatus("КАНАЛ ОТКРЫТ", "#0ea5e9");
-    $("video").style.display = "block";
-    $("hang").style.display = "none";
-  }
+$("tcpOnly").onchange=()=>st("Режим ICE сменился → нажми 🆕 Новый сеанс","w1");
 
-  // Рендер кнопок
-  $("pad").innerHTML = "";
-  keys.forEach(k => {
-    const b = document.createElement("button");
-    b.className = "btn";
-    b.textContent = k.i;
-    b.onclick = async () => { roomPass = k.v; enterApp(); await initPeer(); };
-    $("pad").appendChild(b);
-  });
+// КЛЮЧ: при возврате в приложение делаем новый сеанс (если включён Fresh session)
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible"){
+  st("Возврат в приложение","w1");
+  if($("fresh").checked) newSession();
+  else if(peer && peer.disconnected) try{peer.reconnect()}catch(e){}
+ }
+});
 
-  // Connect
-  $("connect").onclick = () => {
-    const tid = ($("target").value || "").trim().toUpperCase();
-    if (!tid || !peer) return;
-    setStatus("ПОИСК…", "#0ea5e9");
-    localStorage.setItem("lastTarget", tid);
-    conn = peer.connect(roomPass + "-" + tid.toLowerCase());
-    bindConn();
-  };
-  const last = localStorage.getItem("lastTarget");
-  if (last) $("target").value = last;
+// Если сеть “прыгнула” — тоже новый сеанс (иначе peer висит полумёртвым)
+window.addEventListener("online",()=>{ st("Сеть online","w1"); if($("fresh").checked) newSession(); });
 
-  // Start call
-  $("video").onclick = async () => {
-    if (!conn || !conn.open) return;
-    try{
-      localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-      $("local-v").srcObject = localStream;
-      $("local-v").style.display = "block";
+window.addEventListener("beforeunload",()=>{
+ try{ if(localStream) localStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+ destroyPeer();
+});
 
-      const call = peer.call(conn.peer, localStream);
-      $("video").style.display = "none";
-      $("hang").style.display = "block";
-
-      call.on("stream", (s) => {
-        $("remote-v").srcObject = s;
-        $("remote-v").style.display = "block";
-        $("wait").style.display = "none";
-        setStatus("НА СВЯЗИ", "#22c55e");
-      });
-      call.on("close", closeCallUI);
-    } catch(e){
-      console.error(e);
-      setStatus("ОШИБКА КАМЕРЫ", "#f59e0b");
-    }
-  };
-
-  // Hang
-  $("hang").onclick = () => location.reload();
-
-  // Стартовые подсказки
-  showHints("готов (metered)", "#22c55e", "ожидание", "#64748b");
+st("Нажми «Камера». VPN → включай TCP-only. Выход/возврат → Fresh session создаст новый ID.","w1");
 })();
-</script>
-</body>
-</html>
+</script></body></html>
